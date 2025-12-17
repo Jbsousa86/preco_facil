@@ -40,6 +40,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use('/uploads', express.static('uploads'));
+app.use(express.json({ limit: '10mb' }));
 
 // Configuração do Multer para Uploads
 const storage = multer.diskStorage({
@@ -345,17 +346,25 @@ app.post('/api/merchant/products', upload.single('image'), async (req, res) => {
 
 // Endpoint: POST /api/merchant/logo (Upload de Logo)
 app.post('/api/merchant/logo', upload.single('logo'), async (req, res) => {
-    const { store_id } = req.body;
-    if (!store_id || !req.file) return res.status(400).json({ error: 'Dados incompletos' });
-    const logo_url = `/uploads/${req.file.filename}`;
     try {
+        const { store_id } = req.body;
+        
+        if (!req.file) {
+            return res.status(400).json({ error: 'Nenhuma imagem enviada' });
+        }
+
+        const logo_url = `/uploads/${req.file.filename}`;
+        
         const client = await pool.connect();
         await client.query('UPDATE stores SET logo_url = $1 WHERE id = $2', [logo_url, store_id]);
         client.release();
-        res.json({ success: true, logo_url });
+
+        // IMPORTANTE: O servidor precisa responder para o Vercel não dar erro
+        res.json({ success: true, logo_url: logo_url });
+        
     } catch (e) {
-        console.error(e);
-        res.status(500).json({ error: e.message });
+        console.error('Erro no upload:', e);
+        res.status(500).json({ error: 'Erro interno ao salvar imagem' });
     }
 });
 
