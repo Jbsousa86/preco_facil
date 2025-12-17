@@ -137,14 +137,24 @@
             sessionStorage.removeItem('admin_key');
         }
 
-        async function loginWithKey(key) {
-            const res = await fetch(`${API_URL}/api/admin/login`, {
-                method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ key })
-            });
-            if (!res.ok) throw new Error('Chave inválida');
-            const data = await res.json();
-            return data;
-        }
+       async function loginWithKey(key) {
+    const res = await fetch(`${API_URL}/api/admin/login`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-admin-key': key // Envia a chave aqui para o "porteiro" deixar passar
+        },
+        body: JSON.stringify({ key }) // Envia a chave aqui para o corpo da mensagem
+    });
+
+    if (!res.ok) throw new Error('Chave inválida');
+
+    // SALVA A CHAVE: Isso é fundamental para as estatísticas carregarem depois
+    sessionStorage.setItem('admin_key', key); 
+    
+    const data = await res.json();
+    return data;
+}
 
         // Simple UI prompt fallback to get key from user (used only if needed)
         async function promptForAdminKey() {
@@ -161,14 +171,17 @@
             }
         }
 
-       async function fetchAdmin(endpoint, options = {}) {
-    const key = sessionStorage.getItem('admin_key'); // Pega a chave salva no login
+      async function fetchAdmin(endpoint, options = {}) {
+    // Busca a chave que acabamos de salvar no sessionStorage
+    const key = sessionStorage.getItem('admin_key'); 
+
     options.headers = {
         ...options.headers,
-        'x-admin-key': key, // ESTA LINHA É OBRIGATÓRIA
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-admin-key': key // Garante que cada pedido de dados leve a chave junto
     };
-    return fetch(`https://preco-facil.onrender.com${endpoint}`, options);
+
+    return fetch(`${API_URL}${endpoint}`, options);
 }
 
         // Carregar Estatísticas
