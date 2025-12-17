@@ -85,44 +85,17 @@ const pool = new Pool(config);
 
 // Middleware de proteção administrativa
 const requireAdminSecret = (req, res, next) => {
-    // 1. Primeiro, verificar cookie 'admin_token' (HttpOnly cookie enviado pelo navegador)
-    try {
-        const cookieHeader = req.headers['cookie'];
-        if (cookieHeader) {
-            const match = cookieHeader.split(';').map(s => s.trim()).find(s => s.startsWith('admin_token='));
-            if (match) {
-                const token = match.split('=')[1];
-                try {
-                    const payload = verifyAdminToken(decodeURIComponent(token));
-                    req.admin = payload;
-                    return next();
-                } catch (e) {
-                    // token inválido via cookie, continuar
-                }
-            }
-        }
-    } catch (e) {
-        // ignore cookie parse errors
-    }
-
-    // 2. Verificar Authorization: Bearer <token> (compatibilidade)
-    const authHeader = req.headers['authorization'];
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.split(' ')[1];
-        try {
-            const payload = verifyAdminToken(token);
-            req.admin = payload;
-            return next();
-        } catch (e) {}
-    }
-
-    // 3. Se não houver token válido, aceitar a chave bruta em 'x-admin-key' (compatibilidade)
+    // Lê a chave que você envia do Vercel
     const clientKey = req.headers['x-admin-key'];
-    if (clientKey && process.env.ADMIN_SECRET_KEY && clientKey === process.env.ADMIN_SECRET_KEY) {
+    const serverKey = process.env.ADMIN_SECRET_KEY;
+
+    // Se a chave bater com a do Render, libera o acesso
+    if (clientKey && serverKey && clientKey === serverKey) {
         return next();
     }
 
-    // Senão, negar acesso
+    // Caso contrário, bloqueia e avisa no log o que aconteceu
+    console.error(`Acesso negado: Recebi '${clientKey}', mas a chave configurada no Render é diferente.`);
     res.status(403).json({ error: 'Acesso negado. Chave de administrador inválida.' });
 };
 
@@ -315,6 +288,7 @@ app.get('/api/merchant/products', async (req, res) => {
         const result = await client.query(
             `SELECT p.name, p.category, pr.price, pr.promo_price, pr.promo_expires_at, pr.image_url, s.name as store_name
              FROM prices pr
+             
              JOIN products p ON p.id = pr.product_id
              JOIN stores s ON s.id = pr.store_id
              WHERE pr.store_id = $1
@@ -485,19 +459,15 @@ app.post('/api/track_visit', async (req, res) => {
 app.use('/api/admin', requireAdminSecret);
 
 // Rota de login admin para trocar a chave secreta por um token curto
-app.post('/api/admin/login', async (req, res) => {
+app.post('/api/admin/login', (req, res) => {
     const { key } = req.body;
-    if (!key) return res.status(400).json({ error: 'Missing key' });
-    if (key !== process.env.ADMIN_SECRET_KEY) return res.status(403).json({ error: 'Chave inválida' });
-    const token = signAdminToken({ role: 'admin' });
-    // Set cookie HttpOnly so browser JS cannot read it
-    res.cookie('admin_token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: TOKEN_TTL_SECONDS * 1000
-    });
-    res.json({ success: true, expires_in: TOKEN_TTL_SECONDS });
+    const serverKey = process.env.ADMIN_SECRET_KEY;
+
+    if (!key || key !== serverKey) {
+        return res.status(403).json({ error: 'Chave inválida' });
+    }
+    
+    res.json({ success: true, message: 'Autenticado com sucesso' });
 });
 
 app.get('/api/admin/stats', async (req, res) => {
