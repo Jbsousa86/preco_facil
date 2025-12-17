@@ -45,6 +45,14 @@
     </header>
 
     <main class="admin-container">
+        <!-- Admin Login Bar -->
+        <div id="admin-login" style="margin-bottom:1rem; display:none;">
+            <form id="admin-login-form" class="form-inline" style="align-items:center;">
+                <input type="password" id="admin-key-input" placeholder="Chave de administrador" style="flex:1;" required>
+                <button type="submit" style="width:auto;">Entrar</button>
+                <button type="button" id="admin-logout" style="width:auto; background:#f44336; display:none; margin-left:8px;">Sair</button>
+            </form>
+        </div>
         <!-- Relatórios -->
         <section>
             <h2>Relatórios do Sistema</h2>
@@ -112,10 +120,85 @@
         // URL base da API do backend
         const API_URL = 'https://preco-facil.onrender.com';
 
+        // --- Admin auth helper (token-based) ---
+        function getStoredAdminToken() {
+            return sessionStorage.getItem('admin_token') || null;
+        }
+        function storeAdminToken(token, expiresIn) {
+            sessionStorage.setItem('admin_token', token);
+            if (expiresIn) {
+                const expAt = Date.now() + expiresIn * 1000;
+                sessionStorage.setItem('admin_token_exp', String(expAt));
+            }
+        }
+        function clearAdminAuth() {
+            sessionStorage.removeItem('admin_token');
+            sessionStorage.removeItem('admin_token_exp');
+            sessionStorage.removeItem('admin_key');
+        }
+
+        async function loginWithKey(key) {
+            const res = await fetch(`${API_URL}/api/admin/login`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ key })
+            });
+            if (!res.ok) throw new Error('Chave inválida');
+            const data = await res.json();
+            storeAdminToken(data.token, data.expires_in);
+            return data.token;
+        }
+
+        // Simple UI prompt fallback to get key from user (used only if needed)
+        async function promptForAdminKey() {
+            const key = window.prompt('Informe a chave de administrador (será enviada ao servidor para login):');
+            if (!key) return null;
+            try {
+                await loginWithKey(key);
+                return getStoredAdminToken();
+            } catch (e) {
+                alert('Chave inválida');
+                return null;
+            }
+        }
+
+        async function fetchAdmin(url, options = {}) {
+            options.headers = options.headers || {};
+            options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/json';
+
+            // Use token if available and not expired
+            let token = getStoredAdminToken();
+            const exp = sessionStorage.getItem('admin_token_exp');
+            if (!token || (exp && Date.now() > Number(exp))) {
+                // try to login with stored raw key if any
+                const storedKey = sessionStorage.getItem('admin_key');
+                if (storedKey) {
+                    try { token = await loginWithKey(storedKey); } catch (e) { clearAdminAuth(); }
+                }
+            }
+
+            if (!token) {
+                // prompt user to login (or implement proper form)
+                token = await promptForAdminKey();
+                if (!token) throw new Error('Não autenticado');
+            }
+
+            options.headers['Authorization'] = 'Bearer ' + token;
+
+            const res = await fetch(url, options);
+            if (res.status === 401 || res.status === 403) {
+                // token inválido/expirado, limpar e tentar novo login
+                clearAdminAuth();
+                token = await promptForAdminKey();
+                if (!token) throw new Error('Não autenticado');
+                options.headers['Authorization'] = 'Bearer ' + token;
+                return fetch(url, options);
+            }
+            return res;
+        }
+
         // Carregar Estatísticas
         async function loadStats() {
             try {
-                const res = await fetch(`${API_URL}/api/admin/stats`);
+                const res = await fetchAdmin(`${API_URL}/api/admin/stats`);
                 const data = await res.json();
                 document.getElementById('stat-stores').innerText = data.stores;
                 document.getElementById('stat-products').innerText = data.products;
@@ -129,7 +212,7 @@
             const tbody = document.getElementById('stores-table');
             tbody.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
             try {
-                const res = await fetch(`${API_URL}/api/admin/stores`);
+                const res = await fetchAdmin(`${API_URL}/api/admin/stores`);
                 const stores = await res.json();
                 
                 tbody.innerHTML = stores.map(store => `
@@ -183,7 +266,7 @@
             const neighborhood = document.getElementById('new-neighborhood').value;
             const phone = document.getElementById('new-phone').value;
 
-            const res = await fetch(`${API_URL}/api/admin/stores`, {
+            const res = await fetchAdmin(`${API_URL}/api/admin/stores`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ name, password, street, number, neighborhood, phone })
@@ -222,7 +305,7 @@
             const neighborhood = document.getElementById(`input-neighborhood-${id}`).value;
             const phone = document.getElementById(`input-phone-${id}`).value;
 
-            const res = await fetch(`${API_URL}/api/admin/stores/${id}`, {
+            const res = await fetchAdmin(`${API_URL}/api/admin/stores/${id}`, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ name, password, street, number, neighborhood, phone })
@@ -240,7 +323,7 @@
             const newStatus = !currentStatus;
             if(!confirm(`Deseja realmente ${newStatus ? 'bloquear' : 'desbloquear'} esta loja?`)) return;
 
-            const res = await fetch(`${API_URL}/api/admin/stores/${id}/block`, {
+            const res = await fetchAdmin(`${API_URL}/api/admin/stores/${id}/block`, {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ is_blocked: newStatus })
@@ -254,7 +337,7 @@
         window.deleteStore = async (id) => {
             if(!confirm('Tem certeza? Isso apagará todos os preços desta loja.')) return;
             
-            const res = await fetch(`${API_URL}/api/admin/stores/${id}`, { method: 'DELETE' });
+            const res = await fetchAdmin(`${API_URL}/api/admin/stores/${id}`, { method: 'DELETE' });
             if(res.ok) {
                 loadStores();
                 loadStats();
@@ -265,8 +348,41 @@
 
         // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
-            loadStats();
-            loadStores();
+            // Mostrar form de login se não autenticado
+            const token = getStoredAdminToken();
+            const loginBar = document.getElementById('admin-login');
+            const logoutBtn = document.getElementById('admin-logout');
+            if (!token) {
+                loginBar.style.display = 'block';
+            } else {
+                loginBar.style.display = 'none';
+                logoutBtn.style.display = 'inline-block';
+                loadStats();
+                loadStores();
+            }
+
+            // Login form submit
+            document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const key = document.getElementById('admin-key-input').value.trim();
+                try {
+                    await loginWithKey(key);
+                    document.getElementById('admin-key-input').value = '';
+                    loginBar.style.display = 'none';
+                    logoutBtn.style.display = 'inline-block';
+                    loadStats();
+                    loadStores();
+                } catch (err) {
+                    alert('Falha no login: chave inválida');
+                }
+            });
+
+            // Logout
+            logoutBtn.addEventListener('click', () => {
+                clearAdminAuth();
+                loginBar.style.display = 'block';
+                logoutBtn.style.display = 'none';
+            });
 
             // Footer Global - JBSousaTech
             const footer = document.createElement('footer');

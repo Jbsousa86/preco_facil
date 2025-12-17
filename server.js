@@ -7,6 +7,7 @@ const { Pool } = require('pg');
 const fetch = require('node-fetch');
 const multer = require('multer');
 const fs = require('fs');
+const crypto = require('crypto');
 
 const app = express();
 
@@ -79,18 +80,52 @@ const pool = new Pool(config);
 
 // Middleware de proteção administrativa
 const requireAdminSecret = (req, res, next) => {
-    // 1. O cliente deve enviar a chave no cabeçalho 'x-admin-key'
-    const clientKey = req.headers['x-admin-key'];
-    
-    // 2. Compara a chave do cliente com a chave secreta do ambiente (Render)
-    if (clientKey === process.env.ADMIN_SECRET_KEY) {
-        // Se as chaves coincidirem, continua para o próximo handler (o endpoint)
-        next();
-    } else {
-        // Se não, retorna erro de acesso negado
-        res.status(403).json({ error: 'Acesso negado. Chave de administrador inválida.' });
+    // 1. Primeiro, verificar Authorization: Bearer <token>
+    const authHeader = req.headers['authorization'];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split(' ')[1];
+        try {
+            const payload = verifyAdminToken(token);
+            // token válido
+            req.admin = payload;
+            return next();
+        } catch (e) {
+            // token inválido, continuar para checar header de chave
+        }
     }
+
+    // 2. Se não houver token válido, aceitar a chave bruta em 'x-admin-key' (compatibilidade)
+    const clientKey = req.headers['x-admin-key'];
+    if (clientKey && process.env.ADMIN_SECRET_KEY && clientKey === process.env.ADMIN_SECRET_KEY) {
+        return next();
+    }
+
+    // Senão, negar acesso
+    res.status(403).json({ error: 'Acesso negado. Chave de administrador inválida.' });
 };
+
+// --- Simple HMAC token helpers (lightweight JWT-like) ---
+const TOKEN_TTL_SECONDS = 60 * 60; // 1 hora
+function signAdminToken(payload) {
+    const secret = process.env.ADMIN_JWT_SECRET || process.env.ADMIN_SECRET_KEY || 'dev-secret';
+    const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
+    const body = Object.assign({}, payload, { iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + TOKEN_TTL_SECONDS });
+    const payloadB = Buffer.from(JSON.stringify(body)).toString('base64url');
+    const signature = crypto.createHmac('sha256', secret).update(`${header}.${payloadB}`).digest('base64url');
+    return `${header}.${payloadB}.${signature}`;
+}
+
+function verifyAdminToken(token) {
+    const secret = process.env.ADMIN_JWT_SECRET || process.env.ADMIN_SECRET_KEY || 'dev-secret';
+    const parts = token.split('.');
+    if (parts.length !== 3) throw new Error('Token inválido');
+    const [headerB, payloadB, sig] = parts;
+    const expected = crypto.createHmac('sha256', secret).update(`${headerB}.${payloadB}`).digest('base64url');
+    if (!crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig))) throw new Error('Assinatura inválida');
+    const payload = JSON.parse(Buffer.from(payloadB, 'base64url').toString('utf8'));
+    if (payload.exp && Math.floor(Date.now() / 1000) > payload.exp) throw new Error('Token expirado');
+    return payload;
+}
 
 // FUNÇÃO PARA INICIALIZAR E GARANTIR A ESTRUTURA DO BANCO DE DADOS
 async function initializeDatabase() {
@@ -426,6 +461,15 @@ app.post('/api/track_visit', async (req, res) => {
 // GET /api/admin/stats - Relatórios simples
 // APLICA O MIDDLEWARE: Tudo que começar com /api/admin precisará da chave secreta
 app.use('/api/admin', requireAdminSecret);
+
+// Rota de login admin para trocar a chave secreta por um token curto
+app.post('/api/admin/login', async (req, res) => {
+    const { key } = req.body;
+    if (!key) return res.status(400).json({ error: 'Missing key' });
+    if (key !== process.env.ADMIN_SECRET_KEY) return res.status(403).json({ error: 'Chave inválida' });
+    const token = signAdminToken({ role: 'admin' });
+    res.json({ token, expires_in: TOKEN_TTL_SECONDS });
+});
 
 app.get('/api/admin/stats', async (req, res) => {
     try {
