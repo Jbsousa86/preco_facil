@@ -109,10 +109,13 @@
     <a href="https://wa.me/5511999999999" target="_blank" class="floating-support-btn" title="Falar com Suporte">🎧</a>
 
     <script>
+        // URL base da API do backend
+        const API_URL = 'https://preco-facil.onrender.com';
+
         // Carregar Estatísticas
         async function loadStats() {
             try {
-                const res = await fetch('/api/admin/stats');
+                const res = await fetch(`${API_URL}/api/admin/stats`);
                 const data = await res.json();
                 document.getElementById('stat-stores').innerText = data.stores;
                 document.getElementById('stat-products').innerText = data.products;
@@ -126,7 +129,7 @@
             const tbody = document.getElementById('stores-table');
             tbody.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
             try {
-                const res = await fetch('/api/admin/stores');
+                const res = await fetch(`${API_URL}/api/admin/stores`);
                 const stores = await res.json();
                 
                 tbody.innerHTML = stores.map(store => `
