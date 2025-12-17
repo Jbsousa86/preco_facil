@@ -153,7 +153,7 @@ async function loadTrendingOffers() {
                         ${fullImageUrl ? `<img src="${fullImageUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px;">` : ''}
                         <div class="store-info" style="overflow: hidden; flex: 1;">
                             <h3 style="color: #fff; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${offer.product_name}</h3>
-                            <div style="font-size: 0.8rem; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">🏪 ${offer.store_name}</div>
+                            <div style="font-size: 0.8rem; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"> ${offer.store_name}</div>
                             ${offer.phone ? `
                                 <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                                     <a href="https://wa.me/55${cleanPhone}?text=Ol%C3%A1%20vim%20pela%20plataforma%20mercado%20local." target="_blank" onclick="event.stopPropagation()" style="background: #25D366; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; text-decoration: none; font-weight: bold;">WhatsApp</a>
@@ -166,6 +166,7 @@ async function loadTrendingOffers() {
                         </div>
                     </div>
                     `;
+                    
                 }).join('');
                 startPromoTimers(); // Inicia os cronômetros
 
