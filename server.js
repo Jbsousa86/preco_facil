@@ -27,9 +27,14 @@ const corsOptions = {
         if (!origin || whitelist.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            callback(null, false);
         }
-    }
+    },
+    methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+    allowedHeaders: ['Content-Type','Authorization','x-admin-key'],
+    exposedHeaders: ['Content-Type','Authorization'],
+    credentials: true,
+    optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
@@ -80,21 +85,38 @@ const pool = new Pool(config);
 
 // Middleware de proteção administrativa
 const requireAdminSecret = (req, res, next) => {
-    // 1. Primeiro, verificar Authorization: Bearer <token>
+    // 1. Primeiro, verificar cookie 'admin_token' (HttpOnly cookie enviado pelo navegador)
+    try {
+        const cookieHeader = req.headers['cookie'];
+        if (cookieHeader) {
+            const match = cookieHeader.split(';').map(s => s.trim()).find(s => s.startsWith('admin_token='));
+            if (match) {
+                const token = match.split('=')[1];
+                try {
+                    const payload = verifyAdminToken(decodeURIComponent(token));
+                    req.admin = payload;
+                    return next();
+                } catch (e) {
+                    // token inválido via cookie, continuar
+                }
+            }
+        }
+    } catch (e) {
+        // ignore cookie parse errors
+    }
+
+    // 2. Verificar Authorization: Bearer <token> (compatibilidade)
     const authHeader = req.headers['authorization'];
     if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.split(' ')[1];
         try {
             const payload = verifyAdminToken(token);
-            // token válido
             req.admin = payload;
             return next();
-        } catch (e) {
-            // token inválido, continuar para checar header de chave
-        }
+        } catch (e) {}
     }
 
-    // 2. Se não houver token válido, aceitar a chave bruta em 'x-admin-key' (compatibilidade)
+    // 3. Se não houver token válido, aceitar a chave bruta em 'x-admin-key' (compatibilidade)
     const clientKey = req.headers['x-admin-key'];
     if (clientKey && process.env.ADMIN_SECRET_KEY && clientKey === process.env.ADMIN_SECRET_KEY) {
         return next();
@@ -468,7 +490,14 @@ app.post('/api/admin/login', async (req, res) => {
     if (!key) return res.status(400).json({ error: 'Missing key' });
     if (key !== process.env.ADMIN_SECRET_KEY) return res.status(403).json({ error: 'Chave inválida' });
     const token = signAdminToken({ role: 'admin' });
-    res.json({ token, expires_in: TOKEN_TTL_SECONDS });
+    // Set cookie HttpOnly so browser JS cannot read it
+    res.cookie('admin_token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: TOKEN_TTL_SECONDS * 1000
+    });
+    res.json({ success: true, expires_in: TOKEN_TTL_SECONDS });
 });
 
 app.get('/api/admin/stats', async (req, res) => {

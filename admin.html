@@ -139,12 +139,11 @@
 
         async function loginWithKey(key) {
             const res = await fetch(`${API_URL}/api/admin/login`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ key })
+                method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ key })
             });
             if (!res.ok) throw new Error('Chave inválida');
             const data = await res.json();
-            storeAdminToken(data.token, data.expires_in);
-            return data.token;
+            return data;
         }
 
         // Simple UI prompt fallback to get key from user (used only if needed)
@@ -153,7 +152,9 @@
             if (!key) return null;
             try {
                 await loginWithKey(key);
-                return getStoredAdminToken();
+                // store raw key briefly to allow retry if cookie not set; will be cleared on logout
+                sessionStorage.setItem('admin_key', key);
+                return true;
             } catch (e) {
                 alert('Chave inválida');
                 return null;
@@ -164,32 +165,15 @@
             options.headers = options.headers || {};
             options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/json';
 
-            // Use token if available and not expired
-            let token = getStoredAdminToken();
-            const exp = sessionStorage.getItem('admin_token_exp');
-            if (!token || (exp && Date.now() > Number(exp))) {
-                // try to login with stored raw key if any
-                const storedKey = sessionStorage.getItem('admin_key');
-                if (storedKey) {
-                    try { token = await loginWithKey(storedKey); } catch (e) { clearAdminAuth(); }
-                }
-            }
-
-            if (!token) {
-                // prompt user to login (or implement proper form)
-                token = await promptForAdminKey();
-                if (!token) throw new Error('Não autenticado');
-            }
-
-            options.headers['Authorization'] = 'Bearer ' + token;
-
+            // Use cookie-based auth: ensure credentials: 'include' so browser sends HttpOnly cookie
+            options.credentials = 'include';
             const res = await fetch(url, options);
             if (res.status === 401 || res.status === 403) {
-                // token inválido/expirado, limpar e tentar novo login
-                clearAdminAuth();
-                token = await promptForAdminKey();
-                if (!token) throw new Error('Não autenticado');
-                options.headers['Authorization'] = 'Bearer ' + token;
+                // try prompting for key/login
+                sessionStorage.removeItem('admin_key');
+                const ok = await promptForAdminKey();
+                if (!ok) throw new Error('Não autenticado');
+                options.credentials = 'include';
                 return fetch(url, options);
             }
             return res;
