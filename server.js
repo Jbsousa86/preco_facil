@@ -22,17 +22,9 @@ if (process.env.FRONTEND_URL) {
 }
 
 const corsOptions = {
-    origin: function (origin, callback) {
-        // Permitir requisições sem 'origin' (ex: Postman, apps mobile)
-        if (!origin || whitelist.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(null, false);
-        }
-    },
-    methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-    allowedHeaders: ['Content-Type','Authorization','x-admin-key'],
-    exposedHeaders: ['Content-Type','Authorization'],
+    origin: 'https://preco-facil-vc5w.vercel.app', // Domínio exato do seu frontend
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-key'],
     credentials: true,
     optionsSuccessStatus: 204
 };
@@ -41,7 +33,7 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use('/uploads', express.static('uploads'));
 app.use(express.json({ limit: '10mb' }));
-
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Configuração do Multer para Uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -348,26 +340,25 @@ app.post('/api/merchant/products', upload.single('image'), async (req, res) => {
 app.post('/api/merchant/logo', upload.single('logo'), async (req, res) => {
     try {
         const { store_id } = req.body;
-        
-        if (!req.file) {
-            return res.status(400).json({ error: 'Nenhuma imagem enviada' });
+        if (!req.file || !store_id) {
+            return res.status(400).json({ error: 'Dados incompletos ou arquivo ausente.' });
         }
 
         const logo_url = `/uploads/${req.file.filename}`;
-        
         const client = await pool.connect();
+        
         await client.query('UPDATE stores SET logo_url = $1 WHERE id = $2', [logo_url, store_id]);
         client.release();
 
-        // IMPORTANTE: O servidor precisa responder para o Vercel não dar erro
-        res.json({ success: true, logo_url: logo_url });
+        // Responda IMEDIATAMENTE após a query para liberar a conexão
+        return res.status(200).json({ success: true, logo_url: logo_url });
         
     } catch (e) {
         console.error('Erro no upload:', e);
-        res.status(500).json({ error: 'Erro interno ao salvar imagem' });
+        // Garante que o servidor envie uma resposta mesmo em caso de erro
+        return res.status(500).json({ error: 'Erro interno ao processar a imagem.' });
     }
 });
-
 // Endpoint: GET /api/search?product=...
 app.get('/api/search', async (req, res) => {
     const { product } = req.query;
