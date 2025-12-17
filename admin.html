@@ -172,25 +172,28 @@
         }
 
      async function fetchAdmin(endpoint, options = {}) {
-    // 1. Pega a chave que você salvou no login
     const key = sessionStorage.getItem('admin_key'); 
 
-    // 2. Prepara os cabeçalhos para o servidor aceitar
     options.headers = {
         ...options.headers,
         'Content-Type': 'application/json',
         'x-admin-key': key 
     };
 
-    // 3. Faz o pedido ao Render
-    const res = await fetch(`${API_URL}${endpoint}`, options);
+    // Remove a barra inicial do endpoint se ela existir para evitar // na URL
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
     
-    // Se o servidor negar, volta para a tela de login
+    // Monta a URL garantindo que o API_URL apareça apenas uma vez
+    const finalURL = `${API_URL}/${cleanEndpoint}`;
+
+    const res = await fetch(finalURL, options);
+
     if (res.status === 401 || res.status === 403) {
         sessionStorage.removeItem('admin_key');
-        location.reload(); 
+        alert('Sessão expirada. Por favor, faça login novamente.');
+        location.reload();
     }
-    
+
     return res;
 }
 
