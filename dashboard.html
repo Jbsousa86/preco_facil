@@ -283,23 +283,36 @@
             formData.append('logo', fileInput.files[0]);
 
             try {
-                const res = await fetch(`${API_BASE_URL}/api/merchant/logo`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    const fullLogoUrl = getFullUrl(data.logo_url);
-                    localStorage.setItem('store_logo', fullLogoUrl);
-                    document.getElementById('current-logo').innerHTML = `<img src="${fullLogoUrl}" style="height: 60px; border-radius: 50%;">`;
-                    alert('Logo atualizada!');
-                } else {
-                     alert(`Erro: ${data.error || 'Não foi possível enviar a logo.'}`);
-                }
-            } catch (err) { 
-                console.error(err); 
-                alert('Erro de conexão ao enviar a logo.');
-            }
+    const res = await fetch(`${API_BASE_URL}/api/merchant/logo`, {
+        method: 'POST',
+        body: formData
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+        // Garante que a URL da imagem comece com o endereço do Render
+        const fullLogoUrl = data.logo_url.startsWith('http') 
+            ? data.logo_url 
+            : `${API_BASE_URL}${data.logo_url}`;
+
+        // Salva para persistir na sessão do navegador
+        localStorage.setItem('store_logo', fullLogoUrl);
+        
+        // Atualiza a prévia na página
+        const logoImg = document.getElementById('current-logo');
+        if (logoImg) {
+            logoImg.innerHTML = `<img src="${fullLogoUrl}" style="height: 60px; width: 60px; object-fit: cover; border-radius: 50%;">`;
+        }
+        
+        alert('Logo atualizada com sucesso!');
+    } else {
+        alert(`Erro: ${data.error || 'Não foi possível enviar a logo.'}`);
+    }
+} catch (err) { 
+    console.error('Erro no upload:', err); 
+    alert('Erro de conexão ao enviar a logo. Verifique se o servidor está online.');
+}
         });
 
         // Upload Produto
