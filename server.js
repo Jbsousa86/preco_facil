@@ -340,24 +340,20 @@ app.post('/api/merchant/products', upload.single('image'), async (req, res) => {
 app.post('/api/merchant/logo', upload.single('logo'), async (req, res) => {
     try {
         const { store_id } = req.body;
-        
         if (!req.file || !store_id) {
-            return res.status(400).json({ error: 'Dados ou arquivo ausentes.' });
+            return res.status(400).json({ error: 'Dados ausentes' });
         }
 
         const logo_url = `/uploads/${req.file.filename}`;
-        
         const client = await pool.connect();
         await client.query('UPDATE stores SET logo_url = $1 WHERE id = $2', [logo_url, store_id]);
         client.release();
 
-        // Resposta de sucesso obrigatória
-        return res.status(200).json({ success: true, logo_url: logo_url });
-        
+        // Resposta imediata para evitar o timeout/502
+        return res.json({ success: true, logo_url });
     } catch (e) {
-        console.error('Erro fatal no upload:', e);
-        // Resposta de erro obrigatória para o Vercel não ficar esperando
-        return res.status(500).json({ error: 'Erro interno no servidor.' });
+        console.error(e);
+        return res.status(500).json({ error: 'Erro no servidor' });
     }
 });
 // Endpoint: GET /api/search?product=...

@@ -270,50 +270,80 @@
             }
         };
 
-        // Upload Logo
-        document.getElementById('logo-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const fileInput = document.getElementById('store-logo');
-            if(fileInput.files.length === 0) {
-                alert('Por favor, selecione um arquivo de imagem.');
-                return;
-            }
-            const formData = new FormData();
-            formData.append('store_id', storeId);
-            formData.append('logo', fileInput.files[0]);
+       // 1. Função auxiliar para reduzir o peso da imagem
+function compressImage(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 600; // Redimensiona para um tamanho leve
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
 
-            try {
-    const res = await fetch(`${API_BASE_URL}/api/merchant/logo`, {
-        method: 'POST',
-        body: formData
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                // Converte para Blob (JPEG com 70% de qualidade)
+                canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.7);
+            };
+        };
     });
-
-    const data = await res.json();
-
-    if (res.ok) {
-        // Garante que a URL da imagem comece com o endereço do Render
-        const fullLogoUrl = data.logo_url.startsWith('http') 
-            ? data.logo_url 
-            : `${API_BASE_URL}${data.logo_url}`;
-
-        // Salva para persistir na sessão do navegador
-        localStorage.setItem('store_logo', fullLogoUrl);
-        
-        // Atualiza a prévia na página
-        const logoImg = document.getElementById('current-logo');
-        if (logoImg) {
-            logoImg.innerHTML = `<img src="${fullLogoUrl}" style="height: 60px; width: 60px; object-fit: cover; border-radius: 50%;">`;
-        }
-        
-        alert('Logo atualizada com sucesso!');
-    } else {
-        alert(`Erro: ${data.error || 'Não foi possível enviar a logo.'}`);
-    }
-} catch (err) { 
-    console.error('Erro no upload:', err); 
-    alert('Erro de conexão ao enviar a logo. Verifique se o servidor está online.');
 }
+
+// 2. Evento de Upload Atualizado
+document.getElementById('logo-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fileInput = document.getElementById('store-logo');
+    
+    if (fileInput.files.length === 0) {
+        alert('Por favor, selecione um arquivo de imagem.');
+        return;
+    }
+
+    try {
+        const originalFile = fileInput.files[0];
+        
+        // Exibe um aviso visual de carregamento
+        const currentLogoDiv = document.getElementById('current-logo');
+        const originalContent = currentLogoDiv.innerHTML;
+        currentLogoDiv.innerHTML = "Processando...";
+
+        // COMPRESSÃO: Transforma a foto pesada em um arquivo leve
+        const compressedBlob = await compressImage(originalFile);
+
+        const formData = new FormData();
+        formData.append('store_id', storeId);
+        formData.append('logo', compressedBlob, 'logo.jpg');
+
+        const res = await fetch(`${API_BASE_URL}/api/merchant/logo`, {
+            method: 'POST',
+            body: formData
         });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            const fullLogoUrl = data.logo_url.startsWith('http') 
+                ? data.logo_url 
+                : `${API_BASE_URL}${data.logo_url}`;
+
+            localStorage.setItem('store_logo', fullLogoUrl);
+            currentLogoDiv.innerHTML = `<img src="${fullLogoUrl}" style="height: 60px; width: 60px; object-fit: cover; border-radius: 50%;">`;
+            alert('Logo atualizada com sucesso!');
+        } else {
+            currentLogoDiv.innerHTML = originalContent;
+            alert(`Erro: ${data.error || 'Não foi possível enviar a logo.'}`);
+        }
+    } catch (err) { 
+        console.error('Erro no upload:', err); 
+        alert('Erro de conexão. A imagem pode ser muito grande ou o servidor está reiniciando.');
+    }
+});
 
         // Upload Produto
         document.getElementById('add-product-form').addEventListener('submit', async (e) => {
