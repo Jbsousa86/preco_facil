@@ -11,8 +11,8 @@ const fs = require('fs');
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-const path = require('path');
-app.use(express.static(path.join(__dirname)));
+//const path = require('path');
+//app.use(express.static(path.join(__dirname)));
 
 // Configuração do Multer para Uploads
 const storage = multer.diskStorage({
@@ -55,6 +55,21 @@ if (connectionString) {
 }
 
 const pool = new Pool(config);
+
+// Middleware de proteção administrativa
+const requireAdminSecret = (req, res, next) => {
+    // 1. O cliente deve enviar a chave no cabeçalho 'x-admin-key'
+    const clientKey = req.headers['x-admin-key'];
+    
+    // 2. Compara a chave do cliente com a chave secreta do ambiente (Render)
+    if (clientKey === process.env.ADMIN_SECRET_KEY) {
+        // Se as chaves coincidirem, continua para o próximo handler (o endpoint)
+        next();
+    } else {
+        // Se não, retorna erro de acesso negado
+        res.status(403).json({ error: 'Acesso negado. Chave de administrador inválida.' });
+    }
+};
 
 // FUNÇÃO PARA INICIALIZAR E GARANTIR A ESTRUTURA DO BANCO DE DADOS
 async function initializeDatabase() {
@@ -388,6 +403,9 @@ app.post('/api/track_visit', async (req, res) => {
 // --- ADMIN ENDPOINTS ---
 
 // GET /api/admin/stats - Relatórios simples
+// APLICA O MIDDLEWARE: Tudo que começar com /api/admin precisará da chave secreta
+app.use('/api/admin', requireAdminSecret);
+
 app.get('/api/admin/stats', async (req, res) => {
     try {
         const client = await pool.connect();
