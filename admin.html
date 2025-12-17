@@ -198,65 +198,87 @@
 }
 
         // Carregar Estatísticas
-        async function loadStats() {
-            try {
-                const res = await fetchAdmin(`${API_URL}/api/admin/stats`);
-                const data = await res.json();
-                document.getElementById('stat-stores').innerText = data.stores;
-                document.getElementById('stat-products').innerText = data.products;
-                document.getElementById('stat-prices').innerText = data.prices;
-                document.getElementById('stat-visits').innerText = data.visits || 0;
-            } catch (e) { console.error(e); }
+        // --- Carregar Estatísticas do Sistema ---
+async function loadStats() {
+    try {
+        // Chamando via fetchAdmin para garantir o envio da chave x-admin-key
+        const res = await fetchAdmin('api/admin/stats');
+        
+        if (!res.ok) throw new Error('Falha ao carregar estatísticas');
+        
+        const data = await res.json();
+        
+        // Atualiza os números na tela
+        document.getElementById('stat-stores').innerText = data.stores || 0;
+        document.getElementById('stat-products').innerText = data.products || 0;
+        document.getElementById('stat-prices').innerText = data.prices || 0;
+        document.getElementById('stat-visits').innerText = data.visits || 0;
+        
+    } catch (e) {
+        console.error('Erro em loadStats:', e);
+    }
+}
+
+       // --- Carregar Lista de Comerciantes ---
+async function loadStores() {
+    const tbody = document.getElementById('stores-table');
+    tbody.innerHTML = '<tr><td colspan="7">Carregando comerciantes...</td></tr>';
+    
+    try {
+        const res = await fetchAdmin('api/admin/stores');
+        
+        if (!res.ok) throw new Error('Falha ao carregar lojas');
+        
+        const stores = await res.json();
+        
+        if (stores.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7">Nenhum comerciante cadastrado.</td></tr>';
+            return;
         }
 
-        // Carregar Lojas
-        async function loadStores() {
-            const tbody = document.getElementById('stores-table');
-            tbody.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
-            try {
-                const res = await fetchAdmin(`${API_URL}/api/admin/stores`);
-                const stores = await res.json();
-                
-                tbody.innerHTML = stores.map(store => `
-                    <tr>
-                        <td>${store.id}</td>
-                        <td>
-                            <span id="name-${store.id}">${store.name}</span>
-                            <input type="text" id="input-name-${store.id}" value="${store.name}" style="display:none; width: 100%;">
-                        </td>
-                        <td>
-                            <span id="addr-${store.id}">${store.street || ''}, ${store.number || ''} - ${store.neighborhood || ''}</span>
-                            <div id="input-addr-${store.id}" style="display:none;">
-                                <input type="text" id="input-street-${store.id}" value="${store.street || ''}" placeholder="Rua" style="width: 100%; margin-bottom: 2px;">
-                                <div style="display:flex; gap:2px;">
-                                    <input type="text" id="input-number-${store.id}" value="${store.number || ''}" placeholder="Nº" style="width: 50px;">
-                                    <input type="text" id="input-neighborhood-${store.id}" value="${store.neighborhood || ''}" placeholder="Bairro" style="flex:1;">
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <span id="phone-${store.id}">${store.phone || '-'}</span>
-                            <input type="text" id="input-phone-${store.id}" value="${store.phone || ''}" style="display:none; width: 100%;" placeholder="Telefone">
-                        </td>
-                        <td>
-                            <span id="pass-${store.id}">${store.password}</span>
-                            <input type="text" id="input-pass-${store.id}" value="${store.password}" style="display:none; width: 100%;">
-                        </td>
-                        <td>
-                            ${store.is_blocked ? '<span style="color:#ff5252">Bloqueado</span>' : '<span style="color:#4CAF50">Ativo</span>'}
-                        </td>
-                        <td>
-                            <button class="action-btn btn-edit" onclick="toggleEdit(${store.id})" id="btn-edit-${store.id}">Editar</button>
-                            <button class="action-btn btn-edit" onclick="saveEdit(${store.id})" id="btn-save-${store.id}" style="display:none; background:#4CAF50;">Salvar</button>
-                            <button class="action-btn ${store.is_blocked ? 'btn-unblock' : 'btn-block'}" onclick="toggleBlock(${store.id}, ${store.is_blocked || false})">
-                                ${store.is_blocked ? 'Desbloquear' : 'Bloquear'}
-                            </button>
-                            <button class="action-btn btn-delete" onclick="deleteStore(${store.id})">Excluir</button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (e) { console.error(e); }
-        }
+        tbody.innerHTML = stores.map(store => `
+            <tr>
+                <td>${store.id}</td>
+                <td>
+                    <span id="name-${store.id}">${store.name}</span>
+                    <input type="text" id="input-name-${store.id}" value="${store.name}" style="display:none; width: 100%;">
+                </td>
+                <td>
+                    <span id="addr-${store.id}">${store.street || ''}, ${store.number || ''} - ${store.neighborhood || ''}</span>
+                    <div id="input-addr-${store.id}" style="display:none;">
+                        <input type="text" id="input-street-${store.id}" value="${store.street || ''}" placeholder="Rua" style="width: 100%; margin-bottom: 2px;">
+                        <div style="display:flex; gap:2px;">
+                            <input type="text" id="input-number-${store.id}" value="${store.number || ''}" placeholder="Nº" style="width: 50px;">
+                            <input type="text" id="input-neighborhood-${store.id}" value="${store.neighborhood || ''}" placeholder="Bairro" style="flex:1;">
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span id="phone-${store.id}">${store.phone || '-'}</span>
+                    <input type="text" id="input-phone-${store.id}" value="${store.phone || ''}" style="display:none; width: 100%;">
+                </td>
+                <td>
+                    <span id="pass-${store.id}">${store.password}</span>
+                    <input type="text" id="input-pass-${store.id}" value="${store.password}" style="display:none; width: 100%;">
+                </td>
+                <td>
+                    ${store.is_blocked ? '<span style="color:#ff5252">Bloqueado</span>' : '<span style="color:#4CAF50">Ativo</span>'}
+                </td>
+                <td>
+                    <button class="action-btn btn-edit" onclick="toggleEdit(${store.id})" id="btn-edit-${store.id}">Editar</button>
+                    <button class="action-btn btn-edit" onclick="saveEdit(${store.id})" id="btn-save-${store.id}" style="display:none; background:#4CAF50;">Salvar</button>
+                    <button class="action-btn ${store.is_blocked ? 'btn-unblock' : 'btn-block'}" onclick="toggleBlock(${store.id}, ${store.is_blocked})">
+                        ${store.is_blocked ? 'Desbloquear' : 'Bloquear'}
+                    </button>
+                    <button class="action-btn btn-delete" onclick="deleteStore(${store.id})">Excluir</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        console.error('Erro em loadStores:', e);
+        tbody.innerHTML = '<tr><td colspan="7" style="color:red">Erro ao carregar dados. Verifique a chave administrativa.</td></tr>';
+    }
+}
 
         // Adicionar Loja
         document.getElementById('add-store-form').addEventListener('submit', async (e) => {
