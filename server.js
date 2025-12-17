@@ -30,13 +30,31 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // PostgreSQL connection pool (adjust credentials as needed)
-const pool = new Pool({
+const connectionString = process.env.DATABASE_URL; // Tenta ler a string completa do Render
+
+let config;
+
+if (connectionString) {
+  // Se estiver em ambiente de produção (Render), use a URI completa
+  config = {
+    connectionString: connectionString,
+    // ESSENCIAL: O Render exige SSL para conexões
+    ssl: {
+      rejectUnauthorized: false 
+    }
+  };
+} else {
+  // Se não, use as variáveis separadas (para desenvolvimento local)
+  config = {
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
     database: process.env.DB_NAME,
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
-});
+  };
+}
+
+const pool = new Pool(config);
 
 // Garantir extensões para busca aprimorada
 pool.query('CREATE EXTENSION IF NOT EXISTS unaccent;')
