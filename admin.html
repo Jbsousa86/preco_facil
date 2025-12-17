@@ -171,17 +171,27 @@
             }
         }
 
-      async function fetchAdmin(endpoint, options = {}) {
-    // Busca a chave que acabamos de salvar no sessionStorage
+     async function fetchAdmin(endpoint, options = {}) {
+    // 1. Pega a chave que você salvou no login
     const key = sessionStorage.getItem('admin_key'); 
 
+    // 2. Prepara os cabeçalhos para o servidor aceitar
     options.headers = {
         ...options.headers,
         'Content-Type': 'application/json',
-        'x-admin-key': key // Garante que cada pedido de dados leve a chave junto
+        'x-admin-key': key 
     };
 
-    return fetch(`${API_URL}${endpoint}`, options);
+    // 3. Faz o pedido ao Render
+    const res = await fetch(`${API_URL}${endpoint}`, options);
+    
+    // Se o servidor negar, volta para a tela de login
+    if (res.status === 401 || res.status === 403) {
+        sessionStorage.removeItem('admin_key');
+        location.reload(); 
+    }
+    
+    return res;
 }
 
         // Carregar Estatísticas
