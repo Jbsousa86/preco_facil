@@ -183,7 +183,7 @@
             const neighborhood = document.getElementById('new-neighborhood').value;
             const phone = document.getElementById('new-phone').value;
 
-            const res = await fetch('/api/admin/stores', {
+            const res = await fetch(`${API_URL}/api/admin/stores`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ name, password, street, number, neighborhood, phone })
@@ -222,7 +222,7 @@
             const neighborhood = document.getElementById(`input-neighborhood-${id}`).value;
             const phone = document.getElementById(`input-phone-${id}`).value;
 
-            const res = await fetch(`/api/admin/stores/${id}`, {
+            const res = await fetch(`${API_URL}/api/admin/stores/${id}`, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ name, password, street, number, neighborhood, phone })
@@ -240,7 +240,7 @@
             const newStatus = !currentStatus;
             if(!confirm(`Deseja realmente ${newStatus ? 'bloquear' : 'desbloquear'} esta loja?`)) return;
 
-            const res = await fetch(`/api/admin/stores/${id}/block`, {
+            const res = await fetch(`${API_URL}/api/admin/stores/${id}/block`, {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ is_blocked: newStatus })
@@ -254,7 +254,7 @@
         window.deleteStore = async (id) => {
             if(!confirm('Tem certeza? Isso apagará todos os preços desta loja.')) return;
             
-            const res = await fetch(`/api/admin/stores/${id}`, { method: 'DELETE' });
+            const res = await fetch(`${API_URL}/api/admin/stores/${id}`, { method: 'DELETE' });
             if(res.ok) {
                 loadStores();
                 loadStats();
