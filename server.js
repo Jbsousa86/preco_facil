@@ -56,87 +56,100 @@ if (connectionString) {
 
 const pool = new Pool(config);
 
-// Garantir extensões para busca aprimorada
-pool.query('CREATE EXTENSION IF NOT EXISTS unaccent;')
-    .catch(e => console.error('Erro ao criar extensão unaccent:', e));
-pool.query('CREATE EXTENSION IF NOT EXISTS pg_trgm;')
-    .catch(e => console.error('Erro ao criar extensão pg_trgm:', e));
+// FUNÇÃO PARA INICIALIZAR E GARANTIR A ESTRUTURA DO BANCO DE DADOS
+async function initializeDatabase() {
+    try {
+        console.log("Iniciando a verificação e criação do esquema do banco de dados...");
 
-// Inicializar tabela de histórico automaticamente
-pool.query(`
-    CREATE TABLE IF NOT EXISTS search_history (
-        term TEXT PRIMARY KEY,
-        count INTEGER DEFAULT 1
-    );
-`).catch(e => console.error('Erro ao criar tabela search_history:', e));
+        // --- 1. GARANTIR EXTENSÕES ---
+        await pool.query('CREATE EXTENSION IF NOT EXISTS unaccent;').catch(e => console.error('Erro ao criar extensão unaccent:', e.message));
+        await pool.query('CREATE EXTENSION IF NOT EXISTS pg_trgm;').catch(e => console.error('Erro ao criar extensão pg_trgm:', e.message));
 
-// Tabela para estatísticas do site (ex: visitas)
-pool.query(`
-    CREATE TABLE IF NOT EXISTS site_stats (
-        stat_key VARCHAR(255) PRIMARY KEY,
-        stat_value BIGINT DEFAULT 0
-    );
-`).catch(e => console.error('Erro ao criar tabela site_stats:', e));
+        // --- 2. CRIAR TABELAS BASE (SEM DEPENDÊNCIA DE FK) ---
+        
+        // 2.1 STORES (Necessário para PRICES)
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS stores (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                logo_url TEXT,
+                rating NUMERIC(2, 1) DEFAULT 5.0,
+                is_blocked BOOLEAN DEFAULT FALSE
+            );
+        `).catch(e => console.error('Erro ao criar tabela stores:', e.message));
 
-// Tabela principal: Lojas/Estabelecimentos
-pool.query(`
-    CREATE TABLE IF NOT EXISTS stores (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) UNIQUE NOT NULL,
-        password VARCHAR(255) NOT NULL,
-        logo_url TEXT,
-        rating NUMERIC(2, 1) DEFAULT 5.0,
-        is_blocked BOOLEAN DEFAULT FALSE
-        -- Colunas de localização (lat, lon, street, number, neighborhood, phone) serão adicionadas pelo ALTER TABLE logo abaixo
-    );
-`).catch(e => console.error('Erro ao criar tabela stores:', e));
+        // 2.2 PRODUCTS (Necessário para PRICES)
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS products (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) UNIQUE NOT NULL
+            );
+        `).catch(e => console.error('Erro ao criar tabela products:', e.message));
 
-// Tabela de Produtos (itens genéricos, independentes da loja)
-pool.query(`
-    CREATE TABLE IF NOT EXISTS products (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) UNIQUE NOT NULL
-        -- Coluna category será adicionada pelo ALTER TABLE logo abaixo
-    );
-`).catch(e => console.error('Erro ao criar tabela products:', e));
+        // 2.3 OUTRAS TABELAS INDEPENDENTES
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS search_history (
+                term TEXT PRIMARY KEY,
+                count INTEGER DEFAULT 1
+            );
+        `).catch(e => console.error('Erro ao criar tabela search_history:', e.message));
 
-// Tabela de Preços (relaciona produtos a lojas)
-pool.query(`
-    CREATE TABLE IF NOT EXISTS prices (
-        store_id INTEGER REFERENCES stores(id) ON DELETE CASCADE,
-        product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
-        price NUMERIC NOT NULL,
-        image_url TEXT,
-        PRIMARY KEY (store_id, product_id)
-        -- Colunas de promoção (promo_price, promo_expires_at) serão adicionadas pelo ALTER TABLE logo abaixo
-    );
-`).catch(e => console.error('Erro ao criar tabela prices:', e));
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS site_stats (
+                stat_key VARCHAR(255) PRIMARY KEY,
+                stat_value BIGINT DEFAULT 0
+            );
+        `).catch(e => console.error('Erro ao criar tabela site_stats:', e.message));
+        
+        console.log("Tabelas base (stores, products, history, stats) criadas.");
 
-// --- FIM DO BLOCO DE CRIAÇÃO DE TABELAS BASE ---
+        // --- 3. CRIAR TABELAS COM DEPENDÊNCIA DE FK (prices) ---
+        // DEVE AGUARDAR STORES E PRODUCTS
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS prices (
+                store_id INTEGER REFERENCES stores(id) ON DELETE CASCADE,
+                product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+                price NUMERIC NOT NULL,
+                image_url TEXT,
+                PRIMARY KEY (store_id, product_id)
+            );
+        `);
+        console.log("Tabela prices criada.");
 
-// Garantir que as colunas de localização existam na tabela stores
-pool.query(`
-    ALTER TABLE stores ADD COLUMN IF NOT EXISTS lat FLOAT DEFAULT 0.0;
-    ALTER TABLE stores ADD COLUMN IF NOT EXISTS lon FLOAT DEFAULT 0.0;
-    ALTER TABLE stores ADD COLUMN IF NOT EXISTS street TEXT;
-    ALTER TABLE stores ADD COLUMN IF NOT EXISTS number TEXT;
-    ALTER TABLE stores ADD COLUMN IF NOT EXISTS neighborhood TEXT;
-    ALTER TABLE stores ADD COLUMN IF NOT EXISTS phone TEXT;
-`).catch(e => console.error('Erro ao atualizar tabela stores:', e));
+        // --- 4. EXECUTAR ALTER TABLES ---
+        // Agora que as tabelas existem, podemos adicionar colunas (como lat/lon e promoções)
 
-// Adicionar coluna de categoria na tabela de produtos
-pool.query(`
-    ALTER TABLE products ADD COLUMN IF NOT EXISTS category TEXT;
-`).catch(e => console.error('Erro ao atualizar tabela products:', e));
+        // Stores
+        await pool.query(`
+            ALTER TABLE stores ADD COLUMN IF NOT EXISTS lat FLOAT DEFAULT 0.0;
+            ALTER TABLE stores ADD COLUMN IF NOT EXISTS lon FLOAT DEFAULT 0.0;
+            ALTER TABLE stores ADD COLUMN IF NOT EXISTS street TEXT;
+            ALTER TABLE stores ADD COLUMN IF NOT EXISTS number TEXT;
+            ALTER TABLE stores ADD COLUMN IF NOT EXISTS neighborhood TEXT;
+            ALTER TABLE stores ADD COLUMN IF NOT EXISTS phone TEXT;
+        `);
+        // Products
+        await pool.query(`
+            ALTER TABLE products ADD COLUMN IF NOT EXISTS category TEXT;
+        `);
+        // Prices
+        await pool.query(`
+            ALTER TABLE prices ADD COLUMN IF NOT EXISTS promo_price NUMERIC;
+            ALTER TABLE prices ADD COLUMN IF NOT EXISTS promo_expires_at TIMESTAMP;
+        `);
+        
+        // Correção pontual, se necessário
+        await pool.query('ALTER TABLE stores ALTER COLUMN lng DROP NOT NULL').catch(() => {});
 
-// Adicionar colunas de promoção na tabela de preços
-pool.query(`
-    ALTER TABLE prices ADD COLUMN IF NOT EXISTS promo_price NUMERIC;
-    ALTER TABLE prices ADD COLUMN IF NOT EXISTS promo_expires_at TIMESTAMP;
-`).catch(e => console.error('Erro ao atualizar tabela prices:', e));
+        console.log("ALTER TABLEs executados com sucesso. O esquema está pronto.");
 
-// Correção para erro de coluna 'lng' (caso tenha sido criada manualmente como obrigatória)
-pool.query('ALTER TABLE stores ALTER COLUMN lng DROP NOT NULL').catch(() => {});
+    } catch (e) {
+        console.error('ERRO FATAL NA INICIALIZAÇÃO DO BANCO DE DADOS. Verifique as chaves estrangeiras e a sintaxe SQL.', e);
+        // Garante que o servidor não inicie sem o DB
+        process.exit(1);
+    }
+}
 
 // Endpoint: GET /api/store/:id
 app.get('/api/store/:id', async (req, res) => {
@@ -484,4 +497,10 @@ app.patch('/api/admin/stores/:id/block', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0',() => console.log(`Servidor rodando na porta ${PORT}`));
+// INICIA O SERVIDOR SOMENTE APÓS A ESTRUTURA DO DB SER GARANTIDA
+initializeDatabase().then(() => {
+    app.listen(PORT, '0.0.0.0',() => console.log(`Servidor rodando na porta ${PORT}`));
+}).catch(e => {
+    console.error("Falha ao iniciar o servidor após erro na inicialização do DB:", e);
+    process.exit(1);
+});
