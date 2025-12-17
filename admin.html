@@ -46,7 +46,7 @@
 
     <main class="admin-container">
         <!-- Admin Login Bar -->
-        <div id="admin-login" style="margin-bottom:1rem; display:none;">
+        <div id="admin-login" style="margin-bottom:1rem;">
             <form id="admin-login-form" class="form-inline" style="align-items:center;">
                 <input type="password" id="admin-key-input" placeholder="Chave de administrador" style="flex:1;" required>
                 <button type="submit" style="width:auto;">Entrar</button>
@@ -120,22 +120,9 @@
         // URL base da API do backend
         const API_URL = 'https://preco-facil.onrender.com';
 
-        // --- Admin auth helper (token-based) ---
-        function getStoredAdminToken() {
-            return sessionStorage.getItem('admin_token') || null;
-        }
-        function storeAdminToken(token, expiresIn) {
-            sessionStorage.setItem('admin_token', token);
-            if (expiresIn) {
-                const expAt = Date.now() + expiresIn * 1000;
-                sessionStorage.setItem('admin_token_exp', String(expAt));
-            }
-        }
         function clearAdminAuth() {
-            sessionStorage.removeItem('admin_token');
-            sessionStorage.removeItem('admin_token_exp');
-            sessionStorage.removeItem('admin_key');
-        }
+          sessionStorage.removeItem('admin_key');}
+
 
        async function loginWithKey(key) {
     const res = await fetch(`${API_URL}/api/admin/login`, {
@@ -373,51 +360,56 @@ async function loadStores() {
 
         // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
-            // Mostrar form de login se não autenticado
-            const token = getStoredAdminToken();
-            const loginBar = document.getElementById('admin-login');
-            const logoutBtn = document.getElementById('admin-logout');
-            if (!token) {
-                loginBar.style.display = 'block';
+             const loginBar = document.getElementById('admin-login');
+             const logoutBtn = document.getElementById('admin-logout');
+
+             const adminKey = sessionStorage.getItem('admin_key');
+
+             if (!adminKey) {
+                 // NÃO LOGADO → MOSTRA LOGIN
+                 loginBar.style.display = 'block';
+                 logoutBtn.style.display = 'none';
             } else {
-                loginBar.style.display = 'none';
-                logoutBtn.style.display = 'inline-block';
-                loadStats();
-                loadStores();
-            }
+                 // LOGADO → CARREGA DADOS
+                 loginBar.style.display = 'none';
+                 logoutBtn.style.display = 'inline-block';
+                 loadStats();
+                 loadStores();
+          }
 
-            // Login form submit
-            document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const key = document.getElementById('admin-key-input').value.trim();
-                try {
-                    await loginWithKey(key);
-                    document.getElementById('admin-key-input').value = '';
-                    loginBar.style.display = 'none';
-                    logoutBtn.style.display = 'inline-block';
-                    loadStats();
-                    loadStores();
-                } catch (err) {
-                    alert('Falha no login: chave inválida');
-                }
-            });
+                    // Login
+        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const key = document.getElementById('admin-key-input').value.trim();
 
-            // Logout
-            logoutBtn.addEventListener('click', () => {
-                clearAdminAuth();
-                loginBar.style.display = 'block';
-                logoutBtn.style.display = 'none';
-            });
+            try {
+                 await loginWithKey(key);
+                 document.getElementById('admin-key-input').value = '';
+                 loginBar.style.display = 'none';
+                 logoutBtn.style.display = 'inline-block';
+                 loadStats();
+                 loadStores();
+            } catch (err) {
+                alert('Falha no login: chave inválida');
+        }
+    });
 
-            // Footer Global - JBSousaTech
-            const footer = document.createElement('footer');
-            footer.innerHTML = `
-                <div style="text-align: center; padding: 20px; margin-top: 40px; border-top: 1px solid #333; color: #888; font-size: 0.9rem;">
-                    &copy; ${new Date().getFullYear()} JbsousaTech - Todos os direitos reservados
-                </div>
-            `;
-            document.body.appendChild(footer);
-        });
+    // Logout
+    logoutBtn.addEventListener('click', () => {
+        clearAdminAuth();
+        location.reload();
+    });
+
+    // Footer
+    const footer = document.createElement('footer');
+    footer.innerHTML = `
+        <div style="text-align: center; padding: 20px; margin-top: 40px; border-top: 1px solid #333; color: #888; font-size: 0.9rem;">
+            &copy; ${new Date().getFullYear()} JbsousaTech - Todos os direitos reservados
+        </div>
+    `;
+    document.body.appendChild(footer);
+});
+
     </script>
 </body>
 </html>
