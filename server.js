@@ -9,10 +9,30 @@ const multer = require('multer');
 const fs = require('fs');
 
 const app = express();
-app.use(cors());
+
+// Configuração de CORS
+const whitelist = [
+    'http://localhost:3000', 
+    'http://127.0.0.1:5500', // Para desenvolvimento local com Live Server
+];
+if (process.env.FRONTEND_URL) {
+    whitelist.push(process.env.FRONTEND_URL);
+}
+
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Permitir requisições sem 'origin' (ex: Postman, apps mobile)
+        if (!origin || whitelist.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
-//const path = require('path');
-//app.use(express.static(path.join(__dirname)));
+app.use('/uploads', express.static('uploads'));
 
 // Configuração do Multer para Uploads
 const storage = multer.diskStorage({

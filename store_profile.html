@@ -110,6 +110,10 @@
     <a href="https://wa.me/5563992225774" target="_blank" class="floating-support-btn" title="Falar com Suporte">🎧</a>
 
     <script>
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000' 
+            : 'https://preco-facil.onrender.com';
+
         const params = new URLSearchParams(window.location.search);
         const storeId = params.get('id');
 
@@ -117,11 +121,18 @@
             document.body.innerHTML = '<h2 style="text-align:center; margin-top:2rem; color:white;">Loja não encontrada.</h2>';
         } else {
             // Carregar Detalhes da Loja
-            fetch(`/api/store/${storeId}`)
-                .then(res => res.json())
+            fetch(`${API_BASE_URL}/api/store/${storeId}`)
+                .then(res => {
+                    if (!res.ok) throw new Error('Store not found');
+                    return res.json();
+                })
                 .then(store => {
+                    const fullLogoUrl = store.logo_url && !store.logo_url.startsWith('http')
+                        ? `${API_BASE_URL}${store.logo_url}`
+                        : store.logo_url;
+
                     document.getElementById('store-header').innerHTML = `
-                        ${store.logo_url ? `<img src="${store.logo_url}" class="store-logo-large">` : '<div style="font-size:3rem;">🏪</div>'}
+                        ${fullLogoUrl ? `<img src="${fullLogoUrl}" class="store-logo-large">` : '<div style="font-size:3rem;">🏪</div>'}
                         <h2 style="margin: 0.5rem 0;">${store.name}</h2>
                         ${store.street ? `<p style="color: #ccc;">📍 ${store.street}, ${store.number || ''} - ${store.neighborhood || ''}</p>` : ''}
                         ${store.phone ? `
@@ -131,11 +142,17 @@
                         ` : ''}
                     `;
                 })
-                .catch(err => console.error(err));
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('store-header').innerHTML = '<p style="color: #ff9800;">Erro ao carregar informações da loja. Verifique a URL ou tente mais tarde.</p>';
+                });
 
             // Carregar Produtos da Loja
-            fetch(`/api/merchant/products?store_id=${storeId}`)
-                .then(res => res.json())
+            fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}`)
+                .then(res => {
+                    if (!res.ok) throw new Error('Products not found');
+                    return res.json();
+                })
                 .then(products => {
                     const container = document.getElementById('products-container');
                     if (products.length === 0) {
@@ -144,9 +161,13 @@
                     }
                     container.innerHTML = products.map(p => {
                         const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
+                        const fullImageUrl = p.image_url && !p.image_url.startsWith('http')
+                            ? `${API_BASE_URL}${p.image_url}`
+                            : p.image_url;
+
                         return `
                             <div class="product-card">
-                                ${p.image_url ? `<img src="${p.image_url}" alt="${p.name}">` : ''}
+                                ${fullImageUrl ? `<img src="${fullImageUrl}" alt="${p.name}">` : ''}
                                 <h4 style="margin: 0 0 0.5rem 0;">${p.name}</h4>
                                 ${p.category ? `<span style="font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: #ccc; width: fit-content; margin-bottom: 5px;">${p.category}</span>` : ''}
                                 ${isPromo ? `<div class="old-price">R$ ${parseFloat(p.price).toFixed(2)}</div>` : ''}
@@ -156,7 +177,10 @@
                         `;
                     }).join('');
                 })
-                .catch(err => console.error(err));
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('products-container').innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ff9800;">Erro ao carregar os produtos.</p>';
+                });
         }
 
         // Footer Global - JBSousaTech

@@ -176,27 +176,41 @@
     <a href="https://wa.me/5563992225774" target="_blank" class="floating-support-btn" title="Falar com Suporte">🎧</a>
 
     <script>
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000' 
+            : 'https://preco-facil.onrender.com';
+
         // Auth Check
         const storeId = localStorage.getItem('store_id');
         const storeName = localStorage.getItem('store_name');
-        const storeLogo = localStorage.getItem('store_logo');
+        let storeLogo = localStorage.getItem('store_logo'); // Use let to allow update
         if (!storeId) window.location.href = 'login.html';
 
         document.getElementById('store-name').textContent = `Loja: ${storeName || 'Comerciante'}`;
         
+        function getFullUrl(path) {
+            if (!path || path === 'null' || path.startsWith('http')) {
+                return path;
+            }
+            return `${API_BASE_URL}${path}`;
+        }
+
         if (storeLogo && storeLogo !== 'null') {
-            document.getElementById('current-logo').innerHTML = `<img src="${storeLogo}" style="height: 60px; border-radius: 50%;">`;
+            document.getElementById('current-logo').innerHTML = `<img src="${getFullUrl(storeLogo)}" style="height: 60px; border-radius: 50%;">`;
         }
 
         // Buscar dados atualizados da loja (garante que a logo apareça)
-        fetch(`/api/store/${storeId}`)
+        fetch(`${API_BASE_URL}/api/store/${storeId}`)
             .then(res => res.json())
             .then(data => {
                 if (data.logo_url) {
-                    localStorage.setItem('store_logo', data.logo_url);
-                    document.getElementById('current-logo').innerHTML = `<img src="${data.logo_url}" style="height: 60px; border-radius: 50%;">`;
+                    const fullLogoUrl = getFullUrl(data.logo_url);
+                    localStorage.setItem('store_logo', fullLogoUrl);
+                    document.getElementById('current-logo').innerHTML = `<img src="${fullLogoUrl}" style="height: 60px; border-radius: 50%;">`;
                 }
-            }).catch(console.error);
+            }).catch(err => {
+                console.error("Failed to fetch store details:", err)
+            });
 
         function logout() {
             localStorage.clear();
@@ -206,12 +220,15 @@
         let currentProducts = [];
 
         async function loadProducts() {
+            const container = document.getElementById('products-list');
             try {
-                const res = await fetch(`/api/merchant/products?store_id=${storeId}`);
+                const res = await fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}`);
+                 if (!res.ok) {
+                    throw new Error(`Server responded with ${res.status}`);
+                }
                 const products = await res.json();
                 currentProducts = products;
 
-                const container = document.getElementById('products-list');
                 if (products.length === 0) {
                     container.innerHTML = '<div style="color: #888; grid-column: 1/-1; text-align: center;">Nenhum produto cadastrado ainda.</div>';
                     return;
@@ -219,7 +236,7 @@
 
                 container.innerHTML = products.map((p, index) => `
                     <div class="product-item">
-                        ${p.image_url ? `<img src="${p.image_url}" alt="${p.name}">` : ''}
+                        ${p.image_url ? `<img src="${getFullUrl(p.image_url)}" alt="${p.name}">` : ''}
                         <h4>${p.name}</h4>
                         ${p.category ? `<span style="font-size: 0.8rem; background: #e91e63; padding: 2px 6px; border-radius: 4px; color: white;">${p.category}</span>` : ''}
                         
@@ -236,7 +253,8 @@
                     </div>
                 `).join('');
             } catch (err) {
-                console.error(err);
+                console.error("Failed to load products:", err);
+                container.innerHTML = '<div style="color: #ff9800; grid-column: 1/-1; text-align: center;">Falha ao carregar produtos. Verifique sua conexão ou contate o suporte.</div>';
             }
         }
 
@@ -256,24 +274,32 @@
         document.getElementById('logo-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const fileInput = document.getElementById('store-logo');
+            if(fileInput.files.length === 0) {
+                alert('Por favor, selecione um arquivo de imagem.');
+                return;
+            }
             const formData = new FormData();
             formData.append('store_id', storeId);
             formData.append('logo', fileInput.files[0]);
 
             try {
-                const res = await fetch('/api/merchant/logo', {
+                const res = await fetch(`${API_BASE_URL}/api/merchant/logo`, {
                     method: 'POST',
                     body: formData
                 });
                 const data = await res.json();
                 if (res.ok) {
-                    localStorage.setItem('store_logo', data.logo_url);
-                    document.getElementById('current-logo').innerHTML = `<img src="${data.logo_url}" style="height: 60px; border-radius: 50%;">`;
+                    const fullLogoUrl = getFullUrl(data.logo_url);
+                    localStorage.setItem('store_logo', fullLogoUrl);
+                    document.getElementById('current-logo').innerHTML = `<img src="${fullLogoUrl}" style="height: 60px; border-radius: 50%;">`;
                     alert('Logo atualizada!');
                 } else {
-                    alert('Erro ao enviar logo');
+                     alert(`Erro: ${data.error || 'Não foi possível enviar a logo.'}`);
                 }
-            } catch (err) { console.error(err); }
+            } catch (err) { 
+                console.error(err); 
+                alert('Erro de conexão ao enviar a logo.');
+            }
         });
 
         // Upload Produto
@@ -300,21 +326,22 @@
                 if (promoPrice) formData.append('promo_price', promoPrice);
                 if (imageFile) formData.append('image', imageFile);
 
-                const res = await fetch('/api/merchant/products', {
+                const res = await fetch(`${API_BASE_URL}/api/merchant/products`, {
                     method: 'POST',
                     body: formData
                 });
+                const data = await res.json();
 
                 if (res.ok) {
                     document.getElementById('add-product-form').reset();
                     loadProducts(); // Refresh list
                     alert('Preço atualizado com sucesso!');
                 } else {
-                    alert('Erro ao salvar produto');
+                    alert(`Erro: ${data.error || 'Não foi possível salvar o produto.'}`);
                 }
             } catch (err) {
                 console.error(err);
-                alert('Erro de conexão');
+                alert('Erro de conexão ao salvar o produto.');
             } finally {
                 btn.textContent = originalText;
                 btn.disabled = false;
