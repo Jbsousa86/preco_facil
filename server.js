@@ -84,21 +84,21 @@ if (connectionString) {
 const pool = new Pool(config);
 
 // Middleware de proteção administrativa
+// Substitua TODA a função requireAdminSecret por esta:
 const requireAdminSecret = (req, res, next) => {
-    // Lê a chave que você envia do Vercel
+    // Pegamos a chave que vem do seu site no Vercel
     const clientKey = req.headers['x-admin-key'];
     const serverKey = process.env.ADMIN_SECRET_KEY;
 
-    // Se a chave bater com a do Render, libera o acesso
+    // Comparação simples e direta
     if (clientKey && serverKey && clientKey === serverKey) {
         return next();
     }
 
-    // Caso contrário, bloqueia e avisa no log o que aconteceu
-    console.error(`Acesso negado: Recebi '${clientKey}', mas a chave configurada no Render é diferente.`);
-    res.status(403).json({ error: 'Acesso negado. Chave de administrador inválida.' });
+    // Se der erro, ele vai imprimir no log do Render exatamente o que recebeu
+    console.error(`Bloqueado: Recebi '${clientKey}', mas a chave no Render é '${serverKey}'`);
+    res.status(403).json({ error: 'Chave de administrador inválida.' });
 };
-
 // --- Simple HMAC token helpers (lightweight JWT-like) ---
 const TOKEN_TTL_SECONDS = 60 * 60; // 1 hora
 function signAdminToken(payload) {
@@ -467,6 +467,7 @@ app.post('/api/admin/login', (req, res) => {
         return res.status(403).json({ error: 'Chave inválida' });
     }
     
+    // Retorna apenas sucesso, o Frontend cuidará do resto
     res.json({ success: true, message: 'Autenticado com sucesso' });
 });
 

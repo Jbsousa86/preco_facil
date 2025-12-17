@@ -161,23 +161,15 @@
             }
         }
 
-        async function fetchAdmin(url, options = {}) {
-            options.headers = options.headers || {};
-            options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/json';
-
-            // Use cookie-based auth: ensure credentials: 'include' so browser sends HttpOnly cookie
-            options.credentials = 'include';
-            const res = await fetch(url, options);
-            if (res.status === 401 || res.status === 403) {
-                // try prompting for key/login
-                sessionStorage.removeItem('admin_key');
-                const ok = await promptForAdminKey();
-                if (!ok) throw new Error('Não autenticado');
-                options.credentials = 'include';
-                return fetch(url, options);
-            }
-            return res;
-        }
+       async function fetchAdmin(endpoint, options = {}) {
+    const key = sessionStorage.getItem('admin_key'); // Pega a chave salva no login
+    options.headers = {
+        ...options.headers,
+        'x-admin-key': key, // ESTA LINHA É OBRIGATÓRIA
+        'Content-Type': 'application/json'
+    };
+    return fetch(`https://preco-facil.onrender.com${endpoint}`, options);
+}
 
         // Carregar Estatísticas
         async function loadStats() {
