@@ -14,6 +14,7 @@ const app = express();
 const whitelist = [
     'http://localhost:3000', 
     'http://127.0.0.1:5500', // Para desenvolvimento local com Live Server
+    'https://preco-facil-vc5w.vercel.app', // Frontend em produção (Vercel)
 ];
 if (process.env.FRONTEND_URL) {
     whitelist.push(process.env.FRONTEND_URL);
