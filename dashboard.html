@@ -271,29 +271,70 @@
         };
 
        // 1. Função auxiliar para reduzir o peso da imagem
-function compressImage(file) {
+function compressLogo(file) {
     return new Promise((resolve) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
+
         reader.onload = (e) => {
             const img = new Image();
             img.src = e.target.result;
+
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 600; // Redimensiona para um tamanho leve
-                const scaleSize = MAX_WIDTH / img.width;
-                canvas.width = MAX_WIDTH;
-                canvas.height = img.height * scaleSize;
+
+                const MAX_SIZE = 500; // logos não precisam ser grandes
+                const scale = Math.min(MAX_SIZE / img.width, MAX_SIZE / img.height, 1);
+
+                canvas.width = img.width * scale;
+                canvas.height = img.height * scale;
 
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                
-                // Converte para Blob (JPEG com 70% de qualidade)
-                canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.7);
+
+                // PNG preserva texto e bordas
+                canvas.toBlob(
+                    (blob) => resolve(blob),
+                    'image/png',
+                    0.9
+                );
             };
         };
     });
 }
+
+function compressProductImage(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+
+                const MAX_WIDTH = 900;
+                const scale = Math.min(MAX_WIDTH / img.width, 1);
+
+                canvas.width = img.width * scale;
+                canvas.height = img.height * scale;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                // JPEG equilibrado
+                canvas.toBlob(
+                    (blob) => resolve(blob),
+                    'image/jpeg',
+                    0.85
+                );
+            };
+        };
+    });
+}
+
 
 // 2. Evento de Upload Atualizado
 document.getElementById('logo-form').addEventListener('submit', async (e) => {
@@ -314,7 +355,7 @@ document.getElementById('logo-form').addEventListener('submit', async (e) => {
         currentLogoDiv.innerHTML = "Processando...";
 
         // COMPRESSÃO: Transforma a foto pesada em um arquivo leve
-        const compressedBlob = await compressImage(originalFile);
+        const compressedBlob = await compressLogo(originalFile);
 
         const formData = new FormData();
         formData.append('store_id', storeId);
@@ -371,7 +412,7 @@ document.getElementById('add-product-form').addEventListener('submit', async (e)
 
         // ✅ COMPRESSÃO APLICADA AO PRODUTO
         if (imageFile) {
-            const compressedBlob = await compressImage(imageFile);
+            const compressedBlob = await compressProdutoImage(imageFile);
             formData.append('image', compressedBlob, 'produto.jpg');
         }
 
