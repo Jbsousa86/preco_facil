@@ -1,6 +1,8 @@
 // assets/app.js
 // Frontend logic for Price Comparison MVP
-
+const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : 'https://preco-facil.onrender.com';
 const form = document.getElementById('search-form');
 const resultsContainer = document.getElementById('results');
 let promoInterval; // Variável para controlar o intervalo do cronômetro
@@ -14,7 +16,7 @@ form.addEventListener('submit', async (e) => {
   resultsContainer.innerHTML = '<div class="loading">Buscando melhores preços...</div>';
 
   try {
-    const res = await fetch(`/api/search?product=${encodeURIComponent(product)}`);
+    const res = await fetch(`${API_BASE_URL}/api/search?product=${encodeURIComponent(product)}`);
     if (!res.ok) throw new Error('Erro na resposta do servidor');
     const data = await res.json();
 
@@ -39,10 +41,13 @@ function renderResults(stores) {
     const isPromo = store.promo_price && new Date(store.promo_expires_at) > new Date();
     const finalPrice = isPromo ? store.promo_price : store.price;
     const cleanPhone = store.phone ? store.phone.replace(/\D/g, '') : '';
+    const fullImageUrl = store.image_url && !store.image_url.startsWith('http')
+        ? `${API_BASE_URL}${store.image_url}`
+        : store.image_url;
 
     html += `
       <div class="result-card ${isBestPrice ? 'best-price' : ''}" onclick="window.open('store_profile.html?id=${store.store_id}', '_blank')" style="cursor: pointer;" title="Clique para ver todos os produtos desta loja">
-        ${store.image_url ? `<img src="${store.image_url}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px;">` : ''}
+        ${fullImageUrl ? `<img src="${fullImageUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px;">` : ''}
         <div class="store-info">
           <h3>${store.store_name}</h3>
           ${store.category ? `<span style="font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: #ccc; margin-right: 5px;">${store.category}</span>` : ''}
@@ -98,7 +103,7 @@ function startPromoTimers() {
 // Carregar termos mais buscados
 async function loadTrending() {
     try {
-        const res = await fetch('/api/search/trending');
+        const res = await fetch(`${API_BASE_URL}/api/search/trending`);
         if (res.ok) {
             const terms = await res.json();
             const container = document.getElementById('trending-container');
@@ -122,7 +127,7 @@ window.searchTrending = (term) => {
 // Carregar Ofertas em Destaque
 async function loadTrendingOffers() {
     try {
-        const res = await fetch('/api/offers/trending');
+        const res = await fetch(`${API_BASE_URL}/api/offers/trending`);
         if (res.ok) {
             const offers = await res.json();
             const container = document.getElementById('offers-container');
@@ -140,9 +145,12 @@ async function loadTrendingOffers() {
 
                 container.innerHTML = offers.map(offer => {
                     const cleanPhone = offer.phone ? offer.phone.replace(/\D/g, '') : '';
+                    const fullImageUrl = offer.image_url && !offer.image_url.startsWith('http')
+                        ? `${API_BASE_URL}${offer.image_url}`
+                        : offer.image_url;
                     return `
                     <div class="result-card" onclick="window.open('store_profile.html?id=${offer.store_id}', '_blank')" style="flex: 0 0 auto; width: 290px; cursor: pointer; border: 1px solid #ff9800; background: rgba(255, 152, 0, 0.05); margin-bottom: 0;">
-                        ${offer.image_url ? `<img src="${offer.image_url}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px;">` : ''}
+                        ${fullImageUrl ? `<img src="${fullImageUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px;">` : ''}
                         <div class="store-info" style="overflow: hidden; flex: 1;">
                             <h3 style="color: #fff; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${offer.product_name}</h3>
                             <div style="font-size: 0.8rem; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">🏪 ${offer.store_name}</div>
@@ -186,7 +194,7 @@ if ('serviceWorker' in navigator) {
 document.addEventListener('DOMContentLoaded', async () => {
     // Rastreia a visita
     try {
-        fetch('/api/track_visit', { method: 'POST' });
+        fetch(`${API_BASE_URL}/api/track_visit`, { method: 'POST' });
     } catch (e) {
         console.error('Erro ao rastrear visita:', e);
     }
@@ -197,15 +205,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (merchantBlock) {
         try {
-            const res = await fetch('/api/stores');
+            const res = await fetch(`${API_BASE_URL}/api/stores`);
             if (res.ok) {
                 const stores = await res.json();
                 if (stores.length > 0) {
                     const storesList = stores.map(store => {
+                        const fullLogoUrl = store.logo_url && !store.logo_url.startsWith('http')
+                            ? `${API_BASE_URL}${store.logo_url}`
+                            : store.logo_url;
+
                         if (store.is_blocked) {
                             return `
                             <div style="flex: 0 0 auto; width: 80px; display: flex; flex-direction: column; align-items: center; margin-right: 10px; opacity: 0.5; filter: grayscale(100%); cursor: not-allowed;" title="Loja Indisponível">
-                                ${store.logo_url ? `<img src="${store.logo_url}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #777; margin-bottom: 5px;">` : `<div style="width: 50px; height: 50px; border-radius: 50%; background: #555; display: flex; align-items: center; justify-content: center; border: 2px solid #777; margin-bottom: 5px;">🔒</div>`}
+                                ${fullLogoUrl ? `<img src="${fullLogoUrl}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #777; margin-bottom: 5px;">` : `<div style="width: 50px; height: 50px; border-radius: 50%; background: #555; display: flex; align-items: center; justify-content: center; border: 2px solid #777; margin-bottom: 5px;">🔒</div>`}
                                 <span style="font-size: 0.8rem; color: #999; text-align: center; line-height: 1.2;">${store.name}</span>
                             </div>`;
                         }
@@ -216,7 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         
                         return `
                         <div onclick="window.location.href='store_profile.html?id=${store.id}'" style="flex: 0 0 auto; width: 80px; display: flex; flex-direction: column; align-items: center; cursor: pointer; margin-right: 10px;" title="Ver perfil da loja">
-                            ${store.logo_url ? `<img src="${store.logo_url}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; ${borderStyle} margin-bottom: 5px;">` : `<div style="width: 50px; height: 50px; border-radius: 50%; background: #555; display: flex; align-items: center; justify-content: center; ${borderStyle} margin-bottom: 5px;">🏪</div>`}
+                            ${fullLogoUrl ? `<img src="${fullLogoUrl}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; ${borderStyle} margin-bottom: 5px;">` : `<div style="width: 50px; height: 50px; border-radius: 50%; background: #555; display: flex; align-items: center; justify-content: center; ${borderStyle} margin-bottom: 5px;">🏪</div>`}
                             <span style="font-size: 0.8rem; color: #ddd; text-align: center; line-height: 1.2;">${store.name}</span>
                             ${store.has_promo ? '<span style="font-size: 0.6rem; color: #FFD700; font-weight: bold;">OFERTAS</span>' : ''}
                         </div>
