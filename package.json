@@ -1,0 +1,25 @@
+{
+  "name": "mercado-na-rota",
+  "version": "1.0.0",
+  "description": "MVP backend for Mercado na Rota",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "multer": "^2.0.2",
+    "muter": "^0.7.0",
+    "node-fetch": "^2.6.9",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

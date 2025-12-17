@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Comerciante - Mercado Local</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ccc;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--accent-color, #e91e63);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+
+        .error {
+            color: #ff5252;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <img src="assets/logo.png" alt="Mercado Local" class="logo">
+            <h1>Área do Comerciante</h1>
+        </div>
+    </header>
+    <main>
+        <div class="login-container">
+            <h2>Acesse sua loja</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="store-id">ID da Loja</label>
+                    <input type="number" id="store-id" required placeholder="Ex.: 1">
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" required placeholder="Senha">
+                </div>
+                <button type="submit">Entrar</button>
+                <div id="error-msg" class="error"></div>
+            </form>
+            <p style="text-align: center; margin-top: 1rem;"><a href="index.html" style="color: #ccc;">Voltar para
+                    busca</a></p>
+        </div>
+    </main>
+
+    <!-- Botão Flutuante de Suporte -->
+    <a href="https://wa.me/5563992225774" target="_blank" class="floating-support-btn" title="Falar com Suporte">🎧</a>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('store-id').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, password })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('store_id', data.id);
+                    localStorage.setItem('store_name', data.name);
+                    localStorage.setItem('store_logo', data.logo_url);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    const errEl = document.getElementById('error-msg');
+                    errEl.textContent = data.error || 'Erro ao entrar';
+                    errEl.style.display = 'block';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erro de conexão');
+            }
+        });
+
+        // Footer Global - JBSousaTech
+        const footer = document.createElement('footer');
+        footer.innerHTML = `
+            <div style="text-align: center; padding: 20px; margin-top: 40px; border-top: 1px solid #333; color: #888; font-size: 0.9rem;">
+                &copy; ${new Date().getFullYear()} JbsousaTech - Todos os direitos reservados
+            </div>
+        `;
+        document.body.appendChild(footer);
+    </script>
+</body>
+
+</html>

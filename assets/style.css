@@ -1,0 +1,260 @@
+/* assets/style.css */
+/* Premium dark‑mode theme with smooth gradients and subtle micro‑animations */
+
+:root {
+  --primary-h: 210;
+  /* cool blue hue */
+  --primary-s: 60%;
+  --primary-l: 55%;
+  --bg-h: 220;
+  --bg-s: 30%;
+  --bg-l: 12%;
+  --accent-h: 340;
+  /* vibrant pink for highlights */
+  --accent-s: 70%;
+  --accent-l: 65%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: hsl(var(--bg-h), var(--bg-s), var(--bg-l));
+  color: hsl(0, 0%, 90%);
+  line-height: 1.6;
+}
+
+header {
+  background: linear-gradient(135deg, hsl(var(--primary-h), var(--primary-s), var(--primary-l)), hsl(var(--accent-h), var(--accent-s), var(--accent-l)));
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.logo {
+  height: 48px;
+  width: auto;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+main {
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.search-section {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.8rem;
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  margin-bottom: 1.5rem;
+}
+
+.search-section label {
+  display: block;
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.search-section input {
+  width: 100%;
+  padding: 0.5rem 0.8rem;
+  margin-top: 0.3rem;
+  border: 1px solid hsl(var(--primary-h), var(--primary-s), 40%);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.search-section button {
+  margin-top: 1rem;
+  width: 100%;
+  padding: 0.7rem;
+  background: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.search-section button:hover {
+  transform: translateY(-2px);
+  background: hsl(var(--accent-h), var(--accent-s), calc(var(--accent-l) + 5%));
+}
+
+.merchant-section {
+    background: rgba(255, 255, 255, 0.08); /* Slightly different background */
+    padding: 1.5rem;
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+    margin-bottom: 1.5rem;
+    text-align: center; /* Center align the content */
+}
+
+.merchant-section h3 {
+    margin-top: 0;
+    color: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
+}
+
+.merchant-section p {
+    margin-bottom: 1.5rem;
+    color: hsl(0, 0%, 80%);
+}
+
+.button {
+    display: inline-block;
+    padding: 0.7rem 1.5rem;
+    background: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    background: hsl(var(--primary-h), var(--primary-s), calc(var(--primary-l) + 5%));
+}
+
+
+/* Result Cards */
+.results-section {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.result-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.2s;
+}
+
+.result-card:hover {
+  transform: translateX(5px);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.result-card.best-price {
+  border: 1px solid hsl(140, 60%, 50%);
+  background: linear-gradient(90deg, rgba(0, 255, 100, 0.05), transparent);
+}
+
+.store-info h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.rating {
+  font-size: 0.9rem;
+  color: #ffd700;
+}
+
+.price-info {
+  text-align: right;
+}
+
+.price {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.badge {
+  background: hsl(140, 70%, 40%);
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.empty-state,
+.loading,
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: #888;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  header h1 {
+    font-size: 1.5rem;
+  }
+
+  .results-section {
+    padding: 0 10px;
+  }
+
+  .search-section button {
+    min-height: 48px;
+  }
+}
+
+/* Trending Tags */
+.trending-tag {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #ddd;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.trending-tag:hover {
+    background: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
+    color: white;
+    border-color: transparent;
+    transform: translateY(-1px);
+}
+
+/* Botão Flutuante de Suporte */
+.floating-support-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #25D366; /* Cor do WhatsApp */
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    font-size: 1.5rem;
+    z-index: 1000;
+    transition: transform 0.2s;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+.floating-support-btn:hover {
+    transform: scale(1.1);
+    background-color: #128C7E;
+}

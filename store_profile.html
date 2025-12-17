@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil da Loja - Mercado Local</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <style>
+        .profile-header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .store-logo-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #e91e63;
+            margin-bottom: 1rem;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+        .product-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        .price-tag {
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: auto;
+        }
+        .promo-tag {
+            color: #ffeb3b;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: auto;
+        }
+        .old-price {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 0.8rem;
+        }
+        .floating-back-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #e91e63;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 1.5rem;
+            z-index: 1000;
+            transition: transform 0.2s;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .floating-back-btn:hover {
+            transform: scale(1.1);
+            background-color: #c2185b;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Mercado Local</h1>
+           <!--<a href="index.html" style="color: white; text-decoration: none; font-size: 0.9rem;">Voltar</a>--> 
+        </div>
+    </header>
+
+    <main>
+        <div id="store-header" class="profile-header">
+            <p>Carregando informações da loja...</p>
+        </div>
+
+        <h3 style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">Produtos Disponíveis</h3>
+        <div id="products-container" class="products-grid">
+            <p style="color: #888;">Carregando produtos...</p>
+        </div>
+    </main>
+
+    <!-- Botão Flutuante de Voltar -->
+    <a href="javascript:history.length > 1 ? history.back() : window.location.href='index.html'" class="floating-back-btn" title="Voltar">↩</a>
+
+    <!-- Botão Flutuante de Suporte -->
+    <a href="https://wa.me/5563992225774" target="_blank" class="floating-support-btn" title="Falar com Suporte">🎧</a>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const storeId = params.get('id');
+
+        if (!storeId) {
+            document.body.innerHTML = '<h2 style="text-align:center; margin-top:2rem; color:white;">Loja não encontrada.</h2>';
+        } else {
+            // Carregar Detalhes da Loja
+            fetch(`/api/store/${storeId}`)
+                .then(res => res.json())
+                .then(store => {
+                    document.getElementById('store-header').innerHTML = `
+                        ${store.logo_url ? `<img src="${store.logo_url}" class="store-logo-large">` : '<div style="font-size:3rem;">🏪</div>'}
+                        <h2 style="margin: 0.5rem 0;">${store.name}</h2>
+                        ${store.street ? `<p style="color: #ccc;">📍 ${store.street}, ${store.number || ''} - ${store.neighborhood || ''}</p>` : ''}
+                        ${store.phone ? `
+                            <p style="color: #ccc; margin-bottom: 10px;">📞 ${store.phone}</p>
+                            <a href="https://wa.me/55${store.phone.replace(/\D/g, '')}?text=Ol%C3%A1%20vim%20pela%20plataforma%20mercado%20local.
+                            " target="_blank" style="background: #25D366; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">Conversar no WhatsApp</a>
+                        ` : ''}
+                    `;
+                })
+                .catch(err => console.error(err));
+
+            // Carregar Produtos da Loja
+            fetch(`/api/merchant/products?store_id=${storeId}`)
+                .then(res => res.json())
+                .then(products => {
+                    const container = document.getElementById('products-container');
+                    if (products.length === 0) {
+                        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #888;">Nenhum produto cadastrado.</p>';
+                        return;
+                    }
+                    container.innerHTML = products.map(p => {
+                        const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
+                        return `
+                            <div class="product-card">
+                                ${p.image_url ? `<img src="${p.image_url}" alt="${p.name}">` : ''}
+                                <h4 style="margin: 0 0 0.5rem 0;">${p.name}</h4>
+                                ${p.category ? `<span style="font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: #ccc; width: fit-content; margin-bottom: 5px;">${p.category}</span>` : ''}
+                                ${isPromo ? `<div class="old-price">R$ ${parseFloat(p.price).toFixed(2)}</div>` : ''}
+                                <div class="${isPromo ? 'promo-tag' : 'price-tag'}">R$ ${parseFloat(isPromo ? p.promo_price : p.price).toFixed(2)}</div>
+                                ${isPromo ? '<div style="font-size: 0.7rem; color: #ff9800;">Oferta 24h</div>' : ''}
+                            </div>
+                        `;
+                    }).join('');
+                })
+                .catch(err => console.error(err));
+        }
+
+        // Footer Global - JBSousaTech
+        const footer = document.createElement('footer');
+        footer.innerHTML = `
+            <div style="text-align: center; padding: 20px; margin-top: 40px; border-top: 1px solid #333; color: #888; font-size: 0.9rem;">
+                &copy; ${new Date().getFullYear()} JbsousaTech - Todos os direitos reservados
+            </div>
+        `;
+        document.body.appendChild(footer);
+    </script>
+</body>
+</html>
