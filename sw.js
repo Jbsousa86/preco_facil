@@ -5,16 +5,19 @@ const FILES_TO_CACHE = [
     '/admin.html',
     '/assets/style.css',
     '/assets/app.js',
-    '/manifest.json',
-    '/assets/icon-192.png',
-    '/assets/icon-512.png',
-    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+    '/manifest.json'
 ];
 
 self.addEventListener('install', (evt) => {
     evt.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
+        caches.open(CACHE_NAME).then(async (cache) => {
+            // Tentar adicionar os arquivos locais; falhas em recursos externos não bloqueiam a instalação
+            try {
+                await cache.addAll(FILES_TO_CACHE);
+            } catch (err) {
+                console.warn('Alguns recursos não puderam ser cacheados na instalação:', err);
+            }
+        })
     );
     self.skipWaiting();
 });
