@@ -290,7 +290,7 @@ async function loadStores() {
             const neighborhood = document.getElementById('new-neighborhood').value;
             const phone = document.getElementById('new-phone').value;
 
-            const res = await fetchAdmin(`${API_URL}/api/admin/stores`, {
+            const res = await fetchAdmin('api/admin/stores', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ name, password, street, number, neighborhood, phone })
@@ -329,11 +329,11 @@ async function loadStores() {
             const neighborhood = document.getElementById(`input-neighborhood-${id}`).value;
             const phone = document.getElementById(`input-phone-${id}`).value;
 
-            const res = await fetchAdmin(`${API_URL}/api/admin/stores/${id}`, {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ name, password, street, number, neighborhood, phone })
-            });
+            const res = await fetchAdmin(`api/admin/stores/${id}`, {
+                  method: 'PUT',
+                  body: JSON.stringify({ name, password, street, number, neighborhood, phone })
+        });
+
 
             if(res.ok) {
                 loadStores();
@@ -347,11 +347,11 @@ async function loadStores() {
             const newStatus = !currentStatus;
             if(!confirm(`Deseja realmente ${newStatus ? 'bloquear' : 'desbloquear'} esta loja?`)) return;
 
-            const res = await fetchAdmin(`${API_URL}/api/admin/stores/${id}/block`, {
-                method: 'PATCH',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ is_blocked: newStatus })
+            const res = await fetchAdmin(`api/admin/stores/${id}/block`, {
+                  method: 'PATCH',
+                  body: JSON.stringify({ is_blocked: newStatus })
             });
+
             
             if(res.ok) loadStores();
             else alert('Erro ao alterar status');
@@ -361,7 +361,8 @@ async function loadStores() {
         window.deleteStore = async (id) => {
             if(!confirm('Tem certeza? Isso apagará todos os preços desta loja.')) return;
             
-            const res = await fetchAdmin(`${API_URL}/api/admin/stores/${id}`, { method: 'DELETE' });
+            const res = await fetchAdmin(`api/admin/stores/${id}`, { method: 'DELETE'});
+
             if(res.ok) {
                 loadStores();
                 loadStats();
