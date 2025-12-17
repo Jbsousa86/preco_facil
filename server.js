@@ -78,6 +78,42 @@ pool.query(`
     );
 `).catch(e => console.error('Erro ao criar tabela site_stats:', e));
 
+// Tabela principal: Lojas/Estabelecimentos
+pool.query(`
+    CREATE TABLE IF NOT EXISTS stores (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        logo_url TEXT,
+        rating NUMERIC(2, 1) DEFAULT 5.0,
+        is_blocked BOOLEAN DEFAULT FALSE
+        -- Colunas de localização (lat, lon, street, number, neighborhood, phone) serão adicionadas pelo ALTER TABLE logo abaixo
+    );
+`).catch(e => console.error('Erro ao criar tabela stores:', e));
+
+// Tabela de Produtos (itens genéricos, independentes da loja)
+pool.query(`
+    CREATE TABLE IF NOT EXISTS products (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) UNIQUE NOT NULL
+        -- Coluna category será adicionada pelo ALTER TABLE logo abaixo
+    );
+`).catch(e => console.error('Erro ao criar tabela products:', e));
+
+// Tabela de Preços (relaciona produtos a lojas)
+pool.query(`
+    CREATE TABLE IF NOT EXISTS prices (
+        store_id INTEGER REFERENCES stores(id) ON DELETE CASCADE,
+        product_id INTEGER REFERENCES products(id) ON DELETE CASCADE,
+        price NUMERIC NOT NULL,
+        image_url TEXT,
+        PRIMARY KEY (store_id, product_id)
+        -- Colunas de promoção (promo_price, promo_expires_at) serão adicionadas pelo ALTER TABLE logo abaixo
+    );
+`).catch(e => console.error('Erro ao criar tabela prices:', e));
+
+// --- FIM DO BLOCO DE CRIAÇÃO DE TABELAS BASE ---
+
 // Garantir que as colunas de localização existam na tabela stores
 pool.query(`
     ALTER TABLE stores ADD COLUMN IF NOT EXISTS lat FLOAT DEFAULT 0.0;
