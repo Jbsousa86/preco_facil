@@ -346,50 +346,59 @@ document.getElementById('logo-form').addEventListener('submit', async (e) => {
 });
 
         // Upload Produto
-        document.getElementById('add-product-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('prod-name').value;
-            const price = document.getElementById('prod-price').value;
-            const promoPrice = document.getElementById('prod-promo').value;
-            const category = document.getElementById('prod-category').value;
-            const imageFile = document.getElementById('prod-image').files[0];
-            
-            const btn = e.target.querySelector('button');
-            const originalText = btn.textContent;
+document.getElementById('add-product-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-            btn.textContent = 'Salvando...';
-            btn.disabled = true;
+    const name = document.getElementById('prod-name').value;
+    const price = document.getElementById('prod-price').value;
+    const promoPrice = document.getElementById('prod-promo').value;
+    const category = document.getElementById('prod-category').value;
+    const imageInput = document.getElementById('prod-image');
+    const imageFile = imageInput.files[0];
 
-            try {
-                const formData = new FormData();
-                formData.append('store_id', storeId);
-                formData.append('product_name', name);
-                formData.append('price', price);
-                formData.append('category', category);
-                if (promoPrice) formData.append('promo_price', promoPrice);
-                if (imageFile) formData.append('image', imageFile);
+    const btn = e.target.querySelector('button');
+    const originalText = btn.textContent;
+    btn.textContent = 'Salvando...';
+    btn.disabled = true;
 
-                const res = await fetch(`${API_BASE_URL}/api/merchant/products`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
+    try {
+        const formData = new FormData();
+        formData.append('store_id', storeId);
+        formData.append('product_name', name);
+        formData.append('price', price);
+        formData.append('category', category);
+        if (promoPrice) formData.append('promo_price', promoPrice);
 
-                if (res.ok) {
-                    document.getElementById('add-product-form').reset();
-                    loadProducts(); // Refresh list
-                    alert('Preço atualizado com sucesso!');
-                } else {
-                    alert(`Erro: ${data.error || 'Não foi possível salvar o produto.'}`);
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Erro de conexão ao salvar o produto.');
-            } finally {
-                btn.textContent = originalText;
-                btn.disabled = false;
-            }
+        // ✅ COMPRESSÃO APLICADA AO PRODUTO
+        if (imageFile) {
+            const compressedBlob = await compressImage(imageFile);
+            formData.append('image', compressedBlob, 'produto.jpg');
+        }
+
+        const res = await fetch(`${API_BASE_URL}/api/merchant/products`, {
+            method: 'POST',
+            body: formData
         });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            e.target.reset();
+            loadProducts();
+            alert('Produto salvo com sucesso!');
+        } else {
+            alert(`Erro: ${data.error || 'Falha ao salvar produto.'}`);
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert('Erro de conexão. O servidor pode estar reiniciando.');
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
+});
+
 
         // Initial load
         loadProducts();

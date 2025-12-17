@@ -47,7 +47,10 @@ const storage = multer.diskStorage({
         cb(null, file.fieldname + '-' + uniqueSuffix + ext);
     }
 });
-const upload = multer({ storage: storage });
+const upload = multer({
+  limits: { fileSize: 600 * 1024 } // 600KB
+});
+
 
 // PostgreSQL connection pool (adjust credentials as needed)
 const connectionString = process.env.DATABASE_URL; // Tenta ler a string completa do Render
