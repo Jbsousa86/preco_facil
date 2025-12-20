@@ -177,249 +177,164 @@
     <a href="https://wa.me/5563992225774" target="_blank" class="floating-support-btn" title="Falar com Suporte">🎧</a>
 
     <script>
-        const supabaseUrl = 'https://licvfuzvvbmjdvcooogo.supabase.co';
-        const supabaseKey = 'sb_publishable_8hwXxxU7C4owwVmlc4FvPg_0pEXUFK-';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey); 
-            
-            
+      // --- CONFIGURAÇÕES INICIAIS ---
+const API_BASE_URL = 'https://preco-facil.onrender.com';
+const supabaseUrl = 'https://licvfuzvvbmjdvcooogo.supabase.co';
+const supabaseKey = 'sb_publishable_8hwXxxU7C4owwVmlc4FvPg_0pEXUFK-'; // Verifique se esta chave está correta no painel
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Auth Check
-        const storeId = localStorage.getItem('store_id');
-        const storeName = localStorage.getItem('store_name');
-        let storeLogo = localStorage.getItem('store_logo'); // Use let to allow update
-        if (!storeId) window.location.href = 'login.html';
+const storeId = localStorage.getItem('store_id');
+const storeName = localStorage.getItem('store_name');
+let storeLogo = localStorage.getItem('store_logo');
 
-        document.getElementById('store-name').textContent = `Loja: ${storeName || 'Comerciante'}`;
-        
-        function getFullUrl(path) {
-            if (!path || path === 'null' || path.startsWith('http')) {
-                return path;
-            }
-            return `${API_BASE_URL}${path}`;
-        }
+if (!storeId) window.location.href = 'login.html';
 
-        if (storeLogo && storeLogo !== 'null') {
-            document.getElementById('current-logo').innerHTML = `<img src="${getFullUrl(storeLogo)}" style="height: 60px; border-radius: 50%;">`;
-        }
+document.getElementById('store-name').textContent = `Loja: ${storeName || 'Comerciante'}`;
 
-        // Buscar dados atualizados da loja (garante que a logo apareça)
-        fetch(`${API_BASE_URL}/api/store/${storeId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.logo_url) {
-                    const fullLogoUrl = getFullUrl(data.logo_url);
-                    localStorage.setItem('store_logo', fullLogoUrl);
-                    document.getElementById('current-logo').innerHTML = `<img src="${fullLogoUrl}" style="height: 60px; border-radius: 50%;">`;
-                }
-            }).catch(err => {
-                console.error("Failed to fetch store details:", err)
-            });
+// --- FUNÇÕES UTILITÁRIAS ---
+function getFullUrl(path) {
+    if (!path || path === 'null' || path.startsWith('http')) return path;
+    return `${API_BASE_URL}${path}`;
+}
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'index.html';
-        }
-
-        let currentProducts = [];
-
-        async function loadProducts() {
-            const container = document.getElementById('products-list');
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}`);
-                 if (!res.ok) {
-                    throw new Error(`Server responded with ${res.status}`);
-                }
-                const products = await res.json();
-                currentProducts = products;
-
-                if (products.length === 0) {
-                    container.innerHTML = '<div style="color: #888; grid-column: 1/-1; text-align: center;">Nenhum produto cadastrado ainda.</div>';
-                    return;
-                }
-
-                container.innerHTML = products.map((p, index) => `
-                    <div class="product-item">
-                        ${p.image_url ? `<img src="${getFullUrl(p.image_url)}" alt="${p.name}">` : ''}
-                        <h4>${p.name}</h4>
-                        ${p.category ? `<span style="font-size: 0.8rem; background: #e91e63; padding: 2px 6px; border-radius: 4px; color: white;">${p.category}</span>` : ''}
-                        
-                        ${(p.promo_price && new Date(p.promo_expires_at) > new Date()) 
-                            ? `
-                                <div style="margin-top:5px;">
-                                    <span style="text-decoration: line-through; color: #888; font-size: 0.9rem;">R$ ${parseFloat(p.price).toFixed(2)}</span>
-                                    <span class="price" style="color: #ffeb3b;">R$ ${parseFloat(p.promo_price).toFixed(2)}</span>
-                                    <div style="font-size: 0.7rem; color: #ffeb3b;">🕒 24h ativa</div>
-                                </div>`
-                            : `<span class="price">R$ ${parseFloat(p.price).toFixed(2)}</span>`
-                        }
-                        <button class="edit-btn" onclick="triggerEdit(${index})">Editar</button>
-                    </div>
-                `).join('');
-            } catch (err) {
-                console.error("Failed to load products:", err);
-                container.innerHTML = '<div style="color: #ff9800; grid-column: 1/-1; text-align: center;">Falha ao carregar produtos. Verifique sua conexão ou contate o suporte.</div>';
-            }
-        }
-
-        // Função para preencher o formulário com dados do produto selecionado
-        window.triggerEdit = (index) => {
-            const p = currentProducts[index];
-            if (p) {
-                document.getElementById('prod-name').value = p.name;
-                document.getElementById('prod-price').value = p.price;
-                document.getElementById('prod-promo').value = (p.promo_price && new Date(p.promo_expires_at) > new Date()) ? p.promo_price : '';
-                document.getElementById('prod-category').value = p.category || '';
-                document.getElementById('add-product-form').scrollIntoView({ behavior: 'smooth' });
-            }
-        };
-
-       // 1. Função auxiliar para reduzir o peso da imagem
-function compressLogo(file) {
+function compressImage(file, isLogo = false) {
     return new Promise((resolve) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
-
         reader.onload = (e) => {
             const img = new Image();
             img.src = e.target.result;
-
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-
-                const MAX_SIZE = 500; // logos não precisam ser grandes
+                const MAX_SIZE = isLogo ? 500 : 900;
                 const scale = Math.min(MAX_SIZE / img.width, MAX_SIZE / img.height, 1);
-
                 canvas.width = img.width * scale;
                 canvas.height = img.height * scale;
-
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                // PNG preserva texto e bordas
-                canvas.toBlob(
-                    (blob) => resolve(blob),
-                    'image/png',
-                    0.9
-                );
+                canvas.toBlob((blob) => resolve(blob), isLogo ? 'image/png' : 'image/jpeg', 0.8);
             };
         };
     });
 }
 
-function compressProductImage(file) {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-
-        reader.onload = (e) => {
-            const img = new Image();
-            img.src = e.target.result;
-
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-
-                const MAX_WIDTH = 900;
-                const scale = Math.min(MAX_WIDTH / img.width, 1);
-
-                canvas.width = img.width * scale;
-                canvas.height = img.height * scale;
-
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                // JPEG equilibrado
-                canvas.toBlob(
-                    (blob) => resolve(blob),
-                    'image/jpeg',
-                    0.85
-                );
-            };
-        };
-    });
+// --- CARREGAMENTO INICIAL ---
+if (storeLogo && storeLogo !== 'null') {
+    document.getElementById('current-logo').innerHTML = `<img src="${getFullUrl(storeLogo)}" style="height: 60px; border-radius: 50%;">`;
 }
 
+async function loadProducts() {
+    const container = document.getElementById('products-list');
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}`);
+        const products = await res.json();
+        
+        if (products.length === 0) {
+            container.innerHTML = '<div style="color: #888; grid-column: 1/-1; text-align: center;">Nenhum produto cadastrado ainda.</div>';
+            return;
+        }
 
+        container.innerHTML = products.map((p, index) => `
+            <div class="product-item">
+                ${p.image_url ? `<img src="${getFullUrl(p.image_url)}" alt="${p.name}">` : ''}
+                <h4>${p.name}</h4>
+                <span class="price">R$ ${parseFloat(p.price).toFixed(2)}</span>
+                <button class="edit-btn" onclick="triggerEdit(${index})">Editar</button>
+            </div>
+        `).join('');
+    } catch (err) {
+        container.innerHTML = '<div style="color: #ff9800; grid-column: 1/-1; text-align: center;">Erro ao carregar produtos.</div>';
+    }
+}
+
+// --- EVENTO: ATUALIZAR LOGO ---
 document.getElementById('logo-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const fileInput = document.getElementById('store-logo');
-    const file = fileInput.files[0];
-    if (!file) return;
+    if (!fileInput.files[0]) return;
 
     try {
-        // 1. Envia para o Storage do Supabase (Bucket "logos")
-        const fileName = `logo-${storeId}-${Date.now()}.jpg`;
+        const compressedFile = await compressImage(fileInput.files[0], true);
+        const fileName = `logo-${storeId}-${Date.now()}.png`;
+
         const { data, error } = await supabase.storage
             .from('logos')
-            .upload(fileName, file);
+            .upload(fileName, compressedFile);
 
         if (error) throw error;
 
-        // 2. Pega a URL pública gerada
-        const { data: { publicUrl } } = supabase.storage
-            .from('logos')
-            .getPublicUrl(fileName);
+        const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(fileName);
 
-        // 3. Avisa o seu servidor no Render para salvar essa nova URL no banco
         await fetch(`${API_BASE_URL}/api/merchant/update-logo`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ store_id: storeId, logo_url: publicUrl })
         });
 
+        localStorage.setItem('store_logo', publicUrl);
         document.getElementById('current-logo').innerHTML = `<img src="${publicUrl}" style="height:60px; border-radius:50%;">`;
-        alert('Logo salva permanentemente!');
+        alert('Logo atualizada!');
     } catch (err) {
-        console.error(err);
-        alert('Erro ao usar Supabase');
+        alert('Erro ao subir logo para o Supabase');
     }
 });
-        // Upload Produto
+
+// --- EVENTO: SALVAR PRODUTO ---
 document.getElementById('add-product-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-
+    const fileInput = document.getElementById('prod-image');
     const name = document.getElementById('prod-name').value;
     const price = document.getElementById('prod-price').value;
-    const promoPrice = document.getElementById('prod-promo').value;
     const category = document.getElementById('prod-category').value;
-    // Substitua a lógica de submissão do formulário de produto
-const productFile = document.getElementById('product-image').files[0];
-if (productFile) {
-    // 1. Upload da imagem do produto para o Supabase
-    const fileName = `prod-${Date.now()}.jpg`;
-    const { data, error } = await supabase.storage
-        .from('produtos')
-        .upload(fileName, productFile);
 
-    if (error) throw error;
+    try {
+        let imageUrl = '';
 
-    // 2. Obter a URL pública da imagem
-    const { data: { publicUrl } } = supabase.storage
-        .from('produtos')
-        .getPublicUrl(fileName);
+        if (fileInput.files[0]) {
+            const compressedProd = await compressImage(fileInput.files[0], false);
+            const fileName = `prod-${storeId}-${Date.now()}.jpg`;
 
-    // 3. Enviar os dados completos para o seu Backend no Render
-    const productData = {
-        name: document.getElementById('product-name').value,
-        price: document.getElementById('product-price').value,
-        category: document.getElementById('product-category').value,
-        image_url: publicUrl, // Agora enviamos o link do Supabase
-        store_id: storeId
-    };
+            const { error } = await supabase.storage
+                .from('produtos')
+                .upload(fileName, compressedProd);
 
-    await fetch(`${API_BASE_URL}/api/products`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productData)
-    });
-    
-    alert('Produto cadastrado com sucesso!');
-}
+            if (error) throw error;
+
+            const { data: { publicUrl } } = supabase.storage.from('produtos').getPublicUrl(fileName);
+            imageUrl = publicUrl;
+        }
+
+        const productData = {
+            name,
+            price,
+            category,
+            image_url: imageUrl,
+            store_id: storeId,
+            promo_price: document.getElementById('prod-promo').value || null
+        };
+
+        const res = await fetch(`${API_BASE_URL}/api/products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(productData)
+        });
+
+        if (res.ok) {
+            alert('Produto salvo!');
+            loadProducts();
+            e.target.reset();
+        }
+    } catch (err) {
+        alert('Erro ao salvar produto.');
+    }
 });
 
+function logout() {
+    localStorage.clear();
+    window.location.href = 'index.html';
+}
 
-        // Initial load
-        loadProducts();
-
+loadProducts();
         // Footer Global - JBSousaTech
         const footer = document.createElement('footer');
         footer.innerHTML = `
