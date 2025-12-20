@@ -186,6 +186,8 @@ const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 const storeId = localStorage.getItem('store_id');
 const storeName = localStorage.getItem('store_name');
 let storeLogo = localStorage.getItem('store_logo');
+let merchantProducts = []; // Para guardar a lista de produtos para edição
+
 
 if (!storeId) window.location.href = 'login.html';
 
@@ -228,6 +230,8 @@ async function loadProducts() {
     try {
         const res = await fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}`);
         const products = await res.json();
+        merchantProducts = products; // Salva os produtos no escopo do script
+        
         
         console.log('API Response for Products:', JSON.stringify(products, null, 2));
 
@@ -286,61 +290,64 @@ document.getElementById('logo-form').addEventListener('submit', async (e) => {
 document.getElementById('add-product-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // 1. Captura os elementos corretamente pelos IDs do seu HTML
-    const fileInput = document.getElementById('prod-image'); // ID correto do seu HTML
+    const btn = e.target.querySelector('button');
+    const isUpdating = btn.textContent === 'Atualizar';
+
+    const fileInput = document.getElementById('prod-image');
     const nameInput = document.getElementById('prod-name');
     const priceInput = document.getElementById('prod-price');
     const categoryInput = document.getElementById('prod-category');
     const promoInput = document.getElementById('prod-promo');
-
     const productFile = fileInput.files[0];
-
-    // Validação: Verifica se o arquivo foi realmente selecionado
-    if (!productFile) {
-        alert('Por favor, selecione uma imagem para o produto.');
+    
+    // Se for um novo produto, a imagem é obrigatória.
+    // Se for uma atualização, a imagem é opcional.
+    if (!productFile && !isUpdating) {
+        alert('Por favor, selecione uma imagem para o novo produto.');
         return;
     }
 
     try {
-        // Exibe um feedback visual (opcional)
-        const btn = e.target.querySelector('button');
         const btnOriginalText = btn.innerText;
         btn.innerText = "Enviando...";
         btn.disabled = true;
 
-        // 2. Upload da imagem para o Supabase (Bucket "produtos")
-        const fileName = `prod-${storeId}-${Date.now()}.jpg`;
-        const { data, error } = await supabaseClient.storage
-            .from('produtos')
-            .upload(fileName, productFile);
+        let publicUrl;
 
-        if (error) throw error;
+        if (productFile) {
+            // Se um novo arquivo foi selecionado, faz o upload
+            const fileName = `prod-${storeId}-${Date.now()}.jpg`;
+            const { data, error } = await supabaseClient.storage
+                .from('produtos')
+                .upload(fileName, productFile);
 
-        // 3. Obter a URL pública
-        const { data: { publicUrl } } = supabaseClient.storage
-            .from('produtos')
-            .getPublicUrl(fileName);
+            if (error) throw error;
 
-        // 4. Enviar os dados para o seu Backend no Render
+            publicUrl = supabaseClient.storage.from('produtos').getPublicUrl(fileName).data.publicUrl;
+        } else {
+            // Se nenhum arquivo novo foi selecionado (durante uma atualização), reutiliza a URL existente.
+            publicUrl = document.getElementById('existing-image-url').value;
+        }
+
         const productData = {
             name: nameInput.value,
             price: priceInput.value,
             category: categoryInput.value,
             promo_price: promoInput.value || null,
-            image_url: publicUrl, // Link permanente do Supabase
+            image_url: publicUrl,
             store_id: storeId
         };
 
         const res = await fetch(`${API_BASE_URL}/api/products`, {
-            method: 'POST',
+            method: 'POST', // O backend já faz "upsert", então POST funciona para criar e atualizar
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(productData)
         });
 
         if (res.ok) {
-            alert('Produto cadastrado com sucesso!');
-            e.target.reset(); // Limpa o formulário
-            loadProducts();   // Recarrega a lista na tela
+            alert(`Produto ${isUpdating ? 'atualizado' : 'cadastrado'} com sucesso!`);
+            e.target.reset(); 
+            loadProducts();
         } else {
             const err = await res.json();
             console.error('Erro do servidor ao salvar produto:', err);
@@ -350,8 +357,7 @@ document.getElementById('add-product-form').addEventListener('submit', async (e)
         console.error("Erro completo:", err);
         alert('Erro ao processar produto: ' + err.message);
     } finally {
-        const btn = e.target.querySelector('button');
-        btn.innerText = "Salvar";
+        btn.innerText = "Salvar"; // Sempre reseta para "Salvar"
         btn.disabled = false;
     }
 });
@@ -365,6 +371,34 @@ function logout() {
     // 3. Redireciona para a página inicial ou de login
     window.location.href = 'index.html'; 
 }
+
+function triggerEdit(index) {
+    const product = merchantProducts[index];
+    if (!product) return;
+
+    // Preenche o formulário com os dados do produto
+    document.getElementById('prod-name').value = product.name;
+    document.getElementById('prod-price').value = parseFloat(product.price).toFixed(2);
+    document.getElementById('prod-category').value = product.category;
+    document.getElementById('prod-promo').value = product.promo_price ? parseFloat(product.promo_price).toFixed(2) : '';
+    
+    const form = document.getElementById('add-product-form');
+
+    // Armazena a URL da imagem existente em um campo oculto
+    let existingImgField = document.getElementById('existing-image-url');
+    if (!existingImgField) {
+        existingImgField = document.createElement('input');
+        existingImgField.type = 'hidden';
+        existingImgField.id = 'existing-image-url';
+        form.appendChild(existingImgField);
+    }
+    existingImgField.value = product.image_url || '';
+    
+    // Altera o texto do botão e foca no formulário
+    form.querySelector('button').textContent = 'Atualizar';
+    form.scrollIntoView({ behavior: 'smooth' });
+}
+
 
 loadProducts();
         // Footer Global - JBSousaTech
