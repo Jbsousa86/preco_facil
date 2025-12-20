@@ -282,35 +282,50 @@ document.getElementById('logo-form').addEventListener('submit', async (e) => {
 // --- EVENTO: SALVAR PRODUTO ---
 document.getElementById('add-product-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const fileInput = document.getElementById('prod-image');
-    const name = document.getElementById('prod-name').value;
-    const price = document.getElementById('prod-price').value;
-    const category = document.getElementById('prod-category').value;
+
+    // 1. Captura os elementos corretamente pelos IDs do seu HTML
+    const fileInput = document.getElementById('prod-image'); // ID correto do seu HTML
+    const nameInput = document.getElementById('prod-name');
+    const priceInput = document.getElementById('prod-price');
+    const categoryInput = document.getElementById('prod-category');
+    const promoInput = document.getElementById('prod-promo');
+
+    const productFile = fileInput.files[0];
+
+    // Validação: Verifica se o arquivo foi realmente selecionado
+    if (!productFile) {
+        alert('Por favor, selecione uma imagem para o produto.');
+        return;
+    }
 
     try {
-        let imageUrl = '';
+        // Exibe um feedback visual (opcional)
+        const btn = e.target.querySelector('button');
+        const btnOriginalText = btn.innerText;
+        btn.innerText = "Salvando...";
+        btn.disabled = true;
 
-        if (fileInput.files[0]) {
-            const compressedProd = await compressImage(fileInput.files[0], false);
-            const fileName = `prod-${storeId}-${Date.now()}.jpg`;
+        // 2. Upload da imagem para o Supabase (Bucket "produtos")
+        const fileName = `prod-${storeId}-${Date.now()}.jpg`;
+        const { data, error } = await supabase.storage
+            .from('produtos')
+            .upload(fileName, productFile);
 
-            const { error } = await supabase.storage
-                .from('produtos')
-                .upload(fileName, compressedProd);
+        if (error) throw error;
 
-            if (error) throw error;
+        // 3. Obter a URL pública
+        const { data: { publicUrl } } = supabase.storage
+            .from('produtos')
+            .getPublicUrl(fileName);
 
-            const { data: { publicUrl } } = supabase.storage.from('produtos').getPublicUrl(fileName);
-            imageUrl = publicUrl;
-        }
-
+        // 4. Enviar os dados para o seu Backend no Render
         const productData = {
-            name,
-            price,
-            category,
-            image_url: imageUrl,
-            store_id: storeId,
-            promo_price: document.getElementById('prod-promo').value || null
+            name: nameInput.value,
+            price: priceInput.value,
+            category: categoryInput.value,
+            promo_price: promoInput.value || null,
+            image_url: publicUrl, // Link permanente do Supabase
+            store_id: storeId
         };
 
         const res = await fetch(`${API_BASE_URL}/api/products`, {
@@ -320,18 +335,31 @@ document.getElementById('add-product-form').addEventListener('submit', async (e)
         });
 
         if (res.ok) {
-            alert('Produto salvo!');
-            loadProducts();
-            e.target.reset();
+            alert('Produto cadastrado com sucesso!');
+            e.target.reset(); // Limpa o formulário
+            loadProducts();   // Recarrega a lista na tela
+        } else {
+            const err = await res.json();
+            alert('Erro no servidor: ' + (err.error || 'Falha ao salvar'));
         }
     } catch (err) {
-        alert('Erro ao salvar produto.');
+        console.error("Erro completo:", err);
+        alert('Erro ao processar produto: ' + err.message);
+    } finally {
+        const btn = e.target.querySelector('button');
+        btn.innerText = "Salvar";
+        btn.disabled = false;
     }
 });
-
 function logout() {
+    // 1. Limpa todos os dados de login salvos no navegador (ID, Nome, Logo)
     localStorage.clear();
-    window.location.href = 'index.html';
+    
+    // 2. Opcional: Limpa também os dados da sessão administrativa se houver
+    sessionStorage.clear();
+    
+    // 3. Redireciona para a página inicial ou de login
+    window.location.href = 'index.html'; 
 }
 
 loadProducts();

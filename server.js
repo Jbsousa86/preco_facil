@@ -276,43 +276,37 @@ app.post('/api/login', async (req, res) => {
 });
 
 // Endpoint: GET /api/merchant/products?store_id=...
+// ROTA PARA SALVAR PRODUTO (Recebe JSON do Supabase)
+app.post('/api/products', async (req, res) => {
+    const { name, price, category, image_url, store_id, promo_price } = req.body;
+    try {
+        const client = await pool.connect();
+        const query = `
+            INSERT INTO products (name, price, category, image_url, store_id, promo_price) 
+            VALUES ($1, $2, $3, $4, $5, $6)
+        `;
+        await client.query(query, [name, price, category, image_url, store_id, promo_price]);
+        client.release();
+        res.status(201).json({ success: true });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: "Erro ao salvar produto no banco" });
+    }
+});
+
+// ROTA PARA LISTAR PRODUTOS DO VENDEDOR
 app.get('/api/merchant/products', async (req, res) => {
     const { store_id } = req.query;
-    if (!store_id) return res.status(400).json({ error: 'Missing store_id' });
     try {
         const client = await pool.connect();
         const result = await client.query(
-            `SELECT p.name, p.category, pr.price, pr.promo_price, pr.promo_expires_at, pr.image_url, s.name as store_name
-             FROM prices pr
-             
-             JOIN products p ON p.id = pr.product_id
-             JOIN stores s ON s.id = pr.store_id
-             WHERE pr.store_id = $1
-             ORDER BY p.name`,
+            'SELECT * FROM products WHERE store_id = $1 ORDER BY id DESC', 
             [store_id]
         );
         client.release();
         res.json(result.rows);
     } catch (e) {
-        console.error(e);
-        res.status(500).json({ error: e.message });
-    }
-});
-
-// Endpoint: POST /api/merchant/products
-app.post('/api/products', async (req, res) => {
-    const { name, price, category, image_url, store_id } = req.body;
-    try {
-        const client = await pool.connect();
-        const query = `
-            INSERT INTO products (name, price, category, image_url, store_id) 
-            VALUES ($1, $2, $3, $4, $5)
-        `;
-        await client.query(query, [name, price, category, image_url, store_id]);
-        client.release();
-        res.status(201).json({ success: true });
-    } catch (e) {
-        res.status(500).json({ error: e.message });
+        res.status(500).json({ error: "Erro ao buscar produtos" });
     }
 });
 app.patch('/api/merchant/update-logo', async (req, res) => {
