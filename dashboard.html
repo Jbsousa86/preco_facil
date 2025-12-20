@@ -181,7 +181,7 @@
 const API_BASE_URL = 'https://preco-facil.onrender.com';
 const supabaseUrl = 'https://licvfuzvvbmjdvcooogo.supabase.co';
 const supabaseKey = 'sb_publishable_8hwXxxU7C4owwVmlc4FvPg_0pEXUFK-'; // Verifique se esta chave está correta no painel
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 const storeId = localStorage.getItem('store_id');
 const storeName = localStorage.getItem('store_name');
@@ -260,13 +260,13 @@ document.getElementById('logo-form').addEventListener('submit', async (e) => {
         const compressedFile = await compressImage(fileInput.files[0], true);
         const fileName = `logo-${storeId}-${Date.now()}.png`;
 
-        const { data, error } = await supabase.storage
+        const { data, error } = await supabaseClient.storage
             .from('logos')
             .upload(fileName, compressedFile);
 
         if (error) throw error;
 
-        const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(fileName);
+        const { data: { publicUrl } } = supabaseClient.storage.from('logos').getPublicUrl(fileName);
 
         await fetch(`${API_BASE_URL}/api/merchant/update-logo`, {
             method: 'PATCH',
@@ -310,14 +310,14 @@ document.getElementById('add-product-form').addEventListener('submit', async (e)
 
         // 2. Upload da imagem para o Supabase (Bucket "produtos")
         const fileName = `prod-${storeId}-${Date.now()}.jpg`;
-        const { data, error } = await supabase.storage
+        const { data, error } = await supabaseClient.storage
             .from('produtos')
             .upload(fileName, productFile);
 
         if (error) throw error;
 
         // 3. Obter a URL pública
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = supabaseClient.storage
             .from('produtos')
             .getPublicUrl(fileName);
 
