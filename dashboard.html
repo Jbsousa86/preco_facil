@@ -265,12 +265,12 @@ document.getElementById('logo-form').addEventListener('submit', async (e) => {
         const fileName = `logo-${storeId}-${Date.now()}.png`;
 
         const { data, error } = await supabaseClient.storage
-            .from('logos')
+            .from('LOGOS')
             .upload(fileName, compressedFile);
 
         if (error) throw error;
 
-        const { data: { publicUrl } } = supabaseClient.storage.from('logos').getPublicUrl(fileName);
+        const { data: { publicUrl } } = supabaseClient.storage.from('LOGOS').getPublicUrl(fileName);
 
         await fetch(`${API_BASE_URL}/api/merchant/update-logo`, {
             method: 'PATCH',
@@ -318,12 +318,12 @@ document.getElementById('add-product-form').addEventListener('submit', async (e)
             // Se um novo arquivo foi selecionado, faz o upload
             const fileName = `prod-${storeId}-${Date.now()}.jpg`;
             const { data, error } = await supabaseClient.storage
-                .from('produtos')
+                .from('PRODUTOS')
                 .upload(fileName, productFile);
 
             if (error) throw error;
 
-            publicUrl = supabaseClient.storage.from('produtos').getPublicUrl(fileName).data.publicUrl;
+            publicUrl = supabaseClient.storage.from('PRODUTOS').getPublicUrl(fileName).data.publicUrl;
         } else {
             // Se nenhum arquivo novo foi selecionado (durante uma atualização), reutiliza a URL existente.
             publicUrl = document.getElementById('existing-image-url').value;
