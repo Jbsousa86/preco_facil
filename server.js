@@ -300,63 +300,30 @@ app.get('/api/merchant/products', async (req, res) => {
 });
 
 // Endpoint: POST /api/merchant/products
-app.post('/api/merchant/products', upload.single('image'), async (req, res) => {
-    const { store_id, product_name, price, category, promo_price } = req.body;
-    if (!store_id || !product_name || !price) return res.status(400).json({ error: 'Dados incompletos' });
-    const image_url = req.file ? `/uploads/${req.file.filename}` : null;
-    const promo_expires_at = promo_price ? new Date(Date.now() + 24 * 60 * 60 * 1000) : null; // 24h a partir de agora
-
+app.post('/api/products', async (req, res) => {
+    const { name, price, category, image_url, store_id } = req.body;
     try {
         const client = await pool.connect();
-
-        // 1. Find or create product
-        let productRes = await client.query('SELECT id FROM products WHERE name ILIKE $1', [product_name]);
-        let productId;
-        if (productRes.rows.length === 0) {
-            const newProd = await client.query('INSERT INTO products (name, category) VALUES ($1, $2) RETURNING id', [product_name, category]);
-            productId = newProd.rows[0].id;
-        } else {
-            productId = productRes.rows[0].id;
-            if (category) {
-                await client.query('UPDATE products SET category = $1 WHERE id = $2', [category, productId]);
-            }
-        }
-
-        // 2. Insert or Update price
-        await client.query(
-            `INSERT INTO prices (store_id, product_id, price, image_url, promo_price, promo_expires_at) 
-             VALUES ($1, $2, $3, $4, $5, $6)
-             ON CONFLICT (store_id, product_id) 
-             DO UPDATE SET price = $3, image_url = COALESCE($4, prices.image_url), promo_price = $5, promo_expires_at = $6`,
-            [store_id, productId, price, image_url, promo_price || null, promo_expires_at]
-        );
-
+        const query = `
+            INSERT INTO products (name, price, category, image_url, store_id) 
+            VALUES ($1, $2, $3, $4, $5)
+        `;
+        await client.query(query, [name, price, category, image_url, store_id]);
         client.release();
-        res.json({ success: true, message: 'Produto atualizado!' });
+        res.status(201).json({ success: true });
     } catch (e) {
-        console.error(e);
         res.status(500).json({ error: e.message });
     }
 });
-
-// Endpoint: POST /api/merchant/logo (Upload de Logo)
-app.post('/api/merchant/logo', upload.single('logo'), async (req, res) => {
+app.patch('/api/merchant/update-logo', async (req, res) => {
+    const { store_id, logo_url } = req.body;
     try {
-        const { store_id } = req.body;
-        if (!req.file || !store_id) {
-            return res.status(400).json({ error: 'Dados ausentes' });
-        }
-
-        const logo_url = `/uploads/${req.file.filename}`;
         const client = await pool.connect();
         await client.query('UPDATE stores SET logo_url = $1 WHERE id = $2', [logo_url, store_id]);
         client.release();
-
-        // Resposta imediata para evitar o timeout/502
-        return res.json({ success: true, logo_url });
+        res.json({ success: true });
     } catch (e) {
-        console.error(e);
-        return res.status(500).json({ error: 'Erro no servidor' });
+        res.status(500).json({ error: e.message });
     }
 });
 // Endpoint: GET /api/search?product=...

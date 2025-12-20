@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Mercado Local</title>
     <link rel="stylesheet" href="assets/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .dashboard-container {
             max-width: 800px;
@@ -176,9 +177,11 @@
     <a href="https://wa.me/5563992225774" target="_blank" class="floating-support-btn" title="Falar com Suporte">🎧</a>
 
     <script>
-        const API_BASE_URL = window.location.hostname === 'localhost' 
-            ? 'http://localhost:3000' 
-            : 'https://preco-facil.onrender.com';
+        const supabaseUrl = 'https://licvfuzvvbmjdvcooogo.supabase.co';
+        const supabaseKey = 'sb_publishable_8hwXxxU7C4owwVmlc4FvPg_0pEXUFK-';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey); 
+            
+            
 
         // Auth Check
         const storeId = localStorage.getItem('store_id');
@@ -336,56 +339,40 @@ function compressProductImage(file) {
 }
 
 
-// 2. Evento de Upload Atualizado
 document.getElementById('logo-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const fileInput = document.getElementById('store-logo');
-    
-    if (fileInput.files.length === 0) {
-        alert('Por favor, selecione um arquivo de imagem.');
-        return;
-    }
+    const file = fileInput.files[0];
+    if (!file) return;
 
     try {
-        const originalFile = fileInput.files[0];
-        
-        // Exibe um aviso visual de carregamento
-        const currentLogoDiv = document.getElementById('current-logo');
-        const originalContent = currentLogoDiv.innerHTML;
-        currentLogoDiv.innerHTML = "Processando...";
+        // 1. Envia para o Storage do Supabase (Bucket "logos")
+        const fileName = `logo-${storeId}-${Date.now()}.jpg`;
+        const { data, error } = await supabase.storage
+            .from('logos')
+            .upload(fileName, file);
 
-        // COMPRESSÃO: Transforma a foto pesada em um arquivo leve
-        const compressedBlob = await compressLogo(originalFile);
+        if (error) throw error;
 
-        const formData = new FormData();
-        formData.append('store_id', storeId);
-        formData.append('logo', compressedBlob, 'logo.jpg');
+        // 2. Pega a URL pública gerada
+        const { data: { publicUrl } } = supabase.storage
+            .from('logos')
+            .getPublicUrl(fileName);
 
-        const res = await fetch(`${API_BASE_URL}/api/merchant/logo`, {
-            method: 'POST',
-            body: formData
+        // 3. Avisa o seu servidor no Render para salvar essa nova URL no banco
+        await fetch(`${API_BASE_URL}/api/merchant/update-logo`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ store_id: storeId, logo_url: publicUrl })
         });
 
-        const data = await res.json();
-
-        if (res.ok) {
-            const fullLogoUrl = data.logo_url.startsWith('http') 
-                ? data.logo_url 
-                : `${API_BASE_URL}${data.logo_url}`;
-
-            localStorage.setItem('store_logo', fullLogoUrl);
-            currentLogoDiv.innerHTML = `<img src="${fullLogoUrl}" style="height: 60px; width: 60px; object-fit: cover; border-radius: 50%;">`;
-            alert('Logo atualizada com sucesso!');
-        } else {
-            currentLogoDiv.innerHTML = originalContent;
-            alert(`Erro: ${data.error || 'Não foi possível enviar a logo.'}`);
-        }
-    } catch (err) { 
-        console.error('Erro no upload:', err); 
-        alert('Erro de conexão. A imagem pode ser muito grande ou o servidor está reiniciando.');
+        document.getElementById('current-logo').innerHTML = `<img src="${publicUrl}" style="height:60px; border-radius:50%;">`;
+        alert('Logo salva permanentemente!');
+    } catch (err) {
+        console.error(err);
+        alert('Erro ao usar Supabase');
     }
 });
-
         // Upload Produto
 document.getElementById('add-product-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -394,50 +381,39 @@ document.getElementById('add-product-form').addEventListener('submit', async (e)
     const price = document.getElementById('prod-price').value;
     const promoPrice = document.getElementById('prod-promo').value;
     const category = document.getElementById('prod-category').value;
-    const imageInput = document.getElementById('prod-image');
-    const imageFile = imageInput.files[0];
+    // Substitua a lógica de submissão do formulário de produto
+const productFile = document.getElementById('product-image').files[0];
+if (productFile) {
+    // 1. Upload da imagem do produto para o Supabase
+    const fileName = `prod-${Date.now()}.jpg`;
+    const { data, error } = await supabase.storage
+        .from('produtos')
+        .upload(fileName, productFile);
 
-    const btn = e.target.querySelector('button');
-    const originalText = btn.textContent;
-    btn.textContent = 'Salvando...';
-    btn.disabled = true;
+    if (error) throw error;
 
-    try {
-        const formData = new FormData();
-        formData.append('store_id', storeId);
-        formData.append('product_name', name);
-        formData.append('price', price);
-        formData.append('category', category);
-        if (promoPrice) formData.append('promo_price', promoPrice);
+    // 2. Obter a URL pública da imagem
+    const { data: { publicUrl } } = supabase.storage
+        .from('produtos')
+        .getPublicUrl(fileName);
 
-        // ✅ COMPRESSÃO APLICADA AO PRODUTO
-        if (imageFile) {
-            const compressedBlob = await compressProdutoImage(imageFile);
-            formData.append('image', compressedBlob, 'produto.jpg');
-        }
+    // 3. Enviar os dados completos para o seu Backend no Render
+    const productData = {
+        name: document.getElementById('product-name').value,
+        price: document.getElementById('product-price').value,
+        category: document.getElementById('product-category').value,
+        image_url: publicUrl, // Agora enviamos o link do Supabase
+        store_id: storeId
+    };
 
-        const res = await fetch(`${API_BASE_URL}/api/merchant/products`, {
-            method: 'POST',
-            body: formData
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-            e.target.reset();
-            loadProducts();
-            alert('Produto salvo com sucesso!');
-        } else {
-            alert(`Erro: ${data.error || 'Falha ao salvar produto.'}`);
-        }
-
-    } catch (err) {
-        console.error(err);
-        alert('Erro de conexão. O servidor pode estar reiniciando.');
-    } finally {
-        btn.textContent = originalText;
-        btn.disabled = false;
-    }
+    await fetch(`${API_BASE_URL}/api/products`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productData)
+    });
+    
+    alert('Produto cadastrado com sucesso!');
+}
 });
 
 
