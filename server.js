@@ -288,17 +288,21 @@ app.post('/api/products', async (req, res) => {
     try {
         await client.query('BEGIN');
 
-        // Etapa 1: Garante que o produto exista na tabela `products` e obtém seu ID.
-        // Se o produto com o mesmo nome já existe, ele não faz nada.
-        await client.query('INSERT INTO products (name, category) VALUES ($1, $2) ON CONFLICT (name) DO NOTHING', [name, category]);
+        // Etapa 1: Insere ou atualiza o produto e retorna o ID de forma atômica.
+        // Se o produto já existe (com base no 'name'), atualiza a categoria para garantir que esteja sempre a mais recente.
+        const productResult = await client.query(
+            `INSERT INTO products (name, category) 
+             VALUES ($1, $2) 
+             ON CONFLICT (name) 
+             DO UPDATE SET category = EXCLUDED.category 
+             RETURNING id`,
+            [name, category]
+        );
         
-        // Em seguida, busca o ID do produto (seja ele novo ou já existente).
-        const productResult = await client.query('SELECT id FROM products WHERE name = $1', [name]);
         const productId = productResult.rows[0].id;
 
         // Etapa 2: Insere ou atualiza o preço na tabela `prices`.
-        // O CONFLICT é na chave primária composta (store_id, product_id).
-        const promoExpires = promo_price ? new Date(Date.now() + 24 * 60 * 60 * 1000) : null; // 24h a partir de agora
+        const promoExpires = promo_price ? new Date(Date.now() + 24 * 60 * 60 * 1000) : null;
         
         const upsertPriceQuery = `
             INSERT INTO prices (store_id, product_id, price, image_url, promo_price, promo_expires_at)
@@ -317,8 +321,11 @@ app.post('/api/products', async (req, res) => {
 
     } catch (e) {
         await client.query('ROLLBACK');
-        console.error("Erro na transação ao salvar produto:", e);
-        res.status(500).json({ error: "Erro no servidor ao salvar produto." });
+        console.error("Erro detalhado na transação ao salvar produto:", e);
+        res.status(500).json({ 
+            error: "Erro no servidor ao salvar produto.",
+            details: e.message 
+        });
     } finally {
         client.release();
     }
@@ -349,8 +356,11 @@ app.get('/api/merchant/products', async (req, res) => {
         client.release();
         res.json(result.rows);
     } catch (e) {
-        console.error("Erro ao buscar produtos do comerciante:", e);
-        res.status(500).json({ error: "Erro ao buscar produtos no servidor." });
+        console.error("Erro detalhado ao buscar produtos do comerciante:", e);
+        res.status(500).json({ 
+            error: "Erro ao buscar produtos no servidor.",
+            details: e.message
+        });
     }
 });
 app.patch('/api/merchant/update-logo', async (req, res) => {

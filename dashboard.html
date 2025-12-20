@@ -229,6 +229,8 @@ async function loadProducts() {
         const res = await fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}`);
         const products = await res.json();
         
+        console.log('API Response for Products:', JSON.stringify(products, null, 2));
+
         if (products.length === 0) {
             container.innerHTML = '<div style="color: #888; grid-column: 1/-1; text-align: center;">Nenhum produto cadastrado ainda.</div>';
             return;
@@ -243,7 +245,8 @@ async function loadProducts() {
             </div>
         `).join('');
     } catch (err) {
-        container.innerHTML = '<div style="color: #ff9800; grid-column: 1/-1; text-align: center;">Erro ao carregar produtos.</div>';
+        console.error('Erro detalhado ao carregar produtos:', err);
+        container.innerHTML = `<div style="color: #ff9800; grid-column: 1/-1; text-align: center;">Erro ao carregar produtos. Verifique o console para mais detalhes. (${err.message})</div>`;
     }
 }
 
@@ -340,7 +343,8 @@ document.getElementById('add-product-form').addEventListener('submit', async (e)
             loadProducts();   // Recarrega a lista na tela
         } else {
             const err = await res.json();
-            alert('Erro no servidor: ' + (err.error || 'Falha ao salvar'));
+            console.error('Erro do servidor ao salvar produto:', err);
+            alert('Erro no servidor: ' + (err.error || err.details || 'Falha ao salvar'));
         }
     } catch (err) {
         console.error("Erro completo:", err);
