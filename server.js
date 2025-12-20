@@ -279,34 +279,78 @@ app.post('/api/login', async (req, res) => {
 // ROTA PARA SALVAR PRODUTO (Recebe JSON do Supabase)
 app.post('/api/products', async (req, res) => {
     const { name, price, category, image_url, store_id, promo_price } = req.body;
+
+    if (!name || !price || !category || !store_id) {
+        return res.status(400).json({ error: 'Todos os campos obrigatórios devem ser preenchidos: nome, preço, categoria e ID da loja.' });
+    }
+
+    const client = await pool.connect();
     try {
-        const client = await pool.connect();
-        const query = `
-            INSERT INTO products (name, price, category, image_url, store_id, promo_price) 
+        await client.query('BEGIN');
+
+        // Etapa 1: Garante que o produto exista na tabela `products` e obtém seu ID.
+        // Se o produto com o mesmo nome já existe, ele não faz nada.
+        await client.query('INSERT INTO products (name, category) VALUES ($1, $2) ON CONFLICT (name) DO NOTHING', [name, category]);
+        
+        // Em seguida, busca o ID do produto (seja ele novo ou já existente).
+        const productResult = await client.query('SELECT id FROM products WHERE name = $1', [name]);
+        const productId = productResult.rows[0].id;
+
+        // Etapa 2: Insere ou atualiza o preço na tabela `prices`.
+        // O CONFLICT é na chave primária composta (store_id, product_id).
+        const promoExpires = promo_price ? new Date(Date.now() + 24 * 60 * 60 * 1000) : null; // 24h a partir de agora
+        
+        const upsertPriceQuery = `
+            INSERT INTO prices (store_id, product_id, price, image_url, promo_price, promo_expires_at)
             VALUES ($1, $2, $3, $4, $5, $6)
+            ON CONFLICT (store_id, product_id)
+            DO UPDATE SET
+                price = EXCLUDED.price,
+                image_url = EXCLUDED.image_url,
+                promo_price = EXCLUDED.promo_price,
+                promo_expires_at = EXCLUDED.promo_expires_at;
         `;
-        await client.query(query, [name, price, category, image_url, store_id, promo_price]);
-        client.release();
-        res.status(201).json({ success: true });
+        await client.query(upsertPriceQuery, [store_id, productId, price, image_url, promo_price, promoExpires]);
+
+        await client.query('COMMIT');
+        res.status(201).json({ success: true, message: 'Produto salvo com sucesso!' });
+
     } catch (e) {
-        console.error(e);
-        res.status(500).json({ error: "Erro ao salvar produto no banco" });
+        await client.query('ROLLBACK');
+        console.error("Erro na transação ao salvar produto:", e);
+        res.status(500).json({ error: "Erro no servidor ao salvar produto." });
+    } finally {
+        client.release();
     }
 });
 
-// ROTA PARA LISTAR PRODUTOS DO VENDEDOR
 app.get('/api/merchant/products', async (req, res) => {
     const { store_id } = req.query;
+    if (!store_id) {
+        return res.status(400).json({ error: 'O ID da loja é obrigatório.' });
+    }
     try {
         const client = await pool.connect();
         const result = await client.query(
-            'SELECT * FROM products WHERE store_id = $1 ORDER BY id DESC', 
+            `SELECT 
+                p.id, 
+                p.name, 
+                p.category,
+                pr.price, 
+                pr.promo_price,
+                pr.promo_expires_at,
+                pr.image_url
+             FROM products p
+             JOIN prices pr ON p.id = pr.product_id
+             WHERE pr.store_id = $1
+             ORDER BY p.name ASC`,
             [store_id]
         );
         client.release();
         res.json(result.rows);
     } catch (e) {
-        res.status(500).json({ error: "Erro ao buscar produtos" });
+        console.error("Erro ao buscar produtos do comerciante:", e);
+        res.status(500).json({ error: "Erro ao buscar produtos no servidor." });
     }
 });
 app.patch('/api/merchant/update-logo', async (req, res) => {

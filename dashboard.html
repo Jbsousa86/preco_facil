@@ -302,7 +302,7 @@ document.getElementById('add-product-form').addEventListener('submit', async (e)
         // Exibe um feedback visual (opcional)
         const btn = e.target.querySelector('button');
         const btnOriginalText = btn.innerText;
-        btn.innerText = "Salvando...";
+        btn.innerText = "Enviando...";
         btn.disabled = true;
 
         // 2. Upload da imagem para o Supabase (Bucket "produtos")
