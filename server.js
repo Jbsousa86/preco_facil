@@ -12,24 +12,7 @@ const crypto = require('crypto');
 const app = express();
 
 // Configuração de CORS
-const whitelist = [
-    'http://localhost:3000', 
-    'http://127.0.0.1:5500', // Para desenvolvimento local com Live Server
-    'https://preco-facil-vc5w.vercel.app', // Frontend em produção (Vercel)
-];
-if (process.env.FRONTEND_URL) {
-    whitelist.push(process.env.FRONTEND_URL);
-}
-
-const corsOptions = {
-    origin: 'https://preco-facil-vc5w.vercel.app', // Domínio exato do seu frontend
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-key'],
-    credentials: true,
-    optionsSuccessStatus: 204
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(bodyParser.json());
 app.use('/uploads', express.static('uploads'));
 app.use(express.json({ limit: '10mb' }));
@@ -364,9 +347,8 @@ app.get('/api/merchant/products', async (req, res) => {
     }
 });
 
-app.delete('/api/products/:productId', async (req, res) => {
-    const { productId } = req.params;
-    const { store_id } = req.query;
+app.post('/api/delete-product', async (req, res) => {
+    const { productId, store_id } = req.body;
 
     if (!productId || !store_id) {
         return res.status(400).json({ error: 'O ID do produto e o ID da loja são obrigatórios.' });

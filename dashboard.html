@@ -243,7 +243,7 @@ async function loadProducts() {
         merchantProducts = products; // Salva os produtos no escopo do script
         
         
-        console.log('API Response for Products:', JSON.stringify(products, null, 2));
+       // console.log('API Response for Products:', JSON.stringify(products, null, 2));
 
         if (products.length === 0) {
             container.innerHTML = '<div style="color: #888; grid-column: 1/-1; text-align: center;">Nenhum produto cadastrado ainda.</div>';
@@ -271,8 +271,12 @@ async function triggerDelete(productId) {
     }
 
     try {
-        const res = await fetch(`${API_BASE_URL}/api/products/${productId}?store_id=${storeId}`, {
-            method: 'DELETE',
+        const res = await fetch(`${API_BASE_URL}/api/delete-product`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productId, store_id: storeId }),
         });
 
         if (res.ok) {
