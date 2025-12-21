@@ -363,6 +363,34 @@ app.get('/api/merchant/products', async (req, res) => {
         });
     }
 });
+
+app.delete('/api/products/:productId', async (req, res) => {
+    const { productId } = req.params;
+    const { store_id } = req.query;
+
+    if (!productId || !store_id) {
+        return res.status(400).json({ error: 'O ID do produto e o ID da loja são obrigatórios.' });
+    }
+
+    try {
+        const client = await pool.connect();
+        const result = await client.query(
+            'DELETE FROM prices WHERE product_id = $1 AND store_id = $2',
+            [productId, store_id]
+        );
+        client.release();
+
+        if (result.rowCount > 0) {
+            res.status(200).json({ success: true, message: 'Produto excluído com sucesso.' });
+        } else {
+            res.status(404).json({ error: 'Produto não encontrado para esta loja.' });
+        }
+    } catch (e) {
+        console.error("Erro ao excluir produto:", e);
+        res.status(500).json({ error: 'Erro no servidor ao tentar excluir o produto.' });
+    }
+});
+
 app.patch('/api/merchant/update-logo', async (req, res) => {
     const { store_id, logo_url } = req.body;
     try {
