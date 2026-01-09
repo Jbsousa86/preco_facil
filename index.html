@@ -64,6 +64,37 @@
                 flex-direction: column;
                 gap: 1rem;
             }
+
+            /* CORREÇÃO: Garante que as Ofertas em Destaque fiquem em linha (Roll/Carousel) */
+            #offers-container {
+                flex-direction: row !important;
+                overflow-x: auto !important;
+                justify-content: flex-start;
+            }
+
+            /* CORREÇÃO: Ajusta os cards da busca para caberem na tela (Responsividade) */
+            #results .result-card {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                box-sizing: border-box;
+                overflow: hidden; /* Impede que o card estoure a largura */
+            }
+
+            #results .store-info {
+                flex: 1; /* Ocupa o espaço restante */
+                min-width: 0; /* CRÍTICO: Permite que o texto seja cortado (ellipsis) */
+                padding-right: 5px;
+            }
+
+            /* Garante que textos longos não quebrem o layout */
+            #results .store-info h3, 
+            #results .store-info p, 
+            #results .store-info span {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
         }
     </style>
 </head>
