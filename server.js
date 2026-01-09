@@ -335,10 +335,15 @@ app.post('/api/products', async (req, res) => {
 });
 
 app.get('/api/merchant/products', async (req, res) => {
-    const { store_id } = req.query;
+    const { store_id, page, limit } = req.query;
     if (!store_id) {
         return res.status(400).json({ error: 'O ID da loja é obrigatório.' });
     }
+
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 20;
+    const offset = (pageNum - 1) * limitNum;
+
     try {
         const client = await pool.connect();
         const result = await client.query(
@@ -353,8 +358,9 @@ app.get('/api/merchant/products', async (req, res) => {
              FROM products p
              JOIN prices pr ON p.id = pr.product_id
              WHERE pr.store_id = $1
-             ORDER BY p.name ASC`,
-            [store_id]
+             ORDER BY p.name ASC
+             LIMIT $2 OFFSET $3`,
+            [store_id, limitNum, offset]
         );
         client.release();
         res.json(result.rows);

@@ -101,6 +101,9 @@
         <div id="products-container" class="products-grid">
             <p style="color: #888;">Carregando produtos...</p>
         </div>
+        <div style="text-align: center; margin-top: 20px; padding-bottom: 20px;">
+            <button id="load-more-btn" onclick="loadMoreProducts()" style="display: none; background: #e91e63; color: white; border: none; padding: 10px 25px; border-radius: 25px; cursor: pointer; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Carregar Mais</button>
+        </div>
     </main>
 
     <!-- Botão Flutuante de Voltar -->
@@ -116,6 +119,9 @@
 
         const params = new URLSearchParams(window.location.search);
         const storeId = params.get('id');
+        
+        let currentPage = 1;
+        const itemsPerPage = 12;
 
         if (!storeId) {
             document.body.innerHTML = '<h2 style="text-align:center; margin-top:2rem; color:white;">Loja não encontrada.</h2>';
@@ -147,19 +153,28 @@
                     document.getElementById('store-header').innerHTML = '<p style="color: #ff9800;">Erro ao carregar informações da loja. Verifique a URL ou tente mais tarde.</p>';
                 });
 
-            // Carregar Produtos da Loja
-            fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}`)
+            // Função de Carregar Produtos com Paginação
+            window.loadMoreProducts = function() {
+                const btn = document.getElementById('load-more-btn');
+                if(btn) btn.innerText = 'Carregando...';
+
+                fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}&page=${currentPage}&limit=${itemsPerPage}`)
                 .then(res => {
                     if (!res.ok) throw new Error('Products not found');
                     return res.json();
                 })
                 .then(products => {
                     const container = document.getElementById('products-container');
-                    if (products.length === 0) {
+                    
+                    if (currentPage === 1) container.innerHTML = ''; // Limpa o "Carregando..." inicial
+
+                    if (products.length === 0 && currentPage === 1) {
                         container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #888;">Nenhum produto cadastrado.</p>';
+                        if(btn) btn.style.display = 'none';
                         return;
                     }
-                    container.innerHTML = products.map(p => {
+
+                    const html = products.map(p => {
                         const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
                         const fullImageUrl = p.image_url && !p.image_url.startsWith('http')
                             ? `${API_BASE_URL}${p.image_url}`
@@ -176,11 +191,28 @@
                             </div>
                         `;
                     }).join('');
+
+                    container.insertAdjacentHTML('beforeend', html);
+
+                    // Controle do botão "Carregar Mais"
+                    if (products.length < itemsPerPage) {
+                        if(btn) btn.style.display = 'none';
+                    } else {
+                        if(btn) {
+                            btn.style.display = 'inline-block';
+                            btn.innerText = 'Carregar Mais';
+                        }
+                        currentPage++;
+                    }
                 })
                 .catch(err => {
                     console.error(err);
-                    document.getElementById('products-container').innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ff9800;">Erro ao carregar os produtos.</p>';
+                    if(currentPage === 1) document.getElementById('products-container').innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ff9800;">Erro ao carregar os produtos.</p>';
                 });
+            };
+
+            // Carregamento inicial
+            loadMoreProducts();
         }
 
         // Footer Global - JBSousaTech
