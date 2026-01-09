@@ -44,6 +44,9 @@ function renderResults(stores) {
     const fullImageUrl = store.image_url && !store.image_url.startsWith('http')
         ? `${API_BASE_URL}${store.image_url}`
         : store.image_url;
+    
+    const safeStoreName = store.store_name.replace(/'/g, "\\'");
+    const safeProductName = (store.product_name || document.getElementById('product').value).replace(/'/g, "\\'");
 
     html += `
       <div class="result-card ${isBestPrice ? 'best-price' : ''}" onclick="window.open('store_profile.html?id=${store.store_id}', '_blank')" style="cursor: pointer;" title="Clique para ver todos os produtos desta loja">
@@ -66,6 +69,9 @@ function renderResults(stores) {
           <span class="price" style="${isPromo ? 'color: #ffeb3b;' : ''}">R$ ${parseFloat(finalPrice).toFixed(2)}</span>
           ${isBestPrice ? '<span class="badge">Melhor Preço</span>' : ''}
           ${isPromo ? `<div class="promo-timer" data-expires="${store.promo_expires_at}" style="font-size: 0.75rem; color: #ff9800; margin-top: 5px; font-weight: bold;"></div>` : ''}
+          <button onclick="shareOffer(event, '${safeStoreName}', '${safeProductName}', '${finalPrice}', '${store.store_id}')" style="background: rgba(255, 255, 255, 0.1); border: none; border-radius: 4px; color: #fff; cursor: pointer; margin-top: 8px; padding: 4px 8px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.75rem;" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+            <span>📤</span> Compartilhar
+          </button>
         </div>
       </div>
     `;

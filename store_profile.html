@@ -119,6 +119,20 @@
 
         const params = new URLSearchParams(window.location.search);
         const storeId = params.get('id');
+        let storeName = ''; // Variável para armazenar nome da loja para o compartilhamento
+
+        // Função de Compartilhar
+        window.shareOffer = (event, sName, pName, price) => {
+            event.stopPropagation();
+            const text = `🔥 Oferta Imperdível: ${pName}\n🏪 ${sName}\n💰 R$ ${parseFloat(price).toFixed(2)}\n\nConfira no Mercado Local:`;
+            const url = window.location.href;
+            
+            if (navigator.share) {
+                navigator.share({ title: 'Oferta Mercado Local', text: text, url: url }).catch(console.error);
+            } else {
+                window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+            }
+        };
         
         let currentPage = 1;
         const itemsPerPage = 12;
@@ -133,6 +147,7 @@
                     return res.json();
                 })
                 .then(store => {
+                    storeName = store.name;
                     const fullLogoUrl = store.logo_url && !store.logo_url.startsWith('http')
                         ? `${API_BASE_URL}${store.logo_url}`
                         : store.logo_url;
@@ -188,6 +203,9 @@
                                 ${isPromo ? `<div class="old-price">R$ ${parseFloat(p.price).toFixed(2)}</div>` : ''}
                                 <div class="${isPromo ? 'promo-tag' : 'price-tag'}">R$ ${parseFloat(isPromo ? p.promo_price : p.price).toFixed(2)}</div>
                                 ${isPromo ? '<div style="font-size: 0.7rem; color: #ff9800;">Oferta 24h</div>' : ''}
+                                <button onclick="shareOffer(event, '${(storeName || '').replace(/'/g, "\\'")}', '${p.name.replace(/'/g, "\\'")}', '${isPromo ? p.promo_price : p.price}')" style="background: rgba(255, 255, 255, 0.1); border: none; border-radius: 4px; color: #fff; cursor: pointer; margin-top: 10px; padding: 6px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.8rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                                    <span>📤</span> Compartilhar
+                                </button>
                             </div>
                         `;
                     }).join('');

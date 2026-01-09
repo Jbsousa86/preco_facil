@@ -431,7 +431,7 @@ app.get('/api/search', async (req, res) => {
 
         // Busca aprimorada: similaridade, ignora acentos e aceita correspondências parciais
         const result = await client.query(
-            `SELECT s.id as store_id, s.name as store_name, s.rating, pr.price, pr.promo_price, pr.promo_expires_at, pr.image_url, s.logo_url, s.street, s.number, s.neighborhood, s.phone, p.category,
+            `SELECT s.id as store_id, s.name as store_name, s.rating, pr.price, pr.promo_price, pr.promo_expires_at, pr.image_url, s.logo_url, s.street, s.number, s.neighborhood, s.phone, p.category, p.name as product_name,
                     similarity(unaccent(lower(p.name)), unaccent(lower($1))) AS sim
              FROM prices pr
              JOIN products p ON p.id = pr.product_id
