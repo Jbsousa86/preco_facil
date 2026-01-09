@@ -189,7 +189,7 @@ async function loadTrendingOffers() {
                             <span class="price" style="color: #ffeb3b; font-size: 1.1rem; display: block;">R$ ${parseFloat(offer.promo_price).toFixed(2)}</span>
                             <div class="promo-timer" data-expires="${offer.promo_expires_at}" style="font-size: 0.65rem; color: #ff9800; margin-top: 2px; font-weight: bold;"></div>
                             <button onclick="shareOffer(event, '${safeStoreName}', '${safeProductName}', '${offer.promo_price}', '${offer.store_id}')" style="background: rgba(255, 255, 255, 0.1); border: none; border-radius: 4px; color: #fff; cursor: pointer; margin-top: 5px; padding: 4px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.7rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
-                                <span>📤</span> Compartilhar
+                                <span>🔥</span>Compartilhar Ofertas!
                             </button>
                         </div>
                     </div>
