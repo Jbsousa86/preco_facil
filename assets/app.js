@@ -124,6 +124,23 @@ window.searchTrending = (term) => {
     document.getElementById('search-form').dispatchEvent(new Event('submit'));
 };
 
+window.shareOffer = (event, storeName, productName, price, storeId) => {
+    event.stopPropagation();
+    const text = `🔥 Oferta Imperdível: ${productName}\n🏪 ${storeName}\n💰 R$ ${parseFloat(price).toFixed(2)}\n\nConfira no Mercado Local:`;
+    const url = `${window.location.origin}/store_profile.html?id=${storeId}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'Oferta Mercado Local',
+            text: text,
+            url: url
+        }).catch(err => console.log('Erro ao compartilhar:', err));
+    } else {
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+        window.open(whatsappUrl, '_blank');
+    }
+};
+
 // Carregar Ofertas em Destaque
 async function loadTrendingOffers() {
     try {
@@ -148,6 +165,8 @@ async function loadTrendingOffers() {
                     const fullImageUrl = offer.image_url && !offer.image_url.startsWith('http')
                         ? `${API_BASE_URL}${offer.image_url}`
                         : offer.image_url;
+                    const safeStoreName = offer.store_name.replace(/'/g, "\\'");
+                    const safeProductName = offer.product_name.replace(/'/g, "\\'");
                     return `
                     <div class="result-card" onclick="window.open('store_profile.html?id=${offer.store_id}', '_blank')" style="flex: 0 0 auto; width: 290px; cursor: pointer; border: 1px solid #ff9800; background: rgba(255, 152, 0, 0.05); margin-bottom: 0;">
                         ${fullImageUrl ? `<img src="${fullImageUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px;">` : ''}
@@ -163,6 +182,9 @@ async function loadTrendingOffers() {
                             <span style="text-decoration: line-through; color: #888; font-size: 0.7rem; display: block;">R$ ${parseFloat(offer.price).toFixed(2)}</span>
                             <span class="price" style="color: #ffeb3b; font-size: 1.1rem; display: block;">R$ ${parseFloat(offer.promo_price).toFixed(2)}</span>
                             <div class="promo-timer" data-expires="${offer.promo_expires_at}" style="font-size: 0.65rem; color: #ff9800; margin-top: 2px; font-weight: bold;"></div>
+                            <button onclick="shareOffer(event, '${safeStoreName}', '${safeProductName}', '${offer.promo_price}', '${offer.store_id}')" style="background: rgba(255, 255, 255, 0.1); border: none; border-radius: 4px; color: #fff; cursor: pointer; margin-top: 5px; padding: 4px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.7rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                                <span>📤</span> Compartilhar
+                            </button>
                         </div>
                     </div>
                     `;
