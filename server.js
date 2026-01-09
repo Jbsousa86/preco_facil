@@ -261,10 +261,30 @@ app.post('/api/login', async (req, res) => {
 // Endpoint: GET /api/merchant/products?store_id=...
 // ROTA PARA SALVAR PRODUTO (Recebe JSON do Supabase)
 app.post('/api/products', async (req, res) => {
-    const { name, price, category, image_url, store_id, promo_price } = req.body;
+    let { name, price, category, image_url, store_id, promo_price } = req.body;
 
     if (!name || !price || !category || !store_id) {
         return res.status(400).json({ error: 'Todos os campos obrigatórios devem ser preenchidos: nome, preço, categoria e ID da loja.' });
+    }
+
+    // Helper para limpar e formatar preços (aceita vírgula ou ponto)
+    const cleanPrice = (val) => {
+        if (val === null || val === undefined || val === '') return null;
+        const strVal = String(val).replace(',', '.').trim();
+        const num = parseFloat(strVal);
+        return isNaN(num) ? null : num;
+    };
+
+    const finalPrice = cleanPrice(price);
+    let finalPromoPrice = cleanPrice(promo_price);
+
+    if (finalPrice === null) {
+        return res.status(400).json({ error: 'O preço informado é inválido.' });
+    }
+
+    // Regra: Se o preço promocional for maior ou igual ao normal, cancela a promoção
+    if (finalPromoPrice !== null && finalPromoPrice >= finalPrice) {
+        finalPromoPrice = null;
     }
 
     const client = await pool.connect();
@@ -285,7 +305,7 @@ app.post('/api/products', async (req, res) => {
         const productId = productResult.rows[0].id;
 
         // Etapa 2: Insere ou atualiza o preço na tabela `prices`.
-        const promoExpires = promo_price ? new Date(Date.now() + 24 * 60 * 60 * 1000) : null;
+        const promoExpires = finalPromoPrice !== null ? new Date(Date.now() + 24 * 60 * 60 * 1000) : null;
         
         const upsertPriceQuery = `
             INSERT INTO prices (store_id, product_id, price, image_url, promo_price, promo_expires_at)
@@ -297,7 +317,7 @@ app.post('/api/products', async (req, res) => {
                 promo_price = EXCLUDED.promo_price,
                 promo_expires_at = EXCLUDED.promo_expires_at;
         `;
-        await client.query(upsertPriceQuery, [store_id, productId, price, image_url, promo_price, promoExpires]);
+        await client.query(upsertPriceQuery, [store_id, productId, finalPrice, image_url, finalPromoPrice, promoExpires]);
 
         await client.query('COMMIT');
         res.status(201).json({ success: true, message: 'Produto salvo com sucesso!' });
@@ -449,7 +469,7 @@ app.get('/api/offers/trending', async (req, res) => {
              WHERE pr.promo_price IS NOT NULL 
                AND pr.promo_expires_at > NOW()
                AND (s.is_blocked IS NULL OR s.is_blocked = FALSE)
-             LIMIT 10`
+             LIMIT 30`
         );
         client.release();
         res.json(result.rows);
