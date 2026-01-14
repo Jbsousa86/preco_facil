@@ -11,14 +11,15 @@
             max-width: 400px;
             margin: 4rem auto;
             padding: 2rem;
-            background: rgba(255, 255, 255, 0.05);
+            background: linear-gradient(135deg, hsl(var(--primary-h, 220), var(--primary-s, 90%), 92%), #ffffff);
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid hsl(var(--primary-h, 220), var(--primary-s, 90%), 85%);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
         h2 {
             text-align: center;
-            color: #fff;
+            color: var(--text-main, #1f2937);
             margin-bottom: 1.5rem;
         }
 
@@ -29,23 +30,23 @@
         label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #ccc;
+            color: var(--text-muted, #6b7280);
         }
 
         input {
             width: 100%;
             padding: 0.8rem;
             border-radius: 6px;
-            border: 1px solid #444;
-            background: rgba(0, 0, 0, 0.2);
-            color: #fff;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+            color: var(--text-main, #1f2937);
             box-sizing: border-box;
         }
 
         button {
             width: 100%;
             padding: 0.8rem;
-            background: var(--accent-color, #e91e63);
+            background: hsl(var(--primary-h, 220), var(--primary-s, 90%), var(--primary-l, 50%));
             color: white;
             border: none;
             border-radius: 6px;
@@ -85,8 +86,7 @@
                 <button type="submit">Entrar</button>
                 <div id="error-msg" class="error"></div>
             </form>
-            <p style="text-align: center; margin-top: 1rem;"><a href="index.html" style="color: #ccc;">Voltar para
-                    busca</a></p>
+            <p style="text-align: center; margin-top: 1rem;"><a href="index.html" style="color: hsl(var(--primary-h, 220), var(--primary-s, 90%), var(--primary-l, 50%)); text-decoration: none;">Voltar para busca</a></p>
         </div>
     </main>
 
@@ -130,8 +130,8 @@
         // Footer Global - JBSousaTech
         const footer = document.createElement('footer');
         footer.innerHTML = `
-            <div style="text-align: center; padding: 20px; margin-top: 40px; border-top: 1px solid #333; color: #888; font-size: 0.9rem;">
-                &copy; ${new Date().getFullYear()} JbsousaTech - Todos os direitos reservados
+            <div style="text-align: center; padding: 20px; margin-top: 40px; border-top: 1px solid var(--border-color, #e5e7eb); color: var(--text-muted, #6b7280); font-size: 0.9rem;">
+                &copy; ${new Date().getFullYear()} JBSousaTech - Todos os direitos reservados
             </div>
         `;
         document.body.appendChild(footer);

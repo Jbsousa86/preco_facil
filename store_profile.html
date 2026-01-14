@@ -7,12 +7,12 @@
     <link rel="stylesheet" href="assets/style.css">
     <style>
         .profile-header {
-            background: rgba(255, 255, 255, 0.05);
+            background: linear-gradient(135deg, hsl(var(--primary-h, 220), var(--primary-s, 90%), 92%), #ffffff);
             padding: 2rem;
             border-radius: 12px;
             text-align: center;
             margin-bottom: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid hsl(var(--primary-h, 220), var(--primary-s, 90%), 85%);
         }
         .store-logo-large {
             width: 100px;
@@ -28,10 +28,10 @@
             gap: 1rem;
         }
         .product-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: linear-gradient(135deg, hsl(var(--primary-h, 220), var(--primary-s, 90%), 92%), #ffffff);
             padding: 1rem;
             border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid hsl(var(--primary-h, 220), var(--primary-s, 90%), 85%);
             display: flex;
             flex-direction: column;
         }
@@ -155,9 +155,9 @@
                     document.getElementById('store-header').innerHTML = `
                         ${fullLogoUrl ? `<img src="${fullLogoUrl}" class="store-logo-large">` : '<div style="font-size:3rem;">🏪</div>'}
                         <h2 style="margin: 0.5rem 0;">${store.name}</h2>
-                        ${store.street ? `<p style="color: #ccc;">📍 ${store.street}, ${store.number || ''} - ${store.neighborhood || ''}</p>` : ''}
+                        ${store.street ? `<p style="color: #6b7280;">📍 ${store.street}, ${store.number || ''} - ${store.neighborhood || ''}</p>` : ''}
                         ${store.phone ? `
-                            <p style="color: #ccc; margin-bottom: 10px;">📞 ${store.phone}</p>
+                            <p style="color: #6b7280; margin-bottom: 10px;">📞 ${store.phone}</p>
                             <a href="https://wa.me/55${store.phone.replace(/\D/g, '')}?text=Ol%C3%A1%20vim%20pela%20plataforma%20mercado%20local.
                             " target="_blank" style="background: #25D366; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">Conversar no WhatsApp</a>
                         ` : ''}
@@ -199,11 +199,11 @@
                             <div class="product-card">
                                 ${fullImageUrl ? `<img src="${fullImageUrl}" alt="${p.name}">` : ''}
                                 <h4 style="margin: 0 0 0.5rem 0;">${p.name}</h4>
-                                ${p.category ? `<span style="font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: #ccc; width: fit-content; margin-bottom: 5px;">${p.category}</span>` : ''}
+                                ${p.category ? `<span style="font-size: 0.7rem; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; color: #666; width: fit-content; margin-bottom: 5px;">${p.category}</span>` : ''}
                                 ${isPromo ? `<div class="old-price">R$ ${parseFloat(p.price).toFixed(2)}</div>` : ''}
                                 <div class="${isPromo ? 'promo-tag' : 'price-tag'}">R$ ${parseFloat(isPromo ? p.promo_price : p.price).toFixed(2)}</div>
                                 ${isPromo ? '<div style="font-size: 0.7rem; color: #ff9800;">Oferta 24h</div>' : ''}
-                                <button onclick="shareOffer(event, '${(storeName || '').replace(/'/g, "\\'")}', '${p.name.replace(/'/g, "\\'")}', '${isPromo ? p.promo_price : p.price}')" style="background: rgba(255, 255, 255, 0.1); border: none; border-radius: 4px; color: #fff; cursor: pointer; margin-top: 10px; padding: 6px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.8rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                                <button onclick="shareOffer(event, '${(storeName || '').replace(/'/g, "\\'")}', '${p.name.replace(/'/g, "\\'")}', '${isPromo ? p.promo_price : p.price}')" style="background: #2563eb; border: none; border-radius: 4px; color: #fff; cursor: pointer; margin-top: 10px; padding: 6px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.8rem; transition: background 0.2s;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
                                     <span>📤</span> Compartilhar
                                 </button>
                             </div>

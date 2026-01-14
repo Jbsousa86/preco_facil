@@ -9,12 +9,12 @@
     <style>
         .admin-container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .stat-card { background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .stat-card { background: linear-gradient(135deg, hsl(var(--primary-h, 220), var(--primary-s, 90%), 92%), #ffffff); padding: 1.5rem; border-radius: 8px; text-align: center; border: 1px solid hsl(var(--primary-h, 220), var(--primary-s, 90%), 85%); color: var(--text-main, #1f2937); }
         .stat-number { font-size: 2.5rem; font-weight: bold; color: #4CAF50; display: block; }
         
-        .admin-section { background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; }
+        .admin-section { background: linear-gradient(135deg, hsl(var(--primary-h, 220), var(--primary-s, 90%), 92%), #ffffff); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid hsl(var(--primary-h, 220), var(--primary-s, 90%), 85%); }
         table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e5e7eb; color: var(--text-main, #1f2937); }
         th { color: #e91e63; }
         
         .action-btn { padding: 5px 10px; border-radius: 4px; cursor: pointer; border: none; margin-right: 5px; color: white; }
@@ -23,7 +23,7 @@
         .btn-block { background: #ff9800; }
         .btn-unblock { background: #4CAF50; }
         
-        .form-inline { display: flex; gap: 10px; margin-bottom: 1rem; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; flex-wrap: wrap; }
+        .form-inline { display: flex; gap: 10px; margin-bottom: 1rem; background: #f9fafb; padding: 1rem; border-radius: 8px; flex-wrap: wrap; border: 1px solid #e5e7eb; }
         .form-inline input { margin: 0; flex: 1; min-width: 150px; }
 
         @media (max-width: 768px) {

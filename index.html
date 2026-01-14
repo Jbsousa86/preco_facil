@@ -12,24 +12,25 @@
     <style>
         /* Estilos para o agrupamento por loja */
         .store-block {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, hsl(220, 90%, 92%), #ffffff);
+            border: 1px solid hsl(220, 90%, 85%);
             border-radius: 12px;
             margin-bottom: 1.5rem;
             padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
         .store-header {
             margin: 0 0 1rem 0;
-            color: #e91e63; /* Cor de destaque */
+            color: #2563eb; /* Cor de destaque */
             font-size: 1.2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e5e7eb;
             padding-bottom: 0.5rem;
         }
         .product-result-item {
             display: flex;
             justify-content: space-between;
             padding: 0.5rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid #f3f4f6;
         }
         .product-result-item:last-child {
             border-bottom: none;
@@ -115,7 +116,7 @@
             <a href="login.html" class="button">Acessar área do comerciante</a>
         </section>
         <section id="offers-section" style="display: none; margin-bottom: 1.5rem;">
-            <h3 style="color: #ffeb3b; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">🔥 Ofertas em Destaque</h3>
+            <h3 style="color: #1f2937; margin-top: 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem;">🔥 Ofertas em Destaque</h3>
             <div id="offers-container" class="results-list"></div>
         </section>
         <section class="search-section">

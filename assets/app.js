@@ -53,23 +53,23 @@ function renderResults(stores) {
         ${fullImageUrl ? `<img src="${fullImageUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px;">` : ''}
         <div class="store-info">
           <h3>${store.store_name}</h3>
-          ${store.category ? `<span style="font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: #ccc; margin-right: 5px;">${store.category}</span>` : ''}
+          ${store.category ? `<span style="font-size: 0.7rem; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; color: #666; margin-right: 5px;">${store.category}</span>` : ''}
           <span class="rating">${store.rating} ⭐</span>
-          ${store.street ? `<p style="font-size: 0.8rem; color: #aaa; margin: 4px 0;">📍 ${store.street}, ${store.number || ''} - ${store.neighborhood || ''}</p>` : ''}
+          ${store.street ? `<p style="font-size: 0.8rem; color: #6b7280; margin: 4px 0;">📍 ${store.street}, ${store.number || ''} - ${store.neighborhood || ''}</p>` : ''}
           ${store.phone ? `
             <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
-                <span style="font-size: 0.8rem; color: #aaa;">📞 ${store.phone}</span>
+                <span style="font-size: 0.8rem; color: #6b7280;">📞 ${store.phone}</span>
                 <a href="https://wa.me/55${cleanPhone}" target="_blank" onclick="event.stopPropagation()" style="background: #25D366; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; text-decoration: none; font-weight: bold;">WhatsApp</a>
             </div>` : ''}
         </div>
         <div class="price-info">
           ${isPromo 
-            ? `<span style="text-decoration: line-through; color: #888; font-size: 0.8rem;">R$ ${parseFloat(store.price).toFixed(2)}</span>` 
+            ? `<span style="text-decoration: line-through; color: #9ca3af; font-size: 0.8rem;">R$ ${parseFloat(store.price).toFixed(2)}</span>` 
             : ''}
-          <span class="price" style="${isPromo ? 'color: #ffeb3b;' : ''}">R$ ${parseFloat(finalPrice).toFixed(2)}</span>
+          <span class="price" style="${isPromo ? 'color: #d97706;' : ''}">R$ ${parseFloat(finalPrice).toFixed(2)}</span>
           ${isBestPrice ? '<span class="badge">Melhor Preço</span>' : ''}
-          ${isPromo ? `<div class="promo-timer" data-expires="${store.promo_expires_at}" style="font-size: 0.75rem; color: #ff9800; margin-top: 5px; font-weight: bold;"></div>` : ''}
-          <button onclick="shareOffer(event, '${safeStoreName}', '${safeProductName}', '${finalPrice}', '${store.store_id}')" style="background: rgba(255, 255, 255, 0.1); border: none; border-radius: 4px; color: #fff; cursor: pointer; margin-top: 8px; padding: 4px 8px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.75rem;" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+          ${isPromo ? `<div class="promo-timer" data-expires="${store.promo_expires_at}" style="font-size: 0.75rem; color: #d97706; margin-top: 5px; font-weight: bold;"></div>` : ''}
+          <button onclick="shareOffer(event, '${safeStoreName}', '${safeProductName}', '${finalPrice}', '${store.store_id}')" style="background: #2563eb; border: none; border-radius: 4px; color: #fff; cursor: pointer; margin-top: 8px; padding: 4px 8px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.75rem;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
             <span>📤</span> Compartilhar
           </button>
         </div>
@@ -174,21 +174,21 @@ async function loadTrendingOffers() {
                     const safeStoreName = offer.store_name.replace(/'/g, "\\'");
                     const safeProductName = offer.product_name.replace(/'/g, "\\'");
                     return `
-                    <div class="result-card" onclick="window.open('store_profile.html?id=${offer.store_id}', '_blank')" style="flex: 0 0 auto; width: 290px; cursor: pointer; border: 1px solid #ff9800; background: rgba(255, 152, 0, 0.05); margin-bottom: 0;">
+                    <div class="result-card" onclick="window.open('store_profile.html?id=${offer.store_id}', '_blank')" style="flex: 0 0 auto; width: 290px; cursor: pointer; border: 1px solid #fcd34d; background: #fffbeb; margin-bottom: 0;">
                         ${fullImageUrl ? `<img src="${fullImageUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px;">` : ''}
                         <div class="store-info" style="overflow: hidden; flex: 1;">
-                            <h3 style="color: #fff; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${offer.product_name}</h3>
-                            <div style="font-size: 0.8rem; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"> ${offer.store_name}</div>
+                            <h3 style="color: #1f2937; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${offer.product_name}</h3>
+                            <div style="font-size: 0.8rem; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"> ${offer.store_name}</div>
                             ${offer.phone ? `
                                 <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                                     <a href="https://wa.me/55${cleanPhone}?text=Ol%C3%A1%20vim%20pela%20plataforma%20mercado%20local." target="_blank" onclick="event.stopPropagation()" style="background: #25D366; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; text-decoration: none; font-weight: bold;">WhatsApp</a>
                                 </div>` : ''}
                         </div>
                         <div class="price-info" style="min-width: 85px; text-align: right;">
-                            <span style="text-decoration: line-through; color: #888; font-size: 0.7rem; display: block;">R$ ${parseFloat(offer.price).toFixed(2)}</span>
-                            <span class="price" style="color: #ffeb3b; font-size: 1.1rem; display: block;">R$ ${parseFloat(offer.promo_price).toFixed(2)}</span>
-                            <div class="promo-timer" data-expires="${offer.promo_expires_at}" style="font-size: 0.65rem; color: #ff9800; margin-top: 2px; font-weight: bold;"></div>
-                            <button onclick="shareOffer(event, '${safeStoreName}', '${safeProductName}', '${offer.promo_price}', '${offer.store_id}')" style="background: rgba(255, 255, 255, 0.1); border: none; border-radius: 4px; color: #fff; cursor: pointer; margin-top: 5px; padding: 4px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.7rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                            <span style="text-decoration: line-through; color: #9ca3af; font-size: 0.7rem; display: block;">R$ ${parseFloat(offer.price).toFixed(2)}</span>
+                            <span class="price" style="color: #d97706; font-size: 1.1rem; display: block;">R$ ${parseFloat(offer.promo_price).toFixed(2)}</span>
+                            <div class="promo-timer" data-expires="${offer.promo_expires_at}" style="font-size: 0.65rem; color: #d97706; margin-top: 2px; font-weight: bold;"></div>
+                            <button onclick="shareOffer(event, '${safeStoreName}', '${safeProductName}', '${offer.promo_price}', '${offer.store_id}')" style="background: #2563eb; border: none; border-radius: 4px; color: #fff; cursor: pointer; margin-top: 5px; padding: 4px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.7rem; transition: background 0.2s;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
                                 <span>🔥</span>Compartilhar Ofertas!
                             </button>
                         </div>
@@ -247,18 +247,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                             return `
                             <div style="flex: 0 0 auto; width: 80px; display: flex; flex-direction: column; align-items: center; margin-right: 10px; opacity: 0.5; filter: grayscale(100%); cursor: not-allowed;" title="Loja Indisponível">
                                 ${fullLogoUrl ? `<img src="${fullLogoUrl}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #777; margin-bottom: 5px;">` : `<div style="width: 50px; height: 50px; border-radius: 50%; background: #555; display: flex; align-items: center; justify-content: center; border: 2px solid #777; margin-bottom: 5px;">🔒</div>`}
-                                <span style="font-size: 0.8rem; color: #999; text-align: center; line-height: 1.2;">${store.name}</span>
+                                <span style="font-size: 0.8rem; color: #fff; text-align: center; line-height: 1.2;">${store.name}</span>
                             </div>`;
                         }
 
                         const borderStyle = store.has_promo 
                             ? 'border: 3px solid #FFD700; box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);' 
-                            : 'border: 2px solid #e91e63;';
+                            : 'border: 2px solid #2563eb;';
                         
                         return `
                         <div onclick="window.location.href='store_profile.html?id=${store.id}'" style="flex: 0 0 auto; width: 80px; display: flex; flex-direction: column; align-items: center; cursor: pointer; margin-right: 10px;" title="Ver perfil da loja">
-                            ${fullLogoUrl ? `<img src="${fullLogoUrl}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; ${borderStyle} margin-bottom: 5px;">` : `<div style="width: 50px; height: 50px; border-radius: 50%; background: #555; display: flex; align-items: center; justify-content: center; ${borderStyle} margin-bottom: 5px;">🏪</div>`}
-                            <span style="font-size: 0.8rem; color: #ddd; text-align: center; line-height: 1.2;">${store.name}</span>
+                            ${fullLogoUrl ? `<img src="${fullLogoUrl}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; ${borderStyle} margin-bottom: 5px;">` : `<div style="width: 50px; height: 50px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; ${borderStyle} margin-bottom: 5px;">🏪</div>`}
+                            <span style="font-size: 0.8rem; color: #fff; text-align: center; line-height: 1.2;">${store.name}</span>
                             ${store.has_promo ? '<span style="font-size: 0.6rem; color: #FFD700; font-weight: bold;">OFERTAS</span>' : ''}
                         </div>
                     `}).join('');
@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Footer Global - JBSousaTech
     const footer = document.createElement('footer');
     footer.innerHTML = `
-        <div id="footer-copy" style="text-align: center; padding: 20px; margin-top: 40px; border-top: 1px solid #333; color: #888; font-size: 0.9rem; user-select: none; cursor: default;">
+        <div id="footer-copy" style="text-align: center; padding: 20px; margin-top: 40px; border-top: 1px solid var(--border-color, #e5e7eb); color: var(--text-muted, #6b7280); font-size: 0.9rem; user-select: none; cursor: default;">
             &copy; ${new Date().getFullYear()} JBSousaTech - Todos os direitos reservados
         </div>
     `;

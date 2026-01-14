@@ -24,16 +24,16 @@
         }
 
         .add-product-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: linear-gradient(135deg, hsl(var(--primary-h, 220), var(--primary-s, 90%), 92%), #ffffff);
             padding: 1.5rem;
             border-radius: 12px;
             margin-bottom: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid hsl(var(--primary-h, 220), var(--primary-s, 90%), 85%);
         }
 
         .add-product-card h3 {
             margin-top: 0;
-            color: #fff;
+            color: var(--text-main, #1f2937);
         }
 
         .form-row {
@@ -60,10 +60,10 @@
         }
 
         .product-item {
-            background: rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, hsl(var(--primary-h, 220), var(--primary-s, 90%), 92%), #ffffff);
             padding: 1rem;
             border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid hsl(var(--primary-h, 220), var(--primary-s, 90%), 85%);
         }
 
         .product-item img {
@@ -76,7 +76,7 @@
 
         .product-item h4 {
             margin: 0 0 0.5rem 0;
-            color: #fff;
+            color: var(--text-main, #1f2937);
             overflow-wrap: break-word;
             word-wrap: break-word;
         }
@@ -160,7 +160,7 @@
                 <div class="form-row">
                     <input type="text" id="prod-name" placeholder="Nome do Produto (ex: Arroz 5kg)" required>
                     <input type="number" id="prod-price" placeholder="Preço (R$)" step="0.01" required>
-                    <select id="prod-category" required style="flex: 1; padding: 0.8rem; border-radius: 6px; border: 1px solid #444; background: rgba(0, 0, 0, 0.2); color: #ffffff;">
+                    <select id="prod-category" required style="flex: 1; padding: 0.8rem; border-radius: 6px; border: 1px solid #d1d5db; background: #f9fafb; color: var(--text-main, #1f2937);">
                         <option value="" disabled selected>Categoria</option>
                         <option value="Alimentos">Alimentos</option>
                         <option value="Bebidas">Bebidas</option>
