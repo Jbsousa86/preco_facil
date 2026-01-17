@@ -150,20 +150,7 @@
             <h3>Logo da Loja</h3>
             <form id="logo-form">
                 <div class="form-row">
-                    <div style="display: flex; gap: 5px; align-items: center; flex: 1; min-width: 300px;">
-                        <select id="logo-source-type"
-                            style="padding: 0.8rem; border-radius: 6px; border: 1px solid #d1d5db; background: #f9fafb; width: 100px;">
-                            <option value="file">Arquivo</option>
-                            <option value="url">Link</option>
-                        </select>
-                        <div id="logo-file-container" style="flex: 1;">
-                            <input type="file" id="store-logo" accept="image/*" style="width: 100%;">
-                        </div>
-                        <div id="logo-url-container" style="flex: 1; display: none;">
-                            <input type="url" id="store-logo-url" placeholder="Link da Logo (Supabase ou outro)"
-                                style="width: 100%;">
-                        </div>
-                    </div>
+                    <input type="file" id="store-logo" accept="image/*" required style="flex: 1;">
                     <button type="submit" style="width: auto;">Atualizar Logo</button>
                 </div>
             </form>
@@ -251,17 +238,7 @@
             }
         });
 
-        document.getElementById('logo-source-type').addEventListener('change', (e) => {
-            const isUrl = e.target.value === 'url';
-            document.getElementById('logo-file-container').style.display = isUrl ? 'none' : 'block';
-            document.getElementById('logo-url-container').style.display = isUrl ? 'block' : 'none';
-            // Clear inputs when switching
-            if (isUrl) {
-                document.getElementById('store-logo').value = '';
-            } else {
-                document.getElementById('store-logo-url').value = '';
-            }
-        });
+
 
         function getFullUrl(path) {
             if (!path || path === 'null' || String(path).trim() === '') return '';
@@ -295,14 +272,6 @@
         // --- CARREGAMENTO INICIAL ---
         if (storeLogo && storeLogo !== 'null') {
             document.getElementById('current-logo').innerHTML = `<img src="${getFullUrl(storeLogo)}" style="height: 60px; border-radius: 50%;">`;
-
-            // Se a logo for um link externo, preenche o campo de URL por conveniência
-            if (storeLogo.startsWith('http')) {
-                document.getElementById('logo-source-type').value = 'url';
-                document.getElementById('logo-file-container').style.display = 'none';
-                document.getElementById('logo-url-container').style.display = 'block';
-                document.getElementById('store-logo-url').value = storeLogo;
-            }
         }
 
         async function loadProducts() {
@@ -365,37 +334,26 @@
         document.getElementById('logo-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button');
-            const sourceType = document.getElementById('logo-source-type').value;
             const fileInput = document.getElementById('store-logo');
-            const urlInput = document.getElementById('store-logo-url');
 
-            if (sourceType === 'file' && !fileInput.files[0]) {
-                alert('Selecione um arquivo de imagem.');
-                return;
-            }
-            if (sourceType === 'url' && !urlInput.value.trim()) {
-                alert('Insira o link da imagem.');
+            if (!fileInput.files[0]) {
+                alert('Por favor, selecione um arquivo de imagem para a logo.');
                 return;
             }
 
             try {
                 btn.innerText = "Enviando...";
                 btn.disabled = true;
-                let publicUrl = '';
 
-                if (sourceType === 'file') {
-                    const compressedFile = await compressImage(fileInput.files[0], true);
-                    const fileName = `logo-${storeId}-${Date.now()}.png`;
+                const compressedFile = await compressImage(fileInput.files[0], true);
+                const fileName = `logo-${storeId}-${Date.now()}.png`;
 
-                    const { data, error } = await supabaseClient.storage
-                        .from('logos')
-                        .upload(fileName, compressedFile);
+                const { data, error } = await supabaseClient.storage
+                    .from('logos')
+                    .upload(fileName, compressedFile);
 
-                    if (error) throw error;
-                    publicUrl = supabaseClient.storage.from('logos').getPublicUrl(fileName).data.publicUrl;
-                } else {
-                    publicUrl = urlInput.value.trim();
-                }
+                if (error) throw error;
+                const publicUrl = supabaseClient.storage.from('logos').getPublicUrl(fileName).data.publicUrl;
 
                 await fetch(`${API_BASE_URL}/api/merchant/update-logo`, {
                     method: 'PATCH',
@@ -405,7 +363,8 @@
 
                 localStorage.setItem('store_logo', publicUrl);
                 document.getElementById('current-logo').innerHTML = `<img src="${publicUrl}" style="height:60px; border-radius:50%;">`;
-                alert('Logo atualizada!');
+                alert('Logo atualizada com sucesso!');
+                e.target.reset();
             } catch (err) {
                 console.error(err);
                 alert('Erro ao atualizar logo: ' + err.message);
