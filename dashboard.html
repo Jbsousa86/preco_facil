@@ -128,6 +128,13 @@
             .form-row button {
                 width: 100% !important;
             }
+
+            .image-source-group {
+                flex-direction: column;
+                align-items: stretch !important;
+                width: 100%;
+                min-width: 0 !important;
+            }
         }
     </style>
 </head>
@@ -177,7 +184,8 @@
                     </select>
                     <input type="number" id="prod-promo" placeholder="Promoção (24h)" step="0.01" style="width: 130px;">
 
-                    <div style="display: flex; gap: 5px; align-items: center; flex: 1; min-width: 300px;">
+                    <div class="image-source-group"
+                        style="display: flex; gap: 5px; align-items: center; flex: 1; min-width: 280px;">
                         <select id="image-source-type"
                             style="padding: 0.8rem; border-radius: 6px; border: 1px solid #d1d5db; background: #f9fafb; width: 100px;">
                             <option value="file">Arquivo</option>
