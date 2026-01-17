@@ -11,10 +11,9 @@ let offersScrollInterval; // Variável para o carrossel
 function getFullUrl(path) {
     if (!path || path === 'null' || String(path).trim() === '') return '';
     const cleanPath = String(path).trim();
-    if (cleanPath.startsWith('http')) return cleanPath;
+    if (cleanPath.startsWith('http') || cleanPath.startsWith('//')) return cleanPath;
     const finalPath = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
-    const result = `${API_BASE_URL}${finalPath}`;
-    return result;
+    return `${API_BASE_URL}${finalPath}`;
 }
 
 form.addEventListener('submit', async (e) => {
@@ -57,7 +56,7 @@ function renderResults(stores) {
 
         html += `
       <div class="result-card ${isBestPrice ? 'best-price' : ''}" onclick="window.open('store_profile.html?id=${store.store_id}', '_blank')" style="cursor: pointer;" title="Clique para ver todos os produtos desta loja">
-        ${fullImageUrl ? `<img src="${fullImageUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px;">` : ''}
+        ${fullImageUrl ? `<img src="${fullImageUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px;" referrerpolicy="no-referrer">` : ''}
         <div class="store-info">
           <h3>${store.store_name}</h3>
           ${store.category ? `<span style="font-size: 0.7rem; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; color: #666; margin-right: 5px;">${store.category}</span>` : ''}
@@ -180,7 +179,7 @@ async function loadTrendingOffers() {
                     const safeProductName = offer.product_name.replace(/'/g, "\\'");
                     return `
                     <div class="result-card" onclick="window.open('store_profile.html?id=${offer.store_id}', '_blank')" style="flex: 0 0 auto; width: 290px; cursor: pointer; border: 1px solid #fcd34d; background: #fffbeb; margin-bottom: 0;">
-                        ${fullImageUrl ? `<img src="${fullImageUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px;">` : ''}
+                        ${fullImageUrl ? `<img src="${fullImageUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px;" referrerpolicy="no-referrer">` : ''}
                         <div class="store-info" style="overflow: hidden; flex: 1;">
                             <h3 style="color: #1f2937; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${offer.product_name}</h3>
                             <div style="font-size: 0.8rem; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"> ${offer.store_name}</div>
@@ -260,7 +259,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                         return `
                         <div onclick="window.location.href='store_profile.html?id=${store.id}'" style="flex: 0 0 auto; width: 80px; display: flex; flex-direction: column; align-items: center; cursor: pointer; margin-right: 10px;" title="Ver perfil da loja">
-                            ${fullLogoUrl ? `<img src="${fullLogoUrl}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; ${borderStyle} margin-bottom: 5px;">` : `<div style="width: 50px; height: 50px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; ${borderStyle} margin-bottom: 5px;">🏪</div>`}
+                            ${fullLogoUrl ? `<img src="${fullLogoUrl}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; ${borderStyle} margin-bottom: 5px;" referrerpolicy="no-referrer">` : `<div style="width: 50px; height: 50px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; ${borderStyle} margin-bottom: 5px;">🏪</div>`}
                             <span style="font-size: 0.8rem; color: #fff; text-align: center; line-height: 1.2;">${store.name}</span>
                             ${store.has_promo ? '<span style="font-size: 0.6rem; color: #FFD700; font-weight: bold;">OFERTAS</span>' : ''}
                         </div>

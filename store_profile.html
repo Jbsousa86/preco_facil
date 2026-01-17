@@ -134,7 +134,7 @@
         function getFullUrl(path) {
             if (!path || path === 'null' || String(path).trim() === '') return '';
             const cleanPath = String(path).trim();
-            if (cleanPath.startsWith('http')) return cleanPath;
+            if (cleanPath.startsWith('http') || cleanPath.startsWith('//')) return cleanPath;
             const finalPath = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
             return `${API_BASE_URL}${finalPath}`;
         }
@@ -173,7 +173,7 @@
                     const fullLogoUrl = getFullUrl(store.logo_url);
 
                     document.getElementById('store-header').innerHTML = `
-                        ${fullLogoUrl ? `<img src="${fullLogoUrl}" class="store-logo-large">` : '<div style="font-size:3rem;">🏪</div>'}
+                        ${fullLogoUrl ? `<img src="${fullLogoUrl}" class="store-logo-large" referrerpolicy="no-referrer">` : '<div style="font-size:3rem;">🏪</div>'}
                         <h2 style="margin: 0.5rem 0;">${store.name}</h2>
                         ${store.street ? `<p style="color: #6b7280;">📍 ${store.street}, ${store.number || ''} - ${store.neighborhood || ''}</p>` : ''}
                         ${store.phone ? `
@@ -215,7 +215,7 @@
 
                             return `
                             <div class="product-card">
-                                ${fullImageUrl ? `<img src="${fullImageUrl}" alt="${p.name}">` : ''}
+                                ${fullImageUrl ? `<img src="${fullImageUrl}" alt="${p.name}" referrerpolicy="no-referrer">` : ''}
                                 <h4 style="margin: 0 0 0.5rem 0;">${p.name}</h4>
                                 ${p.category ? `<span style="font-size: 0.7rem; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; color: #666; width: fit-content; margin-bottom: 5px;">${p.category}</span>` : ''}
                                 ${isPromo ? `<div class="old-price">R$ ${parseFloat(p.price).toFixed(2)}</div>` : ''}
