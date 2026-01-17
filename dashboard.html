@@ -106,6 +106,7 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
         .delete-btn {
             margin-top: 0.5rem;
             width: 100%;
@@ -121,8 +122,9 @@
             .form-row {
                 flex-direction: column;
             }
-            .form-row input, 
-            .form-row select, 
+
+            .form-row input,
+            .form-row select,
             .form-row button {
                 width: 100% !important;
             }
@@ -160,7 +162,8 @@
                 <div class="form-row">
                     <input type="text" id="prod-name" placeholder="Nome do Produto (ex: Arroz 5kg)" required>
                     <input type="number" id="prod-price" placeholder="Preço (R$)" step="0.01" required>
-                    <select id="prod-category" required style="flex: 1; padding: 0.8rem; border-radius: 6px; border: 1px solid #d1d5db; background: #f9fafb; color: var(--text-main, #1f2937);">
+                    <select id="prod-category" required
+                        style="flex: 1; padding: 0.8rem; border-radius: 6px; border: 1px solid #d1d5db; background: #f9fafb; color: var(--text-main, #1f2937);">
                         <option value="" disabled selected>Categoria</option>
                         <option value="Alimentos">Alimentos</option>
                         <option value="Bebidas">Bebidas</option>
@@ -171,7 +174,22 @@
                         <option value="Outros">Outros</option>
                     </select>
                     <input type="number" id="prod-promo" placeholder="Promoção (24h)" step="0.01" style="width: 130px;">
-                    <input type="file" id="prod-image" accept="image/*" style="width: 200px;">
+
+                    <div style="display: flex; gap: 5px; align-items: center; flex: 1; min-width: 300px;">
+                        <select id="image-source-type"
+                            style="padding: 0.8rem; border-radius: 6px; border: 1px solid #d1d5db; background: #f9fafb; width: 100px;">
+                            <option value="file">Arquivo</option>
+                            <option value="url">Link</option>
+                        </select>
+                        <div id="image-file-container" style="flex: 1;">
+                            <input type="file" id="prod-image" accept="image/*" style="width: 100%;">
+                        </div>
+                        <div id="image-url-container" style="flex: 1; display: none;">
+                            <input type="url" id="prod-image-url" placeholder="https://exemplo.com/imagem.jpg"
+                                style="width: 100%;">
+                        </div>
+                    </div>
+
                     <button type="submit">Salvar</button>
                 </div>
             </form>
@@ -188,70 +206,83 @@
     <a href="https://wa.me/5563992225774" target="_blank" class="floating-support-btn" title="Falar com Suporte">🎧</a>
 
     <script>
-      // --- CONFIGURAÇÕES INICIAIS ---
-const API_BASE_URL = 'https://preco-facil.onrender.com';
-const supabaseUrl = 'https://licvfuzvvbmjdvcooogo.supabase.co';
-const supabaseKey = 'sb_publishable_8hwXxxU7C4owwVmlc4FvPg_0pEXUFK-'; // Verifique se esta chave está correta no painel
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        // --- CONFIGURAÇÕES INICIAIS ---
+        const API_BASE_URL = 'https://preco-facil.onrender.com';
+        const supabaseUrl = 'https://licvfuzvvbmjdvcooogo.supabase.co';
+        const supabaseKey = 'sb_publishable_8hwXxxU7C4owwVmlc4FvPg_0pEXUFK-'; // Verifique se esta chave está correta no painel
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-const storeId = localStorage.getItem('store_id');
-const storeName = localStorage.getItem('store_name');
-let storeLogo = localStorage.getItem('store_logo');
-let merchantProducts = []; // Para guardar a lista de produtos para edição
+        const storeId = localStorage.getItem('store_id');
+        const storeName = localStorage.getItem('store_name');
+        let storeLogo = localStorage.getItem('store_logo');
+        let merchantProducts = []; // Para guardar a lista de produtos para edição
 
 
-if (!storeId) window.location.href = 'login.html';
+        if (!storeId) window.location.href = 'login.html';
 
-document.getElementById('store-name').textContent = `Loja: ${storeName || 'Comerciante'}`;
+        document.getElementById('store-name').textContent = `Loja: ${storeName || 'Comerciante'}`;
 
-// --- FUNÇÕES UTILITÁRIAS ---
-function getFullUrl(path) {
-    if (!path || path === 'null' || path.startsWith('http')) return path;
-    return `${API_BASE_URL}${path}`;
-}
+        // --- FUNÇÕES UTILITÁRIAS ---
+        document.getElementById('image-source-type').addEventListener('change', (e) => {
+            const isUrl = e.target.value === 'url';
+            document.getElementById('image-file-container').style.display = isUrl ? 'none' : 'block';
+            document.getElementById('image-url-container').style.display = isUrl ? 'block' : 'none';
 
-function compressImage(file, isLogo = false) {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (e) => {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const MAX_SIZE = isLogo ? 500 : 900;
-                const scale = Math.min(MAX_SIZE / img.width, MAX_SIZE / img.height, 1);
-                canvas.width = img.width * scale;
-                canvas.height = img.height * scale;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                canvas.toBlob((blob) => resolve(blob), isLogo ? 'image/png' : 'image/jpeg', 0.8);
-            };
-        };
-    });
-}
+            // Clear inputs when switching
+            if (isUrl) {
+                document.getElementById('prod-image').value = '';
+            } else {
+                document.getElementById('prod-image-url').value = '';
+            }
+        });
 
-// --- CARREGAMENTO INICIAL ---
-if (storeLogo && storeLogo !== 'null') {
-    document.getElementById('current-logo').innerHTML = `<img src="${getFullUrl(storeLogo)}" style="height: 60px; border-radius: 50%;">`;
-}
-
-async function loadProducts() {
-    const container = document.getElementById('products-list');
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}`);
-        const products = await res.json();
-        merchantProducts = products; // Salva os produtos no escopo do script
-        
-        
-       // console.log('API Response for Products:', JSON.stringify(products, null, 2));
-
-        if (products.length === 0) {
-            container.innerHTML = '<div style="color: #888; grid-column: 1/-1; text-align: center;">Nenhum produto cadastrado ainda.</div>';
-            return;
+        function getFullUrl(path) {
+            if (!path || path === 'null' || path.startsWith('http')) return path;
+            return `${API_BASE_URL}${path}`;
         }
 
-        container.innerHTML = products.map((p, index) => `
+        function compressImage(file, isLogo = false) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_SIZE = isLogo ? 500 : 900;
+                        const scale = Math.min(MAX_SIZE / img.width, MAX_SIZE / img.height, 1);
+                        canvas.width = img.width * scale;
+                        canvas.height = img.height * scale;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        canvas.toBlob((blob) => resolve(blob), isLogo ? 'image/png' : 'image/jpeg', 0.8);
+                    };
+                };
+            });
+        }
+
+        // --- CARREGAMENTO INICIAL ---
+        if (storeLogo && storeLogo !== 'null') {
+            document.getElementById('current-logo').innerHTML = `<img src="${getFullUrl(storeLogo)}" style="height: 60px; border-radius: 50%;">`;
+        }
+
+        async function loadProducts() {
+            const container = document.getElementById('products-list');
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}`);
+                const products = await res.json();
+                merchantProducts = products; // Salva os produtos no escopo do script
+
+
+                // console.log('API Response for Products:', JSON.stringify(products, null, 2));
+
+                if (products.length === 0) {
+                    container.innerHTML = '<div style="color: #888; grid-column: 1/-1; text-align: center;">Nenhum produto cadastrado ainda.</div>';
+                    return;
+                }
+
+                container.innerHTML = products.map((p, index) => `
             <div class="product-item">
                 ${p.image_url ? `<img src="${getFullUrl(p.image_url)}" alt="${p.name}">` : ''}
                 <h4>${p.name}</h4>
@@ -260,185 +291,221 @@ async function loadProducts() {
                 <button class="delete-btn" onclick="triggerDelete(${p.id})">Excluir</button>
             </div>
         `).join('');
-    } catch (err) {
-        console.error('Erro detalhado ao carregar produtos:', err);
-        container.innerHTML = `<div style="color: #ff9800; grid-column: 1/-1; text-align: center;">Erro ao carregar produtos. Verifique o console para mais detalhes. (${err.message})</div>`;
-    }
-}
-
-async function triggerDelete(productId) {
-    if (!confirm('Tem certeza que deseja excluir este produto?')) {
-        return;
-    }
-
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/delete-product`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ productId, store_id: storeId }),
-        });
-
-        if (res.ok) {
-            alert('Produto excluído com sucesso!');
-            loadProducts();
-        } else {
-            const err = await res.json();
-            alert('Erro ao excluir produto: ' + (err.error || 'Falha no servidor'));
-        }
-    } catch (err) {
-        alert('Erro de rede ao tentar excluir o produto.');
-    }
-}
-
-// --- EVENTO: ATUALIZAR LOGO ---
-document.getElementById('logo-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const fileInput = document.getElementById('store-logo');
-    if (!fileInput.files[0]) return;
-
-    try {
-        const compressedFile = await compressImage(fileInput.files[0], true);
-        const fileName = `logo-${storeId}-${Date.now()}.png`;
-
-        const { data, error } = await supabaseClient.storage
-            .from('logos')
-            .upload(fileName, compressedFile);
-
-        if (error) throw error;
-
-        const { data: { publicUrl } } = supabaseClient.storage.from('logos').getPublicUrl(fileName);
-
-        await fetch(`${API_BASE_URL}/api/merchant/update-logo`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ store_id: storeId, logo_url: publicUrl })
-        });
-
-        localStorage.setItem('store_logo', publicUrl);
-        document.getElementById('current-logo').innerHTML = `<img src="${publicUrl}" style="height:60px; border-radius:50%;">`;
-        alert('Logo atualizada!');
-    } catch (err) {
-        alert('Erro ao subir logo para o Supabase');
-    }
-});
-
-// --- EVENTO: SALVAR PRODUTO ---
-document.getElementById('add-product-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const btn = e.target.querySelector('button');
-    const isUpdating = btn.textContent === 'Atualizar';
-
-    const fileInput = document.getElementById('prod-image');
-    const nameInput = document.getElementById('prod-name');
-    const priceInput = document.getElementById('prod-price');
-    const categoryInput = document.getElementById('prod-category');
-    const promoInput = document.getElementById('prod-promo');
-    const productFile = fileInput.files[0];
-    
-    // Se for um novo produto, a imagem é obrigatória.
-    // Se for uma atualização, a imagem é opcional.
-    if (!productFile && !isUpdating) {
-        alert('Por favor, selecione uma imagem para o novo produto.');
-        return;
-    }
-
-    try {
-        const btnOriginalText = btn.innerText;
-        btn.innerText = "Enviando...";
-        btn.disabled = true;
-
-        let publicUrl;
-
-        if (productFile) {
-            // Se um novo arquivo foi selecionado, faz o upload
-            const fileName = `prod-${storeId}-${Date.now()}.jpg`;
-            const { data, error } = await supabaseClient.storage
-                .from('produtos')
-                .upload(fileName, productFile);
-
-            if (error) throw error;
-
-            publicUrl = supabaseClient.storage.from('produtos').getPublicUrl(fileName).data.publicUrl;
-        } else {
-            // Se nenhum arquivo novo foi selecionado (durante uma atualização), reutiliza a URL existente.
-            publicUrl = document.getElementById('existing-image-url').value;
+            } catch (err) {
+                console.error('Erro detalhado ao carregar produtos:', err);
+                container.innerHTML = `<div style="color: #ff9800; grid-column: 1/-1; text-align: center;">Erro ao carregar produtos. Verifique o console para mais detalhes. (${err.message})</div>`;
+            }
         }
 
-        const productData = {
-            name: nameInput.value,
-            price: priceInput.value,
-            category: categoryInput.value,
-            promo_price: promoInput.value || null,
-            image_url: publicUrl,
-            store_id: storeId
-        };
+        async function triggerDelete(productId) {
+            if (!confirm('Tem certeza que deseja excluir este produto?')) {
+                return;
+            }
 
-        const res = await fetch(`${API_BASE_URL}/api/products`, {
-            method: 'POST', // O backend já faz "upsert", então POST funciona para criar e atualizar
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(productData)
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/delete-product`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ productId, store_id: storeId }),
+                });
+
+                if (res.ok) {
+                    alert('Produto excluído com sucesso!');
+                    loadProducts();
+                } else {
+                    const err = await res.json();
+                    alert('Erro ao excluir produto: ' + (err.error || 'Falha no servidor'));
+                }
+            } catch (err) {
+                alert('Erro de rede ao tentar excluir o produto.');
+            }
+        }
+
+        // --- EVENTO: ATUALIZAR LOGO ---
+        document.getElementById('logo-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('store-logo');
+            if (!fileInput.files[0]) return;
+
+            try {
+                const compressedFile = await compressImage(fileInput.files[0], true);
+                const fileName = `logo-${storeId}-${Date.now()}.png`;
+
+                const { data, error } = await supabaseClient.storage
+                    .from('logos')
+                    .upload(fileName, compressedFile);
+
+                if (error) throw error;
+
+                const { data: { publicUrl } } = supabaseClient.storage.from('logos').getPublicUrl(fileName);
+
+                await fetch(`${API_BASE_URL}/api/merchant/update-logo`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ store_id: storeId, logo_url: publicUrl })
+                });
+
+                localStorage.setItem('store_logo', publicUrl);
+                document.getElementById('current-logo').innerHTML = `<img src="${publicUrl}" style="height:60px; border-radius:50%;">`;
+                alert('Logo atualizada!');
+            } catch (err) {
+                alert('Erro ao subir logo para o Supabase');
+            }
         });
 
-        if (res.ok) {
-            alert(`Produto ${isUpdating ? 'atualizado' : 'cadastrado'} com sucesso!`);
-            e.target.reset(); 
-            loadProducts();
-        } else {
-            const err = await res.json();
-            console.error('Erro do servidor ao salvar produto:', err);
-            alert('Erro no servidor: ' + (err.error || err.details || 'Falha ao salvar'));
+        // --- EVENTO: SALVAR PRODUTO ---
+        document.getElementById('add-product-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btn = e.target.querySelector('button');
+            const isUpdating = btn.textContent === 'Atualizar';
+
+            const sourceType = document.getElementById('image-source-type').value;
+            const fileInput = document.getElementById('prod-image');
+            const urlInput = document.getElementById('prod-image-url');
+            const nameInput = document.getElementById('prod-name');
+            const priceInput = document.getElementById('prod-price');
+            const categoryInput = document.getElementById('prod-category');
+            const promoInput = document.getElementById('prod-promo');
+            const productFile = fileInput.files[0];
+            const productUrl = urlInput.value.trim();
+
+            // Se for um novo produto, a imagem é obrigatória (seja arquivo ou link).
+            // Se for uma atualização, a imagem é opcional.
+            if (!isUpdating) {
+                if (sourceType === 'file' && !productFile) {
+                    alert('Por favor, selecione uma imagem para o novo produto.');
+                    return;
+                }
+                if (sourceType === 'url' && !productUrl) {
+                    alert('Por favor, insira o link da imagem para o novo produto.');
+                    return;
+                }
+            }
+
+            try {
+                const btnOriginalText = btn.innerText;
+                btn.innerText = "Enviando...";
+                btn.disabled = true;
+
+                let publicUrl = '';
+
+                if (sourceType === 'file' && productFile) {
+                    // Se um novo arquivo foi selecionado, faz o upload
+                    const fileName = `prod-${storeId}-${Date.now()}.jpg`;
+                    const { data, error } = await supabaseClient.storage
+                        .from('produtos')
+                        .upload(fileName, productFile);
+
+                    if (error) throw error;
+
+                    publicUrl = supabaseClient.storage.from('produtos').getPublicUrl(fileName).data.publicUrl;
+                } else if (sourceType === 'url' && productUrl) {
+                    // Se for link, usa o link diretamente
+                    publicUrl = productUrl;
+                } else {
+                    // Se nenhum arquivo novo foi selecionado (durante uma atualização), reutiliza a URL existente.
+                    publicUrl = document.getElementById('existing-image-url')?.value || '';
+                }
+
+                const productData = {
+                    name: nameInput.value,
+                    price: priceInput.value,
+                    category: categoryInput.value,
+                    promo_price: promoInput.value || null,
+                    image_url: publicUrl,
+                    store_id: storeId
+                };
+
+                const res = await fetch(`${API_BASE_URL}/api/products`, {
+                    method: 'POST', // O backend já faz "upsert", então POST funciona para criar e atualizar
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(productData)
+                });
+
+                if (res.ok) {
+                    alert(`Produto ${isUpdating ? 'atualizado' : 'cadastrado'} com sucesso!`);
+                    e.target.reset();
+                    // Reset visibility
+                    document.getElementById('image-source-type').value = 'file';
+                    document.getElementById('image-file-container').style.display = 'block';
+                    document.getElementById('image-url-container').style.display = 'none';
+                    btn.textContent = 'Salvar';
+
+                    loadProducts();
+                } else {
+                    const err = await res.json();
+                    console.error('Erro do servidor ao salvar produto:', err);
+                    alert('Erro no servidor: ' + (err.error || err.details || 'Falha ao salvar'));
+                }
+            } catch (err) {
+                console.error("Erro completo:", err);
+                alert('Erro ao processar produto: ' + err.message);
+            } finally {
+                if (btn.textContent !== 'Atualizar') {
+                    btn.innerText = "Salvar";
+                } else {
+                    btn.innerText = "Atualizar";
+                }
+                btn.disabled = false;
+            }
+        });
+        function logout() {
+            // 1. Limpa todos os dados de login salvos no navegador (ID, Nome, Logo)
+            localStorage.clear();
+
+            // 2. Opcional: Limpa também os dados da sessão administrativa se houver
+            sessionStorage.clear();
+
+            // 3. Redireciona para a página inicial ou de login
+            window.location.href = 'index.html';
         }
-    } catch (err) {
-        console.error("Erro completo:", err);
-        alert('Erro ao processar produto: ' + err.message);
-    } finally {
-        btn.innerText = "Salvar"; // Sempre reseta para "Salvar"
-        btn.disabled = false;
-    }
-});
-function logout() {
-    // 1. Limpa todos os dados de login salvos no navegador (ID, Nome, Logo)
-    localStorage.clear();
-    
-    // 2. Opcional: Limpa também os dados da sessão administrativa se houver
-    sessionStorage.clear();
-    
-    // 3. Redireciona para a página inicial ou de login
-    window.location.href = 'index.html'; 
-}
 
-function triggerEdit(index) {
-    const product = merchantProducts[index];
-    if (!product) return;
+        function triggerEdit(index) {
+            const product = merchantProducts[index];
+            if (!product) return;
 
-    // Preenche o formulário com os dados do produto
-    document.getElementById('prod-name').value = product.name;
-    document.getElementById('prod-price').value = parseFloat(product.price).toFixed(2);
-    document.getElementById('prod-category').value = product.category;
-    document.getElementById('prod-promo').value = product.promo_price ? parseFloat(product.promo_price).toFixed(2) : '';
-    
-    const form = document.getElementById('add-product-form');
+            // Preenche o formulário com os dados do produto
+            document.getElementById('prod-name').value = product.name;
+            document.getElementById('prod-price').value = parseFloat(product.price).toFixed(2);
+            document.getElementById('prod-category').value = product.category;
+            document.getElementById('prod-promo').value = product.promo_price ? parseFloat(product.promo_price).toFixed(2) : '';
 
-    // Armazena a URL da imagem existente em um campo oculto
-    let existingImgField = document.getElementById('existing-image-url');
-    if (!existingImgField) {
-        existingImgField = document.createElement('input');
-        existingImgField.type = 'hidden';
-        existingImgField.id = 'existing-image-url';
-        form.appendChild(existingImgField);
-    }
-    existingImgField.value = product.image_url || '';
-    
-    // Altera o texto do botão e foca no formulário
-    form.querySelector('button').textContent = 'Atualizar';
-    form.scrollIntoView({ behavior: 'smooth' });
-}
+            const form = document.getElementById('add-product-form');
+
+            // Se a imagem for um link externo (não do supabase storage), podemos sugerir o modo "Link"
+            const isExternal = product.image_url && !product.image_url.includes('supabase.co');
+            if (isExternal) {
+                document.getElementById('image-source-type').value = 'url';
+                document.getElementById('image-file-container').style.display = 'none';
+                document.getElementById('image-url-container').style.display = 'block';
+                document.getElementById('prod-image-url').value = product.image_url;
+            } else {
+                document.getElementById('image-source-type').value = 'file';
+                document.getElementById('image-file-container').style.display = 'block';
+                document.getElementById('image-url-container').style.display = 'none';
+                document.getElementById('prod-image-url').value = '';
+            }
+
+            // Armazena a URL da imagem existente em um campo oculto
+            let existingImgField = document.getElementById('existing-image-url');
+            if (!existingImgField) {
+                existingImgField = document.createElement('input');
+                existingImgField.type = 'hidden';
+                existingImgField.id = 'existing-image-url';
+                form.appendChild(existingImgField);
+            }
+            existingImgField.value = product.image_url || '';
+
+            // Altera o texto do botão e foca no formulário
+            form.querySelector('button').textContent = 'Atualizar';
+            form.scrollIntoView({ behavior: 'smooth' });
+        }
 
 
-loadProducts();
+        loadProducts();
         // Footer Global - JBSousaTech
         const footer = document.createElement('footer');
         footer.innerHTML = `
