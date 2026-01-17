@@ -131,6 +131,14 @@
             ? 'http://localhost:3000'
             : 'https://preco-facil.onrender.com';
 
+        function getFullUrl(path) {
+            if (!path || path === 'null' || String(path).trim() === '') return '';
+            const cleanPath = String(path).trim();
+            if (cleanPath.startsWith('http')) return cleanPath;
+            const finalPath = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
+            return `${API_BASE_URL}${finalPath}`;
+        }
+
         const params = new URLSearchParams(window.location.search);
         const storeId = params.get('id');
         let storeName = ''; // Variável para armazenar nome da loja para o compartilhamento
@@ -162,9 +170,7 @@
                 })
                 .then(store => {
                     storeName = store.name;
-                    const fullLogoUrl = store.logo_url && store.logo_url !== 'null' && !store.logo_url.startsWith('http')
-                        ? `${API_BASE_URL}${store.logo_url}`
-                        : (store.logo_url === 'null' ? null : store.logo_url);
+                    const fullLogoUrl = getFullUrl(store.logo_url);
 
                     document.getElementById('store-header').innerHTML = `
                         ${fullLogoUrl ? `<img src="${fullLogoUrl}" class="store-logo-large">` : '<div style="font-size:3rem;">🏪</div>'}
@@ -205,9 +211,7 @@
 
                         const html = products.map(p => {
                             const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
-                            const fullImageUrl = p.image_url && p.image_url !== 'null' && !p.image_url.startsWith('http')
-                                ? `${API_BASE_URL}${p.image_url}`
-                                : p.image_url;
+                            const fullImageUrl = getFullUrl(p.image_url);
 
                             return `
                             <div class="product-card">

@@ -8,6 +8,15 @@ const resultsContainer = document.getElementById('results');
 let promoInterval; // Variável para controlar o intervalo do cronômetro
 let offersScrollInterval; // Variável para o carrossel
 
+function getFullUrl(path) {
+    if (!path || path === 'null' || String(path).trim() === '') return '';
+    const cleanPath = String(path).trim();
+    if (cleanPath.startsWith('http')) return cleanPath;
+    const finalPath = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
+    const result = `${API_BASE_URL}${finalPath}`;
+    return result;
+}
+
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const product = document.getElementById('product').value.trim();
@@ -41,9 +50,7 @@ function renderResults(stores) {
         const isPromo = store.promo_price && new Date(store.promo_expires_at) > new Date();
         const finalPrice = isPromo ? store.promo_price : store.price;
         const cleanPhone = store.phone ? store.phone.replace(/\D/g, '') : '';
-        const fullImageUrl = store.image_url && store.image_url !== 'null' && !store.image_url.startsWith('http')
-            ? `${API_BASE_URL}${store.image_url}`
-            : store.image_url;
+        const fullImageUrl = getFullUrl(store.image_url);
 
         const safeStoreName = store.store_name.replace(/'/g, "\\'");
         const safeProductName = (store.product_name || document.getElementById('product').value).replace(/'/g, "\\'");
@@ -168,9 +175,7 @@ async function loadTrendingOffers() {
 
                 container.innerHTML = offers.map(offer => {
                     const cleanPhone = offer.phone ? offer.phone.replace(/\D/g, '') : '';
-                    const fullImageUrl = offer.image_url && offer.image_url !== 'null' && !offer.image_url.startsWith('http')
-                        ? `${API_BASE_URL}${offer.image_url}`
-                        : offer.image_url;
+                    const fullImageUrl = getFullUrl(offer.image_url);
                     const safeStoreName = offer.store_name.replace(/'/g, "\\'");
                     const safeProductName = offer.product_name.replace(/'/g, "\\'");
                     return `
@@ -239,9 +244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const stores = await res.json();
                 if (stores.length > 0) {
                     const storesList = stores.map(store => {
-                        const fullLogoUrl = store.logo_url && store.logo_url !== 'null' && !store.logo_url.startsWith('http')
-                            ? `${API_BASE_URL}${store.logo_url}`
-                            : (store.logo_url === 'null' ? null : store.logo_url);
+                        const fullLogoUrl = getFullUrl(store.logo_url);
 
                         if (store.is_blocked) {
                             return `
