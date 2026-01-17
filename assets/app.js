@@ -1,7 +1,7 @@
 // assets/app.js
 // Frontend logic for Price Comparison MVP
-const API_BASE_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000' 
+const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
     : 'https://preco-facil.onrender.com';
 const form = document.getElementById('search-form');
 const resultsContainer = document.getElementById('results');
@@ -9,46 +9,46 @@ let promoInterval; // Variável para controlar o intervalo do cronômetro
 let offersScrollInterval; // Variável para o carrossel
 
 form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const product = document.getElementById('product').value.trim();
-  if (!product) return;
+    e.preventDefault();
+    const product = document.getElementById('product').value.trim();
+    if (!product) return;
 
-  resultsContainer.innerHTML = '<div class="loading">Buscando melhores preços...</div>';
+    resultsContainer.innerHTML = '<div class="loading">Buscando melhores preços...</div>';
 
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/search?product=${encodeURIComponent(product)}`);
-    if (!res.ok) throw new Error('Erro na resposta do servidor');
-    const data = await res.json();
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/search?product=${encodeURIComponent(product)}`);
+        if (!res.ok) throw new Error('Erro na resposta do servidor');
+        const data = await res.json();
 
-    if (data.length === 0) {
-      resultsContainer.innerHTML = '<div class="empty-state">Nenhum produto encontrado. Tente outro termo.</div>';
-      return;
+        if (data.length === 0) {
+            resultsContainer.innerHTML = '<div class="empty-state">Nenhum produto encontrado. Tente outro termo.</div>';
+            return;
+        }
+
+        renderResults(data);
+    } catch (err) {
+        console.error(err);
+        resultsContainer.innerHTML = '<div class="error">Erro ao buscar preços. Tente novamente.</div>';
     }
-
-    renderResults(data);
-  } catch (err) {
-    console.error(err);
-    resultsContainer.innerHTML = '<div class="error">Erro ao buscar preços. Tente novamente.</div>';
-  }
 });
 
 function renderResults(stores) {
-  if (promoInterval) clearInterval(promoInterval); // Limpa cronômetros anteriores
+    if (promoInterval) clearInterval(promoInterval); // Limpa cronômetros anteriores
 
-  let html = '<div class="results-list">';
-  stores.forEach((store, index) => {
-    const isBestPrice = index === 0;
-    const isPromo = store.promo_price && new Date(store.promo_expires_at) > new Date();
-    const finalPrice = isPromo ? store.promo_price : store.price;
-    const cleanPhone = store.phone ? store.phone.replace(/\D/g, '') : '';
-    const fullImageUrl = store.image_url && !store.image_url.startsWith('http')
-        ? `${API_BASE_URL}${store.image_url}`
-        : store.image_url;
-    
-    const safeStoreName = store.store_name.replace(/'/g, "\\'");
-    const safeProductName = (store.product_name || document.getElementById('product').value).replace(/'/g, "\\'");
+    let html = '<div class="results-list">';
+    stores.forEach((store, index) => {
+        const isBestPrice = index === 0;
+        const isPromo = store.promo_price && new Date(store.promo_expires_at) > new Date();
+        const finalPrice = isPromo ? store.promo_price : store.price;
+        const cleanPhone = store.phone ? store.phone.replace(/\D/g, '') : '';
+        const fullImageUrl = store.image_url && store.image_url !== 'null' && !store.image_url.startsWith('http')
+            ? `${API_BASE_URL}${store.image_url}`
+            : store.image_url;
 
-    html += `
+        const safeStoreName = store.store_name.replace(/'/g, "\\'");
+        const safeProductName = (store.product_name || document.getElementById('product').value).replace(/'/g, "\\'");
+
+        html += `
       <div class="result-card ${isBestPrice ? 'best-price' : ''}" onclick="window.open('store_profile.html?id=${store.store_id}', '_blank')" style="cursor: pointer;" title="Clique para ver todos os produtos desta loja">
         ${fullImageUrl ? `<img src="${fullImageUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px;">` : ''}
         <div class="store-info">
@@ -63,9 +63,9 @@ function renderResults(stores) {
             </div>` : ''}
         </div>
         <div class="price-info">
-          ${isPromo 
-            ? `<span style="text-decoration: line-through; color: #9ca3af; font-size: 0.8rem;">R$ ${parseFloat(store.price).toFixed(2)}</span>` 
-            : ''}
+          ${isPromo
+                ? `<span style="text-decoration: line-through; color: #9ca3af; font-size: 0.8rem;">R$ ${parseFloat(store.price).toFixed(2)}</span>`
+                : ''}
           <span class="price" style="${isPromo ? 'color: #d97706;' : ''}">R$ ${parseFloat(finalPrice).toFixed(2)}</span>
           ${isBestPrice ? '<span class="badge">Melhor Preço</span>' : ''}
           ${isPromo ? `<div class="promo-timer" data-expires="${store.promo_expires_at}" style="font-size: 0.75rem; color: #d97706; margin-top: 5px; font-weight: bold;"></div>` : ''}
@@ -75,35 +75,35 @@ function renderResults(stores) {
         </div>
       </div>
     `;
-  });
-  html += '</div>';
-  resultsContainer.innerHTML = html;
-  startPromoTimers();
+    });
+    html += '</div>';
+    resultsContainer.innerHTML = html;
+    startPromoTimers();
 }
 
 // Função para iniciar e atualizar os cronômetros
 function startPromoTimers() {
-  const update = () => {
-    document.querySelectorAll('.promo-timer').forEach(el => {
-      const end = new Date(el.dataset.expires).getTime();
-      const now = new Date().getTime();
-      const diff = end - now;
+    const update = () => {
+        document.querySelectorAll('.promo-timer').forEach(el => {
+            const end = new Date(el.dataset.expires).getTime();
+            const now = new Date().getTime();
+            const diff = end - now;
 
-      if (diff <= 0) {
-        el.innerText = 'Oferta encerrada';
-        el.style.color = '#888';
-        return;
-      }
+            if (diff <= 0) {
+                el.innerText = 'Oferta encerrada';
+                el.style.color = '#888';
+                return;
+            }
 
-      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const s = Math.floor((diff % (1000 * 60)) / 1000);
-      
-      el.innerText = `⏳ Acaba em: ${h}h ${m}m ${s}s`;
-    });
-  };
-  update(); // Executa imediatamente
-  promoInterval = setInterval(update, 1000); // Atualiza a cada segundo
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            el.innerText = `⏳ Acaba em: ${h}h ${m}m ${s}s`;
+        });
+    };
+    update(); // Executa imediatamente
+    promoInterval = setInterval(update, 1000); // Atualiza a cada segundo
 }
 
 // Carregar termos mais buscados
@@ -114,10 +114,10 @@ async function loadTrending() {
             const terms = await res.json();
             const container = document.getElementById('trending-container');
             const tags = document.getElementById('trending-tags');
-            
+
             if (terms.length > 0) {
                 container.style.display = 'block';
-                tags.innerHTML = terms.map(t => 
+                tags.innerHTML = terms.map(t =>
                     `<span class="trending-tag" onclick="searchTrending('${t.term}')">${t.term}</span>`
                 ).join('');
             }
@@ -134,7 +134,7 @@ window.shareOffer = (event, storeName, productName, price, storeId) => {
     event.stopPropagation();
     const text = `🔥 Oferta Imperdível: ${productName}\n🏪 ${storeName}\n💰 R$ ${parseFloat(price).toFixed(2)}\n\nConfira no Mercado Local:`;
     const url = `${window.location.origin}/store_profile.html?id=${storeId}`;
-    
+
     if (navigator.share) {
         navigator.share({
             title: 'Oferta Mercado Local',
@@ -158,7 +158,7 @@ async function loadTrendingOffers() {
 
             if (offers.length > 0) {
                 section.style.display = 'block';
-                
+
                 // Estilo de carrossel para o container de ofertas
                 container.style.display = 'flex';
                 container.style.overflowX = 'auto';
@@ -168,7 +168,7 @@ async function loadTrendingOffers() {
 
                 container.innerHTML = offers.map(offer => {
                     const cleanPhone = offer.phone ? offer.phone.replace(/\D/g, '') : '';
-                    const fullImageUrl = offer.image_url && !offer.image_url.startsWith('http')
+                    const fullImageUrl = offer.image_url && offer.image_url !== 'null' && !offer.image_url.startsWith('http')
                         ? `${API_BASE_URL}${offer.image_url}`
                         : offer.image_url;
                     const safeStoreName = offer.store_name.replace(/'/g, "\\'");
@@ -194,7 +194,7 @@ async function loadTrendingOffers() {
                         </div>
                     </div>
                     `;
-                    
+
                 }).join('');
                 startPromoTimers(); // Inicia os cronômetros
 
@@ -215,9 +215,9 @@ async function loadTrendingOffers() {
 
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js')
-    .then(() => console.log('Service Worker registered'))
-    .catch(err => console.error('Service Worker registration failed:', err));
+    navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log('Service Worker registered'))
+        .catch(err => console.error('Service Worker registration failed:', err));
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -239,9 +239,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const stores = await res.json();
                 if (stores.length > 0) {
                     const storesList = stores.map(store => {
-                        const fullLogoUrl = store.logo_url && !store.logo_url.startsWith('http')
+                        const fullLogoUrl = store.logo_url && store.logo_url !== 'null' && !store.logo_url.startsWith('http')
                             ? `${API_BASE_URL}${store.logo_url}`
-                            : store.logo_url;
+                            : (store.logo_url === 'null' ? null : store.logo_url);
 
                         if (store.is_blocked) {
                             return `
@@ -251,10 +251,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                             </div>`;
                         }
 
-                        const borderStyle = store.has_promo 
-                            ? 'border: 3px solid #FFD700; box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);' 
+                        const borderStyle = store.has_promo
+                            ? 'border: 3px solid #FFD700; box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);'
                             : 'border: 2px solid #2563eb;';
-                        
+
                         return `
                         <div onclick="window.location.href='store_profile.html?id=${store.id}'" style="flex: 0 0 auto; width: 80px; display: flex; flex-direction: column; align-items: center; cursor: pointer; margin-right: 10px;" title="Ver perfil da loja">
                             ${fullLogoUrl ? `<img src="${fullLogoUrl}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; ${borderStyle} margin-bottom: 5px;">` : `<div style="width: 50px; height: 50px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; ${borderStyle} margin-bottom: 5px;">🏪</div>`}
@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             ${store.has_promo ? '<span style="font-size: 0.6rem; color: #FFD700; font-weight: bold;">OFERTAS</span>' : ''}
                         </div>
                     `}).join('');
-                    
+
                     merchantBlock.innerHTML = `
                         <h3>Comerciantes Parceiros</h3>
                         <div style="margin-top: 15px; display: flex; overflow-x: auto; padding-bottom: 10px; scrollbar-width: thin;">

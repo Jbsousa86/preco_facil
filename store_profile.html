@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +15,7 @@
             margin-bottom: 2rem;
             border: 1px solid hsl(var(--primary-h, 220), var(--primary-s, 90%), 85%);
         }
+
         .store-logo-large {
             width: 100px;
             height: 100px;
@@ -22,11 +24,13 @@
             border: 3px solid #e91e63;
             margin-bottom: 1rem;
         }
+
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 1rem;
         }
+
         .product-card {
             background: linear-gradient(135deg, hsl(var(--primary-h, 220), var(--primary-s, 90%), 92%), #ffffff);
             padding: 1rem;
@@ -35,6 +39,7 @@
             display: flex;
             flex-direction: column;
         }
+
         .product-card img {
             width: 100%;
             height: 120px;
@@ -42,23 +47,27 @@
             border-radius: 4px;
             margin-bottom: 0.5rem;
         }
+
         .price-tag {
             color: #4CAF50;
             font-weight: bold;
             font-size: 1.1rem;
             margin-top: auto;
         }
+
         .promo-tag {
             color: #ffeb3b;
             font-weight: bold;
             font-size: 1.1rem;
             margin-top: auto;
         }
+
         .old-price {
             text-decoration: line-through;
             color: #888;
             font-size: 0.8rem;
         }
+
         .floating-back-btn {
             position: fixed;
             bottom: 20px;
@@ -72,23 +81,25 @@
             align-items: center;
             justify-content: center;
             text-decoration: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             font-size: 1.5rem;
             z-index: 1000;
             transition: transform 0.2s;
-            border: 2px solid rgba(255,255,255,0.2);
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
+
         .floating-back-btn:hover {
             transform: scale(1.1);
             background-color: #c2185b;
         }
     </style>
 </head>
+
 <body>
     <header>
         <div class="header-content">
             <h1>Mercado Local</h1>
-           <!--<a href="index.html" style="color: white; text-decoration: none; font-size: 0.9rem;">Voltar</a>--> 
+            <!--<a href="index.html" style="color: white; text-decoration: none; font-size: 0.9rem;">Voltar</a>-->
         </div>
     </header>
 
@@ -102,19 +113,22 @@
             <p style="color: #888;">Carregando produtos...</p>
         </div>
         <div style="text-align: center; margin-top: 20px; padding-bottom: 20px;">
-            <button id="load-more-btn" onclick="loadMoreProducts()" style="display: none; background: #e91e63; color: white; border: none; padding: 10px 25px; border-radius: 25px; cursor: pointer; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Carregar Mais</button>
+            <button id="load-more-btn" onclick="loadMoreProducts()"
+                style="display: none; background: #e91e63; color: white; border: none; padding: 10px 25px; border-radius: 25px; cursor: pointer; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Carregar
+                Mais</button>
         </div>
     </main>
 
     <!-- Botão Flutuante de Voltar -->
-    <a href="javascript:history.length > 1 ? history.back() : window.location.href='index.html'" class="floating-back-btn" title="Voltar">↩</a>
+    <a href="javascript:history.length > 1 ? history.back() : window.location.href='index.html'"
+        class="floating-back-btn" title="Voltar">↩</a>
 
     <!-- Botão Flutuante de Suporte -->
     <a href="https://wa.me/5563992225774" target="_blank" class="floating-support-btn" title="Falar com Suporte">🎧</a>
 
     <script>
-        const API_BASE_URL = window.location.hostname === 'localhost' 
-            ? 'http://localhost:3000' 
+        const API_BASE_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000'
             : 'https://preco-facil.onrender.com';
 
         const params = new URLSearchParams(window.location.search);
@@ -126,14 +140,14 @@
             event.stopPropagation();
             const text = `🔥 Oferta Imperdível: ${pName}\n🏪 ${sName}\n💰 R$ ${parseFloat(price).toFixed(2)}\n\nConfira no Mercado Local:`;
             const url = window.location.href;
-            
+
             if (navigator.share) {
                 navigator.share({ title: 'Oferta Mercado Local', text: text, url: url }).catch(console.error);
             } else {
                 window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
             }
         };
-        
+
         let currentPage = 1;
         const itemsPerPage = 12;
 
@@ -148,9 +162,9 @@
                 })
                 .then(store => {
                     storeName = store.name;
-                    const fullLogoUrl = store.logo_url && !store.logo_url.startsWith('http')
+                    const fullLogoUrl = store.logo_url && store.logo_url !== 'null' && !store.logo_url.startsWith('http')
                         ? `${API_BASE_URL}${store.logo_url}`
-                        : store.logo_url;
+                        : (store.logo_url === 'null' ? null : store.logo_url);
 
                     document.getElementById('store-header').innerHTML = `
                         ${fullLogoUrl ? `<img src="${fullLogoUrl}" class="store-logo-large">` : '<div style="font-size:3rem;">🏪</div>'}
@@ -169,33 +183,33 @@
                 });
 
             // Função de Carregar Produtos com Paginação
-            window.loadMoreProducts = function() {
+            window.loadMoreProducts = function () {
                 const btn = document.getElementById('load-more-btn');
-                if(btn) btn.innerText = 'Carregando...';
+                if (btn) btn.innerText = 'Carregando...';
 
                 fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}&page=${currentPage}&limit=${itemsPerPage}`)
-                .then(res => {
-                    if (!res.ok) throw new Error('Products not found');
-                    return res.json();
-                })
-                .then(products => {
-                    const container = document.getElementById('products-container');
-                    
-                    if (currentPage === 1) container.innerHTML = ''; // Limpa o "Carregando..." inicial
+                    .then(res => {
+                        if (!res.ok) throw new Error('Products not found');
+                        return res.json();
+                    })
+                    .then(products => {
+                        const container = document.getElementById('products-container');
 
-                    if (products.length === 0 && currentPage === 1) {
-                        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #888;">Nenhum produto cadastrado.</p>';
-                        if(btn) btn.style.display = 'none';
-                        return;
-                    }
+                        if (currentPage === 1) container.innerHTML = ''; // Limpa o "Carregando..." inicial
 
-                    const html = products.map(p => {
-                        const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
-                        const fullImageUrl = p.image_url && !p.image_url.startsWith('http')
-                            ? `${API_BASE_URL}${p.image_url}`
-                            : p.image_url;
+                        if (products.length === 0 && currentPage === 1) {
+                            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #888;">Nenhum produto cadastrado.</p>';
+                            if (btn) btn.style.display = 'none';
+                            return;
+                        }
 
-                        return `
+                        const html = products.map(p => {
+                            const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
+                            const fullImageUrl = p.image_url && p.image_url !== 'null' && !p.image_url.startsWith('http')
+                                ? `${API_BASE_URL}${p.image_url}`
+                                : p.image_url;
+
+                            return `
                             <div class="product-card">
                                 ${fullImageUrl ? `<img src="${fullImageUrl}" alt="${p.name}">` : ''}
                                 <h4 style="margin: 0 0 0.5rem 0;">${p.name}</h4>
@@ -208,25 +222,25 @@
                                 </button>
                             </div>
                         `;
-                    }).join('');
+                        }).join('');
 
-                    container.insertAdjacentHTML('beforeend', html);
+                        container.insertAdjacentHTML('beforeend', html);
 
-                    // Controle do botão "Carregar Mais"
-                    if (products.length < itemsPerPage) {
-                        if(btn) btn.style.display = 'none';
-                    } else {
-                        if(btn) {
-                            btn.style.display = 'inline-block';
-                            btn.innerText = 'Carregar Mais';
+                        // Controle do botão "Carregar Mais"
+                        if (products.length < itemsPerPage) {
+                            if (btn) btn.style.display = 'none';
+                        } else {
+                            if (btn) {
+                                btn.style.display = 'inline-block';
+                                btn.innerText = 'Carregar Mais';
+                            }
+                            currentPage++;
                         }
-                        currentPage++;
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    if(currentPage === 1) document.getElementById('products-container').innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ff9800;">Erro ao carregar os produtos.</p>';
-                });
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        if (currentPage === 1) document.getElementById('products-container').innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ff9800;">Erro ao carregar os produtos.</p>';
+                    });
             };
 
             // Carregamento inicial
@@ -243,4 +257,5 @@
         document.body.appendChild(footer);
     </script>
 </body>
+
 </html>
