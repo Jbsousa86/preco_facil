@@ -301,3 +301,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         clickTimer = setTimeout(() => clickCount = 0, 1000);
     });
 });
+
+// PWA Install Logic
+let deferredPrompt;
+const installBtn = document.getElementById('install-btn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Stash the event so it can be triggered later.
+    deferredPrompt = e;
+    // Update UI notify the user they can install the PWA
+    if (installBtn) {
+        installBtn.style.display = 'flex';
+        
+        installBtn.addEventListener('click', () => {
+            // Hide the app provided install promotion
+            installBtn.style.display = 'none';
+            // Show the install prompt
+            deferredPrompt.prompt();
+            // Wait for the user to respond to the prompt
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                } else {
+                    console.log('User dismissed the install prompt');
+                }
+                deferredPrompt = null;
+            });
+        });
+    }
+});
+
+window.addEventListener('appinstalled', () => {
+    // Hide the app-provided install promotion
+    if(installBtn) installBtn.style.display = 'none';
+    // Clear the deferredPrompt so it can be garbage collected
+    deferredPrompt = null;
+    console.log('PWA was installed');
+});

@@ -17,24 +17,29 @@
             border-radius: 12px;
             margin-bottom: 1.5rem;
             padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
         }
+
         .store-header {
             margin: 0 0 1rem 0;
-            color: #2563eb; /* Cor de destaque */
+            color: #2563eb;
+            /* Cor de destaque */
             font-size: 1.2rem;
             border-bottom: 1px solid #e5e7eb;
             padding-bottom: 0.5rem;
         }
+
         .product-result-item {
             display: flex;
             justify-content: space-between;
             padding: 0.5rem 0;
             border-bottom: 1px solid #f3f4f6;
         }
+
         .product-result-item:last-child {
             border-bottom: none;
         }
+
         .product-price {
             color: #4CAF50;
             font-weight: bold;
@@ -54,7 +59,7 @@
                 gap: 10px;
             }
 
-            #search-form input, 
+            #search-form input,
             #search-form button {
                 width: 100%;
                 box-sizing: border-box;
@@ -79,18 +84,21 @@
                 flex-direction: row;
                 width: 100%;
                 box-sizing: border-box;
-                overflow: hidden; /* Impede que o card estoure a largura */
+                overflow: hidden;
+                /* Impede que o card estoure a largura */
             }
 
             #results .store-info {
-                flex: 1; /* Ocupa o espaço restante */
-                min-width: 0; /* CRÍTICO: Permite que o texto seja cortado (ellipsis) */
+                flex: 1;
+                /* Ocupa o espaço restante */
+                min-width: 0;
+                /* CRÍTICO: Permite que o texto seja cortado (ellipsis) */
                 padding-right: 5px;
             }
 
             /* Garante que textos longos não quebrem o layout */
-            #results .store-info h3, 
-            #results .store-info p, 
+            #results .store-info h3,
+            #results .store-info p,
             #results .store-info span {
                 white-space: nowrap;
                 overflow: hidden;
@@ -104,8 +112,9 @@
     <header>
         <div class="header-content">
             <img src="assets/logo.png" alt="Mercado Local Logo" class="logo" />
-            <div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
                 <h1>Mercado Local</h1>
+                <button id="install-btn" class="install-button">📲 Instalar App</button>
             </div>
         </div>
     </header>
@@ -116,7 +125,8 @@
             <a href="login.html" class="button">Acessar área do comerciante</a>
         </section>
         <section id="offers-section" style="display: none; margin-bottom: 1.5rem;">
-            <h3 style="color: #1f2937; margin-top: 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem;">🔥 Ofertas em Destaque</h3>
+            <h3 style="color: #1f2937; margin-top: 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem;">🔥
+                Ofertas em Destaque</h3>
             <div id="offers-container" class="results-list"></div>
         </section>
         <section class="search-section">

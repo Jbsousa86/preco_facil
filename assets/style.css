@@ -354,3 +354,37 @@ main {
   }
   .product-card img { height: 110px; }
 }
+
+/* Install App Button */
+.install-button {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: none; /* Hidden by default */
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-size: 0.9rem;
+}
+
+.install-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #34d399, #10b981);
+}
+
+@media (max-width: 600px) {
+    .header-content {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .install-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
