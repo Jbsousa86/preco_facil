@@ -374,7 +374,7 @@
 
         @media (max-width: 600px) {
             .header-nav { display: none !important; }
-            .bottom-nav { display: grid; }
+            .bottom-nav { display: grid; grid-template-columns: repeat(4, 1fr); }
             body { padding-bottom: 80px; }
             .mobile-menu-btn { display: none; } /* Replaced by bottom nav */
         }
@@ -495,6 +495,10 @@
         <a href="javascript:void(0)" id="bnav-merchant" onclick="showView('merchant')" class="bottom-nav-item">
             <i>💼</i>
             <span>Lojista</span>
+        </a>
+        <a href="javascript:void(0)" onclick="sharePlatform()" class="bottom-nav-item">
+            <i>📤</i>
+            <span>Divulgar</span>
         </a>
     </nav>
 
