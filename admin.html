@@ -276,48 +276,51 @@
                 overflow-x: hidden;
             }
 
-            /* Botão Sanduíche Flutuante (FAB) no Canto Superior Direito */
-            .menu-toggle-fab {
-                position: fixed;
-                top: 12px;
-                right: 12px;
-                width: 44px;
-                height: 44px;
-                background: var(--primary);
+            /* Barra Azul Superior - Corrigida e com Sombra */
+            .mobile-header-admin {
+                display: flex;
+                background: var(--primary); /* Azul vibrante */
+                padding: 0 16px;
+                height: 56px;
+                align-items: center;
+                justify-content: space-between;
+                position: sticky;
+                top: 0;
+                z-index: 1010;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                color: #fff;
+            }
+            
+            .menu-toggle-btn {
+                background: rgba(255, 255, 255, 0.2);
                 color: #fff;
                 border: none;
-                border-radius: 50%;
+                width: 42px;
+                height: 42px;
+                border-radius: 10px;
+                font-size: 1.3rem;
+                cursor: pointer;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 1.2rem;
-                box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-                cursor: pointer;
-                z-index: 1020;
             }
 
-            /* Overlay para fechar o menu ao clicar fora */
             .sidebar-overlay {
                 display: none;
                 position: fixed;
                 inset: 0;
                 background: rgba(15, 23, 42, 0.6);
                 backdrop-filter: blur(4px);
-                z-index: 1021; /* Fica entre o main e o sidebar */
+                z-index: 1021;
             }
 
-            .sidebar-overlay.open {
-                display: block;
-            }
-            
-            aside {
-                z-index: 1022; /* Sempre por cima de tudo */
-            }
+            .sidebar-overlay.open { display: block; }
+            aside { z-index: 1022; }
 
             .kpi-grid {
-                grid-template-columns: 1fr; /* Forçando 1 coluna para evitar que o conteúdo fuja */
+                grid-template-columns: 1fr;
                 gap: 12px;
-                margin-bottom: 24px;
+                margin-top: 10px;
             }
             
             .kpi-card {
@@ -329,11 +332,6 @@
             .kpi-value {
                 font-size: 1.8rem;
                 word-break: break-all;
-            }
-
-            .admin-title h1 {
-                font-size: 1.25rem;
-                max-width: 80%;
             }
 
             header {
@@ -423,7 +421,11 @@
         </div>
     </aside>
 
-    <button class="menu-toggle-fab" onclick="toggleSidebar()">☰</button>
+    <div class="mobile-header-admin">
+        <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+        <span style="font-weight: 800; font-size: 0.9rem;">ADMIN MASTER</span>
+        <div style="width: 40px;"></div>
+    </div>
 
     <main>
         <header>
