@@ -148,6 +148,17 @@ async function initializeDatabase() {
             );
         `).catch(e => console.error('Erro ao criar tabela site_stats:', e.message));
 
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS global_banners (
+                id SERIAL PRIMARY KEY,
+                image_url TEXT NOT NULL,
+                link_url TEXT,
+                title TEXT,
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `).catch(e => console.error('Erro ao criar tabela global_banners:', e.message));
+
         // --- 2.5 MIGRAÇÕES DE COLUNAS (DESTAQUES E MÉTRICAS) ---
         await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;').catch(e => {});
         await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS banner_url TEXT;').catch(e => {});
@@ -687,6 +698,29 @@ app.get('/api/prices/cheapest', async (req, res) => {
         console.error(e);
         res.status(500).json({ error: e.message });
     }
+});
+
+// Banners API
+app.get('/api/banners', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM global_banners WHERE is_active = TRUE ORDER BY id DESC');
+        res.json(result.rows);
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/admin/banners', async (req, res) => {
+    const { image_url, link_url, title } = req.body;
+    try {
+        await pool.query('INSERT INTO global_banners (image_url, link_url, title) VALUES ($1, $2, $3)', [image_url, link_url, title]);
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/admin/banners/:id', async (req, res) => {
+    try {
+        await pool.query('DELETE FROM global_banners WHERE id = $1', [req.params.id]);
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 const PORT = process.env.PORT || 3000;

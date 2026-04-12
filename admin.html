@@ -205,6 +205,7 @@
         <nav class="nav-menu">
             <div class="nav-item active" onclick="showSection('dashboard', this)">📊 Dashboard</div>
             <div class="nav-item" onclick="showSection('lojistas', this)">🏪 Lojistas</div>
+            <div class="nav-item" onclick="showSection('banners', this)">🖼️ Banners</div>
             <div class="nav-item" onclick="showSection('destaques', this)">💎 Destaques</div>
             <div class="nav-item" onclick="showSection('seguranca', this)">🛡️ Segurança</div>
         </nav>
@@ -223,7 +224,20 @@
             <button id="add-store-btn" onclick="openModal()" class="btn-icon" style="width: auto; padding: 0 20px; height: 44px; background: var(--primary); color: #fff; border:none; font-weight: 700; border-radius: 12px;">+ Novo Lojista</button>
         </header>
 
-        <!-- New Store Modal -->
+        <!-- BANNERS SECTION -->
+        <section id="section-banners" style="display:none;">
+            <div class="table-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                    <h2 style="margin:0;">🖼️ Gestão de Banners Globais</h2>
+                    <button onclick="document.getElementById('banner-modal').style.display='flex'" class="btn-primary" style="width:auto; padding:0 20px;">+ Novo Banner</button>
+                </div>
+                <div id="banners-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:20px;">
+                    <!-- Banners loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO: LOJISTAS PARCEIROS -->
         <div id="new-store-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:20px;">
             <div style="background:#fff; width:100%; max-width:500px; padding:32px; border-radius:24px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
@@ -273,7 +287,7 @@
             </div>
         </section>
 
-        <section class="table-card">
+        <section class="table-card" id="section-table">
             <div class="table-header">
                 <h3 id="table-title">Todos os Comerciantes</h3>
             </div>
@@ -310,9 +324,49 @@
             init();
         }
 
+        // Banners Management
+        async function loadBannersAdmin() {
+            const res = await fetchAdmin('api/banners');
+            const banners = await res.json();
+            const grid = document.getElementById('banners-grid');
+            grid.innerHTML = banners.map(b => `
+                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:16px; overflow:hidden; box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                    <img src="${b.image_url}" style="width:100%; height:120px; object-fit:cover;">
+                    <div style="padding:16px;">
+                        <div style="font-weight:700; font-size:0.9rem; margin-bottom:4px;">${b.title || 'Aviso Sem Título'}</div>
+                        <div style="font-size:0.75rem; color:#64748b; margin-bottom:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Link: ${b.link_url || 'Nenhum'}</div>
+                        <button onclick="deleteBanner(${b.id})" style="width:100%; padding:8px; background:#fee2e2; color:#ef4444; border:none; border-radius:8px; font-weight:700; cursor:pointer;">Excluir</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function deleteBanner(id) {
+            if(!confirm('Deseja excluir este banner?')) return;
+            await fetchAdmin(`api/admin/banners/${id}`, { method: 'DELETE' });
+            loadBannersAdmin();
+        }
+
+        async function addBanner(e) {
+            e.preventDefault();
+            const payload = {
+                image_url: document.getElementById('b-image').value,
+                link_url: document.getElementById('b-link').value,
+                title: document.getElementById('b-title').value
+            };
+            await fetchAdmin('api/admin/banners', {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            document.getElementById('banner-modal').style.display='none';
+            document.getElementById('banner-form').reset();
+            loadBannersAdmin();
+        }
+
         async function init() {
             document.getElementById('current-date').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             await loadStores();
+            loadBannersAdmin();
         }
 
         async function fetchAdmin(endpoint, options = {}) {
@@ -367,6 +421,7 @@
             const titles = {
                 'dashboard': 'Painel Gestão Master',
                 'lojistas': 'Gerência de Lojistas',
+                'banners': 'Gestão de Banners',
                 'destaques': 'Curadoria de Destaques',
                 'seguranca': 'Segurança e Bloqueios'
             };
@@ -374,6 +429,8 @@
             document.getElementById('table-title').innerText = section === 'dashboard' ? 'Todos os Comerciantes' : section.toUpperCase();
 
             document.getElementById('kpi-section').style.display = section === 'dashboard' ? 'grid' : 'none';
+            document.getElementById('section-table').style.display = (section === 'banners') ? 'none' : 'block';
+            document.getElementById('section-banners').style.display = (section === 'banners') ? 'block' : 'none';
             document.getElementById('add-store-btn').style.display = (section === 'dashboard' || section === 'lojistas') ? 'block' : 'none';
 
             renderStoresTable();
@@ -538,6 +595,29 @@
             location.reload();
         }
     </script>
+    <!-- Banner Modal -->
+    <div id="banner-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:#fff; width:100%; max-width:400px; padding:32px; border-radius:24px;">
+            <h2 style="margin:0 0 20px 0;">🖼️ Novo Banner Global</h2>
+            <form id="banner-form" onsubmit="addBanner(event)">
+                <div style="margin-bottom:12px;">
+                    <label style="display:block; font-size:0.8rem; font-weight:700;">URL da Imagem</label>
+                    <input type="text" id="b-image" required placeholder="https://..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="display:block; font-size:0.8rem; font-weight:700;">Título (Opcional)</label>
+                    <input type="text" id="b-title" placeholder="Ex: Promoção de Natal" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                </div>
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:0.8rem; font-weight:700;">Link de Redirecionamento</label>
+                    <input type="text" id="b-link" placeholder="https://..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <button type="button" onclick="document.getElementById('banner-modal').style.display='none'" style="padding:12px; background:#f1f5f9; border:none; border-radius:8px;">Cancelar</button>
+                    <button type="submit" style="padding:12px; background:var(--primary); color:#fff; border:none; border-radius:8px; font-weight:700;">Salvar Banner</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
-
 </html>

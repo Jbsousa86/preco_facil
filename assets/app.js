@@ -250,7 +250,7 @@ async function loadCheapest() {
 let heroCarouselIndex = 0;
 async function loadHeroPromotions() {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/offers/trending`);
+        const res = await fetch(`${API_BASE_URL}/api/banners`);
         const offers = await res.json();
         
         const section = document.getElementById('hero-carousel-section');
@@ -262,19 +262,12 @@ async function loadHeroPromotions() {
         section.style.display = 'block';
         
         carousel.innerHTML = offers.map((o, i) => `
-            <div class="carousel-slide" style="position:absolute; inset:0; opacity:${i===0?1:0}; transition: opacity 0.8s ease; cursor:pointer;" onclick="window.location.href='store_profile.html?id=${o.store_id}'">
-                <img src="${getFullUrl(o.image_url || 'assets/default_banner.png')}" style="width:100%; height:100%; object-fit:cover; filter: brightness(0.7);">
+            <div class="carousel-slide" style="position:absolute; inset:0; opacity:${i===0?1:0}; transition: opacity 0.8s ease; cursor:pointer;" onclick="if('${o.link_url}') window.open('${o.link_url}', '_blank')">
+                <img src="${getFullUrl(o.image_url)}" style="width:100%; height:100%; object-fit:cover; filter: brightness(0.7);">
                 <div style="position:absolute; inset:0; background:linear-gradient(transparent, rgba(0,0,0,0.8)); display:flex; flex-direction:column; justify-content:flex-end; padding:24px; color:#fff;">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-                        <div>
-                            <span style="background:var(--primary); padding:4px 12px; border-radius:8px; font-size:0.8rem; font-weight:700; margin-bottom:8px; display:inline-block;">OFERTA IMPERDÍVEL 🔥</span>
-                            <h2 style="margin:0; font-size:1.5rem;">${o.product_name}</h2>
-                            <p style="margin:4px 0 0; opacity:0.8;">🏪 ${o.store_name}</p>
-                        </div>
-                        <div style="text-align:right;">
-                            <span style="font-size:1rem; text-decoration:line-through; opacity:0.6;">R$ ${parseFloat(o.price).toFixed(2)}</span>
-                            <div style="font-size:2rem; font-weight:800; color:#10b981;">R$ ${parseFloat(o.promo_price).toFixed(2)}</div>
-                        </div>
+                    <div>
+                        <span style="background:var(--primary); padding:4px 12px; border-radius:8px; font-size:0.8rem; font-weight:700; margin-bottom:8px; display:inline-block;">DESTAQUE ✨</span>
+                        <h2 style="margin:0; font-size:1.5rem;">${o.title || 'Novidade no Ar'}</h2>
                     </div>
                 </div>
             </div>
