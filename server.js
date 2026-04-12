@@ -15,8 +15,8 @@ const app = express();
 // Configuração de CORS
 app.use(cors());
 app.use(bodyParser.json());
-app.use('/uploads', express.static('uploads'));
-app.use(express.static(__dirname)); // <-- Serve os arquivos HTML (admin.html, index.html, etc)
+// app.use('/uploads', express.static('uploads')); // Vercel handles static uploads folder if present, but we prefer API for dynamic stuff
+// No Vercel, as rotas estáticas são gerenciadas pelo vercel.json ou padrão da plataforma
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Configuração do Multer para Uploads
