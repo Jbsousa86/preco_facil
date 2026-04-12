@@ -108,9 +108,9 @@ async function initializeDatabase() {
     try {
         console.log("Iniciando a verificação e criação do esquema do banco de dados...");
 
-        // --- 1. GARANTIR EXTENSÕES ---
-        await pool.query('CREATE EXTENSION IF NOT EXISTS unaccent;').catch(e => console.error('Erro ao criar extensão unaccent:', e.message));
-        await pool.query('CREATE EXTENSION IF NOT EXISTS pg_trgm;').catch(e => console.error('Erro ao criar extensão pg_trgm:', e.message));
+        // --- 1. GARANTIR EXTENSÕES --- (Comentado para evitar erros em DBs sem permissão de SUPERUSER)
+        // await pool.query('CREATE EXTENSION IF NOT EXISTS unaccent;').catch(e => console.error('Erro extensão:', e.message));
+        // await pool.query('CREATE EXTENSION IF NOT EXISTS pg_trgm;').catch(e => console.error('Erro extensão:', e.message));
 
         // --- 2. CRIAR TABELAS BASE (SEM DEPENDÊNCIA DE FK) ---
         
@@ -211,9 +211,8 @@ async function initializeDatabase() {
         console.log("ALTER TABLEs executados com sucesso. O esquema está pronto.");
 
     } catch (e) {
-        console.error('ERRO FATAL NA INICIALIZAÇÃO DO BANCO DE DADOS. Verifique as chaves estrangeiras e a sintaxe SQL.', e);
-        // Garante que o servidor não inicie sem o DB
-        process.exit(1);
+        console.error('AVISO NA INICIALIZAÇÃO DO BANCO DE DADOS (Não fatal):', e);
+        // Não mata o processo para permitir que o Vercel sirva os arquivos estáticos
     }
 }
 
@@ -738,10 +737,14 @@ app.delete('/api/admin/banners/:id', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-// INICIA O SERVIDOR SOMENTE APÓS A ESTRUTURA DO DB SER GARANTIDA
-initializeDatabase().then(() => {
-    app.listen(PORT, '0.0.0.0',() => console.log(`Servidor rodando na porta ${PORT}`));
-}).catch(e => {
-    console.error("Falha ao iniciar o servidor após erro na inicialização do DB:", e);
-    process.exit(1);
-});
+// INICIA O SERVIDOR
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    initializeDatabase().then(() => {
+        app.listen(PORT, '0.0.0.0',() => console.log(`Servidor rodando na porta ${PORT}`));
+    }).catch(e => console.error("Falha startup:", e));
+} else {
+    // No Vercel, apenas rodamos o init sem bloquear e exportamos o app
+    initializeDatabase().catch(e => console.error("Init failed but continuing..."));
+}
+
+module.exports = app;
