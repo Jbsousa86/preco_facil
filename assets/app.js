@@ -175,7 +175,7 @@ window.searchTrending = (term) => {
     const input = document.getElementById('product');
     if (input) {
         input.value = term;
-        form.dispatchEvent(new Event('submit'));
+        // Search is now manual, user must click Buscar
     }
 };
 
@@ -228,7 +228,8 @@ async function loadCheapest() {
             const container = document.getElementById('cheapest-prices-container');
             if (items.length > 0) {
                 section.style.display = 'block';
-                container.innerHTML = items.slice(0, 10).map(p => {
+                // Show TOP 20
+                container.innerHTML = items.slice(0, 20).map(p => {
                     const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
                     const finalPrice = isPromo ? p.promo_price : p.price;
                     return `
