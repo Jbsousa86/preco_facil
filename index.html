@@ -10,6 +10,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css" />
     <link rel="manifest" href="manifest.json" />
+
+    <!-- SEO & Social Sharing (OpenGraph) -->
+    <meta name="description" content="Encontre os melhores preços de supermercados e lojas perto de você. Compare e economize no Mercado Local!" />
+    <meta property="og:title" content="Mercado Local - Comparador de Preços" />
+    <meta property="og:description" content="Compare preços de diversos estabelecimentos em um só lugar. Economize tempo e dinheiro!" />
+    <meta property="og:image" content="https://preco-facil.onrender.com/assets/logo.png" />
+    <meta property="og:url" content="https://preco-facil.onrender.com" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
     <style>
         :root {
             --primary: #2563eb;
@@ -468,6 +477,7 @@
                 <a href="javascript:void(0)" id="nav-home" onclick="showView('home')" class="nav-link active">Início</a>
                 <a href="javascript:void(0)" id="nav-stores" onclick="showView('stores')" class="nav-link">Lojas</a>
                 <a href="javascript:void(0)" id="nav-merchant" onclick="showView('merchant')" class="nav-link merchant-link">Sou Lojista</a>
+                <button onclick="sharePlatform()" class="nav-link" style="border: 1px solid var(--primary); color: var(--primary); cursor: pointer; background: transparent;">📤 Divulgar</button>
             </nav>
         </div>
         <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
@@ -492,6 +502,9 @@
         <section class="hero-section">
             <h2>Compare e economize.</h2>
             <p>Encontre os melhores preços perto de você.</p>
+            <button onclick="sharePlatform()" style="margin-top: 16px; background: #fff; border: 1px solid var(--primary); color: var(--primary); padding: 10px 24px; border-radius: 20px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                <span>🚀</span> Compartilhar Plataforma
+            </button>
         </section>
 
         <!-- Hero Promotion Carousel -->

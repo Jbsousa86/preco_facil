@@ -387,3 +387,25 @@ function shareSearchResults() {
     }
 }
 
+function sharePlatform() {
+    const url = "https://preco-facil.onrender.com";
+    const title = "Mercado Local - Compare e Economize!";
+    const text = "Ei! Já conhece o Mercado Local? É muito fácil comparar preços de vários supermercados e lojas da nossa região em um só lugar. Economize tempo e dinheiro:";
+
+    if (navigator.share) {
+        navigator.share({
+            title: title,
+            text: text,
+            url: url
+        }).catch(console.error);
+    } else {
+        const temp = document.createElement('input');
+        document.body.appendChild(temp);
+        temp.value = url;
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        alert('Link da plataforma copiado para você compartilhar! 🚀');
+    }
+}
+
