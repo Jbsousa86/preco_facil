@@ -288,15 +288,17 @@ async function loadHeroPromotions() {
                 if(!slides.length) return;
                 
                 slides[heroCarouselIndex].style.opacity = 0;
+                slides[heroCarouselIndex].style.pointerEvents = 'none';
                 dotEls[heroCarouselIndex].style.background = 'rgba(0,0,0,0.2)';
                 dotEls[heroCarouselIndex].style.width = '12px';
                 
                 heroCarouselIndex = (heroCarouselIndex + 1) % offers.length;
                 
                 slides[heroCarouselIndex].style.opacity = 1;
+                slides[heroCarouselIndex].style.pointerEvents = 'auto';
                 dotEls[heroCarouselIndex].style.background = 'var(--primary)';
                 dotEls[heroCarouselIndex].style.width = '24px';
-            }, 3000);
+            }, 5000);
         }
         
     } catch (e) { console.error(e); }
