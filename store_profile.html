@@ -778,14 +778,18 @@
 
             cart[prodId].qty += delta;
 
+            const addBtn = document.getElementById(`add-btn-${prodId}`);
+            const qtyCtrl = document.getElementById(`qty-ctrl-${prodId}`);
+            const qtyVal = document.getElementById(`qty-val-${prodId}`);
+
             if (cart[prodId].qty <= 0) {
                 delete cart[prodId];
-                document.getElementById(`add-btn-${prodId}`).style.display = 'flex';
-                document.getElementById(`qty-ctrl-${prodId}`).style.display = 'none';
+                if (addBtn) addBtn.style.display = 'flex';
+                if (qtyCtrl) qtyCtrl.style.display = 'none';
             } else {
-                document.getElementById(`add-btn-${prodId}`).style.display = 'none';
-                document.getElementById(`qty-ctrl-${prodId}`).style.display = 'flex';
-                document.getElementById(`qty-val-${prodId}`).innerText = cart[prodId].qty;
+                if (addBtn) addBtn.style.display = 'none';
+                if (qtyCtrl) qtyCtrl.style.display = 'flex';
+                if (qtyVal) qtyVal.innerText = cart[prodId].qty;
             }
 
             updateCartSummary();
