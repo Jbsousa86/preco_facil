@@ -264,20 +264,21 @@ async function loadHeroPromotions() {
         carousel.innerHTML = offers.map((o, i) => {
             const link = (o.link_url && o.link_url !== 'null' && String(o.link_url).trim() !== '') ? o.link_url : '';
             const isActive = (i === 0);
-            const clickAttr = link ? `onclick="window.open('${link.startsWith('http') ? link : 'https://' + link}', '_blank')"` : '';
+            
+            // Se tiver link, usa <a>, se não tiver usa <div>
+            const tag = link ? 'a' : 'div';
+            const hrefAttr = link ? `href="${link.startsWith('http') ? link : 'https://' + link}" target="_blank"` : '';
             
             return `
-                <div class="carousel-slide" 
-                     data-has-link="${link ? 'true' : 'false'}"
-                     style="position:absolute; inset:0; opacity:${isActive?1:0}; visibility:${isActive?'visible':'hidden'}; pointer-events:${(isActive && link)?'auto':'none'}; transition: opacity 0.8s ease, visibility 0.8s; ${link ? 'cursor:pointer;' : 'cursor:default;'}" 
-                     ${clickAttr}>
+                <${tag} ${hrefAttr} class="carousel-slide" 
+                     style="position:absolute; inset:0; opacity:${isActive?1:0}; display:${isActive?'block':'none'}; text-decoration:none; transition: opacity 0.8s ease; ${link ? 'cursor:pointer;' : 'cursor:default;'}" >
                     <img src="${getFullUrl(o.image_url)}" style="width:100%; height:100%; object-fit:cover;">
                     ${o.title ? `
-                    <div style="position:absolute; inset:0; background:linear-gradient(transparent, rgba(0,0,0,0.7)); display:flex; flex-direction:column; justify-content:flex-end; padding:24px; color:#fff; pointer-events:none;">
+                    <div style="position:absolute; inset:0; background:linear-gradient(transparent, rgba(0,0,0,0.7)); display:flex; flex-direction:column; justify-content:flex-end; padding:24px; color:#fff;">
                         <h2 style="margin:0; font-size:1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${o.title}</h2>
                     </div>
                     ` : ''}
-                </div>
+                </${tag}>
             `;
         }).join('');
         
@@ -292,23 +293,22 @@ async function loadHeroPromotions() {
                 const dotEls = dots.querySelectorAll('.dot');
                 if(!slides.length) return;
                 
-                slides[heroCarouselIndex].style.opacity = 0;
-                slides[heroCarouselIndex].style.visibility = 'hidden';
-                slides[heroCarouselIndex].style.pointerEvents = 'none';
+                const prevSlide = slides[heroCarouselIndex];
+                prevSlide.style.opacity = 0;
+                // Remove do fluxo de cliques após a transição
+                setTimeout(() => { 
+                    if (prevSlide.style.opacity == "0") prevSlide.style.display = 'none'; 
+                }, 800);
+                
                 dotEls[heroCarouselIndex].style.background = 'rgba(0,0,0,0.2)';
                 dotEls[heroCarouselIndex].style.width = '12px';
                 
                 heroCarouselIndex = (heroCarouselIndex + 1) % offers.length;
                 
                 const nextSlide = slides[heroCarouselIndex];
-                nextSlide.style.opacity = 1;
-                nextSlide.style.visibility = 'visible';
-                // Só liga o clique se o banner tiver link
-                if (nextSlide.getAttribute('data-has-link') === 'true') {
-                    nextSlide.style.pointerEvents = 'auto';
-                } else {
-                    nextSlide.style.pointerEvents = 'none';
-                }
+                nextSlide.style.display = 'block';
+                // Pequeno delay para o navegador registrar o display:block antes da opacidade
+                setTimeout(() => { nextSlide.style.opacity = 1; }, 20);
                 
                 dotEls[heroCarouselIndex].style.background = 'var(--primary)';
                 dotEls[heroCarouselIndex].style.width = '24px';
