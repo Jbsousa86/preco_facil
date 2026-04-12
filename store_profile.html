@@ -328,8 +328,8 @@
             position: absolute;
             bottom: 8px;
             right: 8px;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             background: var(--primary);
             color: #fff;
             border-radius: 50%;
@@ -337,22 +337,32 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             transition: transform 0.2s;
-            font-size: 1rem;
+            font-size: 1.2rem;
             z-index: 5;
             border: none;
         }
-        .add-btn:active { transform: scale(0.9); }
+
+        .card-qty-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            border: 2px solid #fff;
+        }
 
         .quantity-control {
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 12px;
-            background: #f1f5f9;
-            border-radius: 10px;
-            padding: 4px;
+            display: none; /* Escondido no card, visível no modal */
         }
 
         .qty-btn {
@@ -745,15 +755,10 @@
                                 <span class="current-price">R$ ${parseFloat(currentPrice).toFixed(2)}</span>
                             </div>
                             
-                            <div id="add-btn-${p.id}" class="add-btn" style="display:${qty > 0 ? 'none' : 'flex'}" onclick="updateCart('${p.id}', 1, event)">
+                            <button class="add-btn" onclick="updateCart('${p.id}', 1, event)">
                                 <span>+</span>
-                            </div>
-                            
-                            <div id="qty-ctrl-${p.id}" class="quantity-control" style="display:${qty > 0 ? 'flex' : 'none'}; margin-top: 8px;">
-                                <button class="qty-btn" onclick="updateCart('${p.id}', -1, event)">-</button>
-                                <span id="qty-val-${p.id}" style="font-weight:700;">${qty}</span>
-                                <button class="qty-btn" onclick="updateCart('${p.id}', 1, event)">+</button>
-                            </div>
+                                <div id="qty-badge-${p.id}" class="card-qty-badge" style="display:${qty > 0 ? 'flex' : 'none'}">${qty}</div>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -778,18 +783,16 @@
 
             cart[prodId].qty += delta;
 
-            const addBtn = document.getElementById(`add-btn-${prodId}`);
-            const qtyCtrl = document.getElementById(`qty-ctrl-${prodId}`);
-            const qtyVal = document.getElementById(`qty-val-${prodId}`);
+            const badge = document.getElementById(`qty-badge-${prodId}`);
 
             if (cart[prodId].qty <= 0) {
                 delete cart[prodId];
-                if (addBtn) addBtn.style.display = 'flex';
-                if (qtyCtrl) qtyCtrl.style.display = 'none';
+                if (badge) badge.style.display = 'none';
             } else {
-                if (addBtn) addBtn.style.display = 'none';
-                if (qtyCtrl) qtyCtrl.style.display = 'flex';
-                if (qtyVal) qtyVal.innerText = cart[prodId].qty;
+                if (badge) {
+                    badge.innerText = cart[prodId].qty;
+                    badge.style.display = 'flex';
+                }
             }
 
             updateCartSummary();
