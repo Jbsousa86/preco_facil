@@ -20,6 +20,28 @@
             --card-hover-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
 
+        .share-btn {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            margin-top: 16px;
+        }
+
+        .share-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
         body {
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-body);
@@ -510,6 +532,9 @@
             <div style="margin-top: 12px;">
                 <span class="status-badge">Aberto Agora</span>
             </div>
+            <button class="share-btn" onclick="shareStore()">
+                <span>📤</span> Compartilhar Loja
+            </button>
         </section>
 
         <nav class="search-nav-container">
@@ -600,6 +625,20 @@
         } else {
             init();
         }
+
+        function shareStore() {
+            if (navigator.share) {
+                navigator.share({
+                    title: storeData ? storeData.name : 'Mercado Local',
+                    text: `Confira o cardápio de ${storeData ? storeData.name : 'esta loja'} no Mercado Local!`,
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('Link copiado para a área de transferência! 🚀');
+            }
+        }
+
 
         async function init() {
             try {

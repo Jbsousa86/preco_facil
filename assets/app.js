@@ -24,6 +24,11 @@ if (form) {
 
         resultsContainer.innerHTML = '<div style="text-align:center; padding:40px; color: #64748b;">🔍 Buscando melhores ofertas para "'+product+'"...</div>';
 
+        // Update URL for shareability
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set('q', product);
+        window.history.pushState({}, '', newUrl);
+
         try {
             const res = await fetch(`${API_BASE_URL}/api/search?product=${encodeURIComponent(product)}`);
             if (!res.ok) throw new Error('Erro na resposta do servidor');
@@ -41,6 +46,16 @@ if (form) {
         }
     });
 }
+
+// Auto-search from URL param
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('q');
+    if (query) {
+        document.getElementById('product').value = query;
+        form.dispatchEvent(new Event('submit'));
+    }
+});
 
 function renderResults(data) {
     if (promoInterval) clearInterval(promoInterval);
@@ -71,6 +86,9 @@ function renderResults(data) {
                     `;
                 }).join('')}
             </div>
+            <button onclick="shareSearchResults()" style="margin-top:20px; background:rgba(37,99,235,0.1); color:var(--primary); border:none; padding:10px 20px; border-radius:12px; font-weight:700; cursor:pointer; width:100%; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <span>📤</span> Compartilhar estes preços
+            </button>
         </div>
         <h3 style="margin-bottom: 20px; color:#64748b; font-size:1rem;">Resultados por Loja:</h3>
     `;
@@ -363,3 +381,25 @@ window.addEventListener('beforeinstallprompt', (e) => {
         };
     }
 });
+
+function shareSearchResults() {
+    const term = document.getElementById('product').value;
+    const url = window.location.href;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: `Preços para ${term} - Mercado Local`,
+            text: `Encontrei os melhores preços de ${term} no Mercado Local! Confira aqui:`,
+            url: url
+        }).catch(console.error);
+    } else {
+        const temp = document.createElement('input');
+        document.body.appendChild(temp);
+        temp.value = url;
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        alert('Link dos resultados copiado! 🚀');
+    }
+}
+
