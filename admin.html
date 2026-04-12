@@ -259,11 +259,11 @@
         @media (max-width: 1024px) {
             aside {
                 transform: translateX(-100%);
-                box-shadow: 20px 0 30px rgba(0,0,0,0.3);
+                box-shadow: 20px 0 30px rgba(0, 0, 0, 0.3);
                 width: 280px;
                 background: var(--sidebar-bg);
             }
-            
+
             aside.open {
                 transform: translateX(0);
             }
@@ -279,7 +279,8 @@
             /* Barra Azul Superior - Corrigida e com Sombra */
             .mobile-header-admin {
                 display: flex;
-                background: var(--primary); /* Azul vibrante */
+                background: var(--primary);
+                /* Azul vibrante */
                 padding: 0 16px;
                 height: 56px;
                 align-items: center;
@@ -287,36 +288,37 @@
                 position: sticky;
                 top: 0;
                 z-index: 1010;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
                 color: #fff;
             }
-            
-            /* Botão Sanduíche Flutuante (FAB) no Canto Inferior Direito */
+
+            /* Botão Sanduíche Flutuante (FAB) no Canto Inferior Direito - SOLITÁRIO */
             .menu-toggle-fab {
                 position: fixed;
-                bottom: 24px;
-                right: 24px;
-                width: 60px;
-                height: 60px;
-                background: var(--primary);
+                bottom: 30px;
+                right: 30px;
+                width: 64px;
+                height: 64px;
+                background: #2563eb; 
                 color: #fff;
                 border: none;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 1.5rem;
-                box-shadow: 0 4px 20px rgba(37, 99, 235, 0.5);
+                font-size: 1.6rem;
+                box-shadow: 0 8px 32px rgba(37, 99, 235, 0.5);
                 cursor: pointer;
-                z-index: 1050; /* Por cima de quase tudo */
-                transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                z-index: 2000; 
+                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                border: 3px solid #fff;
             }
 
             .menu-toggle-fab:active {
-                transform: scale(0.9);
+                transform: scale(0.85);
             }
             
-            .menu-toggle-btn { display: none; } /* Remove o botão antigo do topo */
+            .menu-toggle-btn { display: none; }
 
             .sidebar-overlay {
                 display: none;
@@ -327,15 +329,20 @@
                 z-index: 1021;
             }
 
-            .sidebar-overlay.open { display: block; }
-            aside { z-index: 1022; }
+            .sidebar-overlay.open {
+                display: block;
+            }
+
+            aside {
+                z-index: 1022;
+            }
 
             .kpi-grid {
                 grid-template-columns: 1fr;
                 gap: 12px;
                 margin-top: 10px;
             }
-            
+
             .kpi-card {
                 padding: 20px;
                 word-wrap: break-word;
@@ -363,25 +370,30 @@
                 width: 100%;
                 overflow: hidden;
             }
-            
+
             .table-container {
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
         }
-        
+
         @media (min-width: 1025px) {
-            .menu-toggle-fab { display: none; }
+            .menu-toggle-fab {
+                display: none;
+            }
         }
-        
+
         @media (max-width: 480px) {
             .kpi-grid {
-                grid-template-columns: 1fr; /* 1 coluna em celulares muito pequenos */
+                grid-template-columns: 1fr;
+                /* 1 coluna em celulares muito pequenos */
             }
         }
 
         @media (min-width: 1025px) {
-            .mobile-header-admin { display: none; }
+            .mobile-header-admin {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -418,7 +430,8 @@
     <aside id="sidebar">
         <div class="sidebar-header" style="justify-content: space-between;">
             <span style="font-weight: 800; font-size: 1.2rem;">ADMIN PORTAL</span>
-            <button class="menu-toggle" style="background:none; border:none; color:#fff; display:none;" id="close-menu-btn" onclick="toggleSidebar()">&times;</button>
+            <button class="menu-toggle" style="background:none; border:none; color:#fff; display:none;"
+                id="close-menu-btn" onclick="toggleSidebar()">&times;</button>
         </div>
         <nav class="nav-menu">
             <div class="nav-item active" onclick="showSection('dashboard', this)">📊 Dashboard</div>
@@ -561,7 +574,7 @@
     <script>
         const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === "" || window.location.protocol === 'file:')
             ? 'http://localhost:3000'
-            : 'https://preco-facil.onrender.com';
+            : window.location.origin;
 
         const adminKey = sessionStorage.getItem('admin_key');
         let allStores = [];
@@ -869,10 +882,10 @@
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
             const closeBtn = document.getElementById('close-menu-btn');
-            
+
             sidebar.classList.toggle('open');
             overlay.classList.toggle('open');
-            
+
             if (window.innerWidth <= 1024) {
                 closeBtn.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
             }

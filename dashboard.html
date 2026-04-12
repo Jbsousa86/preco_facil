@@ -583,9 +583,9 @@
     </div>
 
     <script>
-        const API_BASE_URL = window.location.hostname === 'localhost'
+        const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === "" || window.location.protocol === 'file:')
             ? 'http://localhost:3000'
-            : 'https://preco-facil.onrender.com';
+            : window.location.origin;
             
         const supabaseUrl = 'https://licvfuzvvbmjdvcooogo.supabase.co';
         const supabaseKey = 'sb_publishable_8hwXxxU7C4owwVmlc4FvPg_0pEXUFK-';
