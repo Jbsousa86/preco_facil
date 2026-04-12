@@ -804,24 +804,12 @@
                 count += cart[id].qty;
             }
 
-            const cartBar = document.getElementById('cart-bar');
-            if (cartBar) {
-                if (count > 0) {
-                    cartBar.style.display = 'flex';
-                    document.getElementById('cart-summary-qty').innerText = count;
-                } else {
-                    cartBar.style.display = 'none';
-                }
-            }
-            
-            // Atualiza badge do cabeçalho
             const headBadge = document.getElementById('header-cart-badge');
             if (headBadge) {
                 const prevCount = parseInt(headBadge.innerText) || 0;
                 headBadge.innerText = count;
                 headBadge.style.display = count > 0 ? 'block' : 'none';
                 
-                // Animação se mudou o número
                 if (count !== prevCount) {
                     headBadge.style.transform = 'scale(1.4)';
                     setTimeout(() => headBadge.style.transform = 'scale(1)', 200);
