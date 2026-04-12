@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css?v=2.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <style>
         :root {
             --primary: #2563eb; /* Blue E-commerce standard */
@@ -597,6 +600,13 @@
     </div>
 
     <script>
+        // DESINSTALAÇÃO AGRESSIVA DE QUALQUER CACHE ANTIGO
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+                for(let reg of regs) reg.unregister();
+            });
+        }
+        
         const API_BASE_URL = window.location.hostname === 'localhost'
             ? 'http://localhost:3000'
             : 'https://preco-facil.onrender.com';
