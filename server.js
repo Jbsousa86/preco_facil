@@ -51,28 +51,30 @@ const upload = multer({
 });
 
 
-// PostgreSQL connection pool (adjust credentials as needed)
-const connectionString = process.env.DATABASE_URL; // Tenta ler a string completa do Render
+// PostgreSQL connection pool Configuration
+const connectionString = process.env.DATABASE_URL;
 
 let config;
 
-if (connectionString) {
-  // Se estiver em ambiente de produção (Render), use a URI completa
+// Se DATABASE_URL estiver presente e NÃO estivermos forçando o uso do local, usa a URL completa
+// NOTE: Em alguns ambientes locais, o DATABASE_URL pode estar presente no .env para backup.
+// Aqui, verificamos se estamos em produção ou se o usuário explicitamente quer usar o banco remoto.
+if (connectionString && (process.env.NODE_ENV === 'production' || process.env.FORCE_REMOTE_DB === 'true')) {
+  console.log('--- USANDO BANCO DE DADOS REMOTO (NEON/RENDER) ---');
   config = {
     connectionString: connectionString,
-    // ESSENCIAL: O Render exige SSL para conexões
     ssl: {
       rejectUnauthorized: false 
     }
   };
 } else {
-  // Se não, use as variáveis separadas (para desenvolvimento local)
+  console.log('--- USANDO BANCO DE DADOS LOCAL (POSTGRESQL) ---');
   config = {
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
+    user: process.env.DB_USER || 'postgres',
+    host: process.env.DB_HOST || 'localhost',
+    database: process.env.DB_NAME || 'PRECO_FACIL',
+    password: process.env.DB_PASSWORD || 'ADMIN123',
+    port: process.env.DB_PORT || 5432,
   };
 }
 
@@ -752,10 +754,11 @@ app.delete('/api/admin/banners/:id', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 // INICIA O SERVIDOR
-if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+// INICIA O SERVIDOR (Apenas se executado diretamente, não via Vercel/Require)
+if (require.main === module) {
     initializeDatabase().then(() => {
-        app.listen(PORT, '0.0.0.0',() => console.log(`Servidor rodando na porta ${PORT}`));
-    }).catch(e => console.error("Falha startup:", e));
+        app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Servidor rodando localmente em http://localhost:${PORT}`));
+    }).catch(e => console.error("Falha crítica no startup:", e));
 }
 
 // Essencial para o Vercel encontrar o app
