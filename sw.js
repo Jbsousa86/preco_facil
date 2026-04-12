@@ -1,5 +1,5 @@
 // sw.js - Service Worker for PWA offline support
-const CACHE_NAME = 'preco-facil-v40';
+const CACHE_NAME = 'preco-facil-v51';
 const FILES_TO_CACHE = [
     '/',
     '/index.html',
@@ -14,11 +14,10 @@ const FILES_TO_CACHE = [
 self.addEventListener('install', (evt) => {
     evt.waitUntil(
         caches.open(CACHE_NAME).then(async (cache) => {
-            // Tentar adicionar os arquivos locais; falhas em recursos externos não bloqueiam a instalação
             try {
                 await cache.addAll(FILES_TO_CACHE);
             } catch (err) {
-                console.warn('Alguns recursos não puderam ser cacheados na instalação:', err);
+                console.warn('Cache error:', err);
             }
         })
     );
@@ -40,11 +39,23 @@ self.addEventListener('activate', (evt) => {
     self.clients.claim();
 });
 
+// Estratégia Network First: Tenta internet primeiro, se falhar pega o cache
 self.addEventListener('fetch', (evt) => {
     if (evt.request.method !== 'GET') return;
+    
     evt.respondWith(
-        caches.match(evt.request).then((response) => {
-            return response || fetch(evt.request);
+        fetch(evt.request).then(response => {
+            // Se a rede funcionar, clona e atualiza o cache
+            if (response && response.status === 200) {
+                const responseClone = response.clone();
+                caches.open(CACHE_NAME).then(cache => {
+                    cache.put(evt.request, responseClone);
+                });
+            }
+            return response;
+        }).catch(() => {
+            // Se a rede falhar, tenta o cache
+            return caches.match(evt.request);
         })
     );
 });
