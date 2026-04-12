@@ -1,5 +1,5 @@
 // sw.js - Service Worker for PWA offline support
-const CACHE_NAME = 'preco-facil-v70';
+const CACHE_NAME = 'preco-facil-v80';
 const FILES_TO_CACHE = [
     '/',
     '/index.html',
