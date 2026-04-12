@@ -499,6 +499,68 @@
             font-size: 1.1rem;
         }
 
+        /* Floating Cart Bar */
+        .floating-cart-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 500px;
+            background: var(--primary);
+            color: #fff;
+            padding: 16px 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(37, 99, 235, 0.4);
+            z-index: 998;
+            cursor: pointer;
+            display: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideUpFloat 0.3s ease-out;
+        }
+
+        @keyframes slideUpFloat {
+            from { transform: translate(-50%, 100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        .cart-bar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cart-bar-badge {
+            background: #fff;
+            color: var(--primary);
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85rem;
+        }
+
+        .cart-bar-label {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.95rem;
+        }
+
+        .cart-bar-total {
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
         .checkout-btn {
             background: #25D366;
             color: #fff;
@@ -580,6 +642,17 @@
             </div>
         </section>
     </main>
+
+    <!-- Floating Cart Bar -->
+    <div id="floating-cart-bar" class="floating-cart-bar" onclick="openCart()">
+        <div class="cart-bar-content">
+            <div class="cart-bar-left">
+                <span id="floating-cart-count" class="cart-bar-badge">0</span>
+                <span class="cart-bar-label">🛒 Ver Sacola</span>
+            </div>
+            <div id="floating-cart-total" class="cart-bar-total">R$ 0,00</div>
+        </div>
+    </div>
 
     <!-- Cart Modal -->
     <div id="cart-modal" class="modal" onclick="if(event.target == this) closeCart()">
@@ -844,6 +917,7 @@
                 count += cart[id].qty;
             }
 
+            // Atualiza ícone do Header
             const headBadge = document.getElementById('header-cart-badge');
             if (headBadge) {
                 const prevCount = parseInt(headBadge.innerText) || 0;
@@ -853,6 +927,21 @@
                 if (count !== prevCount) {
                     headBadge.style.transform = 'scale(1.4)';
                     setTimeout(() => headBadge.style.transform = 'scale(1)', 200);
+                }
+            }
+
+            // Atualiza Barra Flutuante Inferior
+            const floatingBar = document.getElementById('floating-cart-bar');
+            const floatingCount = document.getElementById('floating-cart-count');
+            const floatingTotal = document.getElementById('floating-cart-total');
+            
+            if (floatingBar) {
+                if (count > 0) {
+                    floatingCount.innerText = count;
+                    floatingTotal.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+                    floatingBar.style.display = 'block';
+                } else {
+                    floatingBar.style.display = 'none';
                 }
             }
             
