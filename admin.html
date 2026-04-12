@@ -15,7 +15,7 @@
             --primary: #2563eb;
             --primary-dark: #1d4ed8;
             --primary-light: #eff6ff;
-            --secondary: #64748b;
+            --secondary: #12151a;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -54,12 +54,19 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .sidebar-logo { height: 32px; filter: brightness(0) invert(1); }
+        .sidebar-logo {
+            height: 32px;
+            filter: brightness(0) invert(1);
+        }
 
-        .nav-menu { padding: 20px 0; flex-grow: 1; }
+        .nav-menu {
+            padding: 20px 0;
+            flex-grow: 1;
+        }
+
         .nav-item {
             padding: 12px 24px;
             display: flex;
@@ -71,11 +78,16 @@
             transition: all 0.2s;
             cursor: pointer;
         }
-        .nav-item:hover, .nav-item.active {
-            background: rgba(255,255,255,0.05);
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.05);
             color: #fff;
         }
-        .nav-item.active { border-left: 4px solid var(--primary); }
+
+        .nav-item.active {
+            border-left: 4px solid var(--primary);
+        }
 
         /* Main Content */
         main {
@@ -92,8 +104,17 @@
             margin-bottom: 32px;
         }
 
-        .admin-title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; }
-        .admin-title p { margin: 4px 0 0; color: var(--secondary); font-size: 0.9rem; }
+        .admin-title h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .admin-title p {
+            margin: 4px 0 0;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
 
         /* KPI Cards */
         .kpi-grid {
@@ -111,8 +132,20 @@
             border: 1px solid #e2e8f0;
         }
 
-        .kpi-label { font-size: 0.85rem; color: var(--secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-        .kpi-value { font-size: 2rem; font-weight: 800; margin: 8px 0; display: block; }
+        .kpi-label {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 8px 0;
+            display: block;
+        }
 
         /* Table Area */
         .table-card {
@@ -131,7 +164,11 @@
             align-items: center;
         }
 
-        table { width: 100%; border-collapse: collapse; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
         th {
             background: #f8fafc;
             text-align: left;
@@ -141,11 +178,31 @@
             color: var(--secondary);
             font-weight: 700;
         }
-        td { padding: 16px 24px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; vertical-align: middle; }
 
-        .store-cell { display: flex; align-items: center; gap: 12px; }
-        .store-icon { width: 40px; height: 40px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        .store-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .store-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
         .badge {
             padding: 4px 10px;
             border-radius: 20px;
@@ -153,11 +210,27 @@
             font-weight: 700;
             text-transform: uppercase;
         }
-        .badge-success { background: #ecfdf5; color: var(--success); }
-        .badge-danger { background: #fef2f2; color: var(--danger); }
-        .badge-warning { background: #fff7ed; color: var(--warning); }
 
-        .actions-cell { display: flex; gap: 8px; }
+        .badge-success {
+            background: #ecfdf5;
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        .badge-warning {
+            background: #fff7ed;
+            color: var(--warning);
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+
         .btn-icon {
             width: 32px;
             height: 32px;
@@ -171,31 +244,54 @@
             transition: all 0.2s;
             font-size: 0.9rem;
         }
-        .btn-icon:hover { background: #f8fafc; transform: translateY(-1px); }
-        .btn-icon.active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+
+        .btn-icon:hover {
+            background: #f8fafc;
+            transform: translateY(-1px);
+        }
+
+        .btn-icon.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
 
         @media (max-width: 1024px) {
-            aside { transform: translateX(-100%); }
-            main { margin-left: 0; }
+            aside {
+                transform: translateX(-100%);
+            }
+
+            main {
+                margin-left: 0;
+            }
         }
     </style>
 </head>
 
 <body>
     <!-- Admin Login Overlay -->
-    <div id="admin-login-overlay" style="position:fixed; inset:0; background:linear-gradient(135deg, #1e293b, #0f172a); z-index:5000; display:flex; align-items:center; justify-content:center; padding:20px;">
-        <div style="background:#fff; width:100%; max-width:400px; padding:40px; border-radius:24px; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+    <div id="admin-login-overlay"
+        style="position:fixed; inset:0; background:linear-gradient(135deg, #1e293b, #0f172a); z-index:5000; display:flex; align-items:center; justify-content:center; padding:20px;">
+        <div
+            style="background:#fff; width:100%; max-width:400px; padding:40px; border-radius:24px; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
             <div style="font-size:3.5rem; margin-bottom:16px;">🔐</div>
             <h2 style="margin:0 0 8px 0; color:#0f172a; font-weight:800; font-size:1.75rem;">Portal Master</h2>
             <p style="color:#64748b; margin-bottom:32px; font-weight:500;">Autenticação administrativa necessária.</p>
             <form id="admin-login-form">
                 <div style="margin-bottom:20px;">
-                    <label style="display:block; text-align:left; font-size:0.75rem; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:6px;">Chave Mestra</label>
-                    <input type="password" id="admin-key-input" placeholder="••••••••" required style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:12px; font-size:1.5rem; text-align:center; transition:0.3s; box-sizing:border-box;">
+                    <label
+                        style="display:block; text-align:left; font-size:0.75rem; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:6px;">Chave
+                        Mestra</label>
+                    <input type="password" id="admin-key-input" placeholder="••••••••" required
+                        style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:12px; font-size:1.5rem; text-align:center; transition:0.3s; box-sizing:border-box;">
                 </div>
-                <button type="submit" style="width:100%; padding:16px; background:var(--primary); color:#fff; border:none; border-radius:14px; font-weight:700; font-size:1rem; cursor:pointer; box-shadow:0 4px 6px -1px rgba(37,99,235,0.2);">Acessar Painel</button>
+                <button type="submit"
+                    style="width:100%; padding:16px; background:var(--primary); color:#fff; border:none; border-radius:14px; font-weight:700; font-size:1rem; cursor:pointer; box-shadow:0 4px 6px -1px rgba(37,99,235,0.2);">Acessar
+                    Painel</button>
             </form>
-            <a href="index.html" style="display:block; margin-top:24px; color:#94a3b8; text-decoration:none; font-size:0.85rem; font-weight:600;">← Voltar para o Site</a>
+            <a href="index.html"
+                style="display:block; margin-top:24px; color:#94a3b8; text-decoration:none; font-size:0.85rem; font-weight:600;">←
+                Voltar para o Site</a>
         </div>
     </div>
 
@@ -212,7 +308,8 @@
         </nav>
         <div style="padding: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
             <a href="index.html" class="nav-item" style="padding: 0;">⬅️ Ir para o Site</a>
-            <div onclick="logoutAdmin()" class="nav-item" style="padding: 0; margin-top: 16px; color: var(--danger);">🚪 Sair</div>
+            <div onclick="logoutAdmin()" class="nav-item" style="padding: 0; margin-top: 16px; color: var(--danger);">🚪
+                Sair</div>
         </div>
     </aside>
 
@@ -222,7 +319,9 @@
                 <h1 id="page-title">Painel Gestão Master</h1>
                 <p id="current-date">Carregando dados...</p>
             </div>
-            <button id="add-store-btn" onclick="openModal()" class="btn-icon" style="width: auto; padding: 0 20px; height: 44px; background: var(--primary); color: #fff; border:none; font-weight: 700; border-radius: 12px;">+ Novo Lojista</button>
+            <button id="add-store-btn" onclick="openModal()" class="btn-icon"
+                style="width: auto; padding: 0 20px; height: 44px; background: var(--primary); color: #fff; border:none; font-weight: 700; border-radius: 12px;">+
+                Novo Lojista</button>
         </header>
 
         <!-- BANNERS SECTION -->
@@ -230,47 +329,63 @@
             <div class="table-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
                     <h2 style="margin:0;">🖼️ Gestão de Banners Globais</h2>
-                    <button onclick="document.getElementById('banner-modal').style.display='flex'" class="btn-primary" style="width:auto; padding:0 20px;">+ Novo Banner</button>
+                    <button onclick="document.getElementById('banner-modal').style.display='flex'" class="btn-primary"
+                        style="width:auto; padding:0 20px;">+ Novo Banner</button>
                 </div>
-                <div id="banners-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:20px;">
+                <div id="banners-grid"
+                    style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:20px;">
                     <!-- Banners loaded here -->
                 </div>
             </div>
         </section>
 
         <!-- SEÇÃO: LOJISTAS PARCEIROS -->
-        <div id="new-store-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:20px;">
-            <div style="background:#fff; width:100%; max-width:500px; padding:32px; border-radius:24px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
+        <div id="new-store-modal"
+            style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+            <div
+                style="background:#fff; width:100%; max-width:500px; padding:32px; border-radius:24px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
                     <h2 style="margin:0; font-size:1.25rem;">🆕 Cadastrar Novo Lojista</h2>
-                    <button onclick="closeModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+                    <button onclick="closeModal()"
+                        style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
                 </div>
                 <form id="add-store-form">
                     <div style="margin-bottom:16px;">
-                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Nome da Loja</label>
-                        <input type="text" id="new-name" required placeholder="Ex: Supermercado Preço Bom" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Nome da
+                            Loja</label>
+                        <input type="text" id="new-name" required placeholder="Ex: Supermercado Preço Bom"
+                            style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
                     </div>
                     <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                         <div>
-                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Telefone/Whats</label>
-                            <input type="text" id="new-phone" placeholder="(63) 9999-9999" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                            <label
+                                style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Telefone/Whats</label>
+                            <input type="text" id="new-phone" placeholder="(63) 9999-9999"
+                                style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
                         </div>
                         <div>
-                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Senha Provisória</label>
-                            <input type="text" id="new-pass" required placeholder="Senha123" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Senha
+                                Provisória</label>
+                            <input type="text" id="new-pass" required placeholder="Senha123"
+                                style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
                         </div>
                     </div>
                     <div style="margin-bottom:24px;">
-                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Bairro</label>
-                        <input type="text" id="new-neighborhood" placeholder="Setor Central" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        <label
+                            style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Bairro</label>
+                        <input type="text" id="new-neighborhood" placeholder="Setor Central"
+                            style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
                     </div>
-                    <button type="submit" style="width:100%; padding:16px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-weight:700; cursor:pointer;">Finalizar Cadastro</button>
+                    <button type="submit"
+                        style="width:100%; padding:16px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-weight:700; cursor:pointer;">Finalizar
+                        Cadastro</button>
                 </form>
             </div>
         </div>
 
         <section id="kpi-section" class="kpi-grid">
-            <div class="kpi-card" onclick="showSection('lojistas', document.querySelectorAll('.nav-item')[1])" style="cursor:pointer;">
+            <div class="kpi-card" onclick="showSection('lojistas', document.querySelectorAll('.nav-item')[1])"
+                style="cursor:pointer;">
                 <span class="kpi-label">Total de Lojas</span>
                 <span id="stat-total-stores" class="kpi-value">0</span>
             </div>
@@ -278,7 +393,8 @@
                 <span class="kpi-label">Lojas Ativas</span>
                 <span id="stat-active-stores" class="kpi-value">0</span>
             </div>
-            <div class="kpi-card" onclick="showSection('seguranca', document.querySelectorAll('.nav-item')[3])" style="cursor:pointer;">
+            <div class="kpi-card" onclick="showSection('seguranca', document.querySelectorAll('.nav-item')[3])"
+                style="cursor:pointer;">
                 <span class="kpi-label">Bloqueadas</span>
                 <span id="stat-blocked-stores" class="kpi-value">0</span>
             </div>
@@ -303,7 +419,9 @@
                         </tr>
                     </thead>
                     <tbody id="stores-table">
-                        <tr><td colspan="4" style="text-align:center; padding:40px;">Carregando lojistas...</td></tr>
+                        <tr>
+                            <td colspan="4" style="text-align:center; padding:40px;">Carregando lojistas...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -312,7 +430,7 @@
 
     <script>
         const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === "" || window.location.protocol === 'file:')
-            ? 'http://localhost:3000' 
+            ? 'http://localhost:3000'
             : 'https://preco-facil.onrender.com';
 
         const adminKey = sessionStorage.getItem('admin_key');
@@ -347,7 +465,7 @@
         }
 
         async function deleteBanner(id) {
-            if(!confirm('Deseja excluir este banner?')) return;
+            if (!confirm('Deseja excluir este banner?')) return;
             await fetchAdmin(`api/admin/banners/${id}`, { method: 'DELETE' });
             loadBannersAdmin();
         }
@@ -379,7 +497,7 @@
                     method: 'POST',
                     body: JSON.stringify(payload)
                 });
-                document.getElementById('banner-modal').style.display='none';
+                document.getElementById('banner-modal').style.display = 'none';
                 document.getElementById('banner-form').reset();
                 loadBannersAdmin();
             } catch (err) {
@@ -420,10 +538,10 @@
                 const res = await fetchAdmin('api/admin/stores');
                 if (!res.ok) throw new Error('Falha ao carregar lojas');
                 allStores = await res.json();
-                
+
                 updateKPIs();
                 renderStoresTable();
-            } catch (e) { 
+            } catch (e) {
                 console.error(e);
                 document.getElementById('stores-table').innerHTML = `<tr><td colspan="4" style="text-align:center; padding:40px; color:var(--danger);">Erro ao carregar dados. Verifique a conexão.</td></tr>`;
             }
@@ -433,7 +551,7 @@
             document.getElementById('stat-total-stores').innerText = allStores.length;
             document.getElementById('stat-active-stores').innerText = allStores.filter(s => !s.is_blocked).length;
             document.getElementById('stat-blocked-stores').innerText = allStores.filter(s => s.is_blocked).length;
-            
+
             // Fetch platform-wide visits
             fetchAdmin('api/admin/stats').then(res => res.json()).then(data => {
                 document.getElementById('stat-total-visits').innerText = data.visits || 0;
@@ -623,39 +741,50 @@
         }
     </script>
     <!-- Banner Modal -->
-    <div id="banner-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+    <div id="banner-modal"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:20px;">
         <div style="background:#fff; width:100%; max-width:400px; padding:32px; border-radius:24px;">
             <h2 style="margin:0 0 20px 0;">🖼️ Novo Banner Global</h2>
             <form id="banner-form" onsubmit="addBanner(event)">
                 <div style="margin-bottom:12px;">
                     <label style="display:block; font-size:0.8rem; font-weight:700;">Origem da Imagem</label>
-                    <select id="banner-source-type" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;" onchange="document.getElementById('b-url-group').style.display = this.value === 'url' ? 'block' : 'none'; document.getElementById('b-file-group').style.display = this.value === 'file' ? 'block' : 'none';">
+                    <select id="banner-source-type"
+                        style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;"
+                        onchange="document.getElementById('b-url-group').style.display = this.value === 'url' ? 'block' : 'none'; document.getElementById('b-file-group').style.display = this.value === 'file' ? 'block' : 'none';">
                         <option value="url">URL da Web</option>
                         <option value="file">Arquivo Local</option>
                     </select>
                 </div>
                 <div id="b-url-group" style="margin-bottom:12px;">
                     <label style="display:block; font-size:0.8rem; font-weight:700;">URL da Imagem</label>
-                    <input type="text" id="b-image" placeholder="https://..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                    <input type="text" id="b-image" placeholder="https://..."
+                        style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
                 </div>
                 <div id="b-file-group" style="margin-bottom:12px; display:none;">
                     <label style="display:block; font-size:0.8rem; font-weight:700;">Selecionar Arquivo</label>
-                    <input type="file" id="b-file" accept="image/*" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                    <input type="file" id="b-file" accept="image/*"
+                        style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
                 </div>
                 <div style="margin-bottom:12px;">
                     <label style="display:block; font-size:0.8rem; font-weight:700;">Título (Opcional)</label>
-                    <input type="text" id="b-title" placeholder="Ex: Promoção de Natal" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                    <input type="text" id="b-title" placeholder="Ex: Promoção de Natal"
+                        style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
                 </div>
                 <div style="margin-bottom:20px;">
                     <label style="display:block; font-size:0.8rem; font-weight:700;">Link de Redirecionamento</label>
-                    <input type="text" id="b-link" placeholder="https://..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                    <input type="text" id="b-link" placeholder="https://..."
+                        style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
                 </div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                    <button type="button" onclick="document.getElementById('banner-modal').style.display='none'" style="padding:12px; background:#f1f5f9; border:none; border-radius:8px;">Cancelar</button>
-                    <button type="submit" style="padding:12px; background:var(--primary); color:#fff; border:none; border-radius:8px; font-weight:700;">Salvar Banner</button>
+                    <button type="button" onclick="document.getElementById('banner-modal').style.display='none'"
+                        style="padding:12px; background:#f1f5f9; border:none; border-radius:8px;">Cancelar</button>
+                    <button type="submit"
+                        style="padding:12px; background:var(--primary); color:#fff; border:none; border-radius:8px; font-weight:700;">Salvar
+                        Banner</button>
                 </div>
             </form>
         </div>
     </div>
 </body>
+
 </html>
