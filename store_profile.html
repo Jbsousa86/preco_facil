@@ -548,9 +548,6 @@
             <div id="category-scroller" class="category-scroller">
                 <!-- Categories will be injected here -->
             </div>
-            <button id="menu-cart-btn" onclick="openCart()" style="display:none; width:100%; margin-top:12px; background:var(--primary); color:#fff; border:none; padding:12px; border-radius:12px; font-weight:700; align-items:center; justify-content:center; gap:8px;">
-                <span>🛒</span> Ver Minha Sacola (<span id="menu-cart-count">0</span>)
-            </button>
         </nav>
 
         <section class="products-section">
@@ -820,8 +817,15 @@
             // Atualiza badge do cabeçalho
             const headBadge = document.getElementById('header-cart-badge');
             if (headBadge) {
+                const prevCount = parseInt(headBadge.innerText) || 0;
                 headBadge.innerText = count;
                 headBadge.style.display = count > 0 ? 'block' : 'none';
+                
+                // Animação se mudou o número
+                if (count !== prevCount) {
+                    headBadge.style.transform = 'scale(1.4)';
+                    setTimeout(() => headBadge.style.transform = 'scale(1)', 200);
+                }
             }
             
             const modalTotal = document.getElementById('modal-cart-total');
