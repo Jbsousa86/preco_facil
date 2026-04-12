@@ -264,11 +264,13 @@ async function loadHeroPromotions() {
         carousel.innerHTML = offers.map((o, i) => {
             const link = (o.link_url && o.link_url !== 'null' && String(o.link_url).trim() !== '') ? o.link_url : '';
             const isActive = (i === 0);
+            const clickAttr = link ? `onclick="window.open('${link.startsWith('http') ? link : 'https://' + link}', '_blank')"` : '';
+            
             return `
                 <div class="carousel-slide" 
                      data-has-link="${link ? 'true' : 'false'}"
-                     style="position:absolute; inset:0; opacity:${isActive?1:0}; visibility:${isActive?'visible':'hidden'}; transition: opacity 0.8s ease, visibility 0.8s; ${link ? 'cursor:pointer;' : 'cursor:default;'}" 
-                     ${link ? `onclick="window.open('${link.startsWith('http') ? link : 'https://' + link}', '_blank')"` : ''}>
+                     style="position:absolute; inset:0; opacity:${isActive?1:0}; visibility:${isActive?'visible':'hidden'}; pointer-events:${(isActive && link)?'auto':'none'}; transition: opacity 0.8s ease, visibility 0.8s; ${link ? 'cursor:pointer;' : 'cursor:default;'}" 
+                     ${clickAttr}>
                     <img src="${getFullUrl(o.image_url)}" style="width:100%; height:100%; object-fit:cover;">
                     ${o.title ? `
                     <div style="position:absolute; inset:0; background:linear-gradient(transparent, rgba(0,0,0,0.7)); display:flex; flex-direction:column; justify-content:flex-end; padding:24px; color:#fff; pointer-events:none;">
@@ -292,6 +294,7 @@ async function loadHeroPromotions() {
                 
                 slides[heroCarouselIndex].style.opacity = 0;
                 slides[heroCarouselIndex].style.visibility = 'hidden';
+                slides[heroCarouselIndex].style.pointerEvents = 'none';
                 dotEls[heroCarouselIndex].style.background = 'rgba(0,0,0,0.2)';
                 dotEls[heroCarouselIndex].style.width = '12px';
                 
@@ -300,6 +303,12 @@ async function loadHeroPromotions() {
                 const nextSlide = slides[heroCarouselIndex];
                 nextSlide.style.opacity = 1;
                 nextSlide.style.visibility = 'visible';
+                // Só liga o clique se o banner tiver link
+                if (nextSlide.getAttribute('data-has-link') === 'true') {
+                    nextSlide.style.pointerEvents = 'auto';
+                } else {
+                    nextSlide.style.pointerEvents = 'none';
+                }
                 
                 dotEls[heroCarouselIndex].style.background = 'var(--primary)';
                 dotEls[heroCarouselIndex].style.width = '24px';
