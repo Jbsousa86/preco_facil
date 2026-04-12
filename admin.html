@@ -259,6 +259,8 @@
         @media (max-width: 1024px) {
             aside {
                 transform: translateX(-100%);
+                box-shadow: 20px 0 30px rgba(0,0,0,0.2);
+                width: 280px;
             }
             
             aside.open {
@@ -267,6 +269,7 @@
 
             main {
                 margin-left: 0;
+                padding: 20px 16px; /* Padding menor no mobile */
             }
 
             .mobile-header-admin {
@@ -291,6 +294,39 @@
                 font-size: 1.2rem;
                 cursor: pointer;
             }
+
+            /* Overlay para fechar o menu ao clicar fora */
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.5);
+                backdrop-filter: blur(4px);
+                z-index: 999;
+            }
+
+            .sidebar-overlay.open {
+                display: block;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr; /* 2 colunas no mobile */
+                gap: 12px;
+            }
+            
+            .kpi-card {
+                padding: 16px;
+            }
+
+            .kpi-value {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .kpi-grid {
+                grid-template-columns: 1fr; /* 1 coluna em celulares muito pequenos */
+            }
         }
 
         @media (min-width: 1025px) {
@@ -300,6 +336,8 @@
 </head>
 
 <body>
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <!-- Admin Login Overlay -->
     <div id="admin-login-overlay"
         style="position:fixed; inset:0; background:linear-gradient(135deg, #1e293b, #0f172a); z-index:5000; display:flex; align-items:center; justify-content:center; padding:20px;">
@@ -774,8 +812,12 @@
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
             const closeBtn = document.getElementById('close-menu-btn');
+            
             sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
+            
             if (window.innerWidth <= 1024) {
                 closeBtn.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
             }
