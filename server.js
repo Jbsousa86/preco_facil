@@ -433,6 +433,19 @@ app.post('/api/delete-product', async (req, res) => {
     }
 });
 
+app.post('/api/merchant/update-identity', async (req, res) => {
+    const { store_id, logo_url, banner_url } = req.body;
+    try {
+        const client = await pool.connect();
+        await client.query('UPDATE stores SET logo_url = $1, banner_url = $2 WHERE id = $3', [logo_url, banner_url, store_id]);
+        client.release();
+        res.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
 app.patch('/api/merchant/update-logo', async (req, res) => {
     const { store_id, logo_url } = req.body;
     try {

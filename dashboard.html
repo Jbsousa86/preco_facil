@@ -498,16 +498,18 @@
                             </div>
 
                             <button type="submit" id="save-btn" class="btn-primary">Salvar Produto</button>
-                            <button type="button" id="cancel-edit-btn" style="display: none; background: none; border: 1px solid var(--gray-200); margin-top: 10px; color: var(--gray-600);" class="btn-primary" onclick="resetForm()">Cancelar Edição</button>
+                            <button type="button" id="cancel-edit-btn" class="btn-sm" style="display: none; width: 100%; margin-top: 8px; border: 1px solid var(--gray-300);" onclick="resetForm()">Cancelar Edição</button>
                         </form>
                     </div>
 
-                    <div class="card" style="background: var(--primary-light); border-color: var(--primary-light);">
-                        <h3 class="card-title" style="color: var(--primary);">🏪 Perfil da Loja</h3>
-                        <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1rem;">Mantenha sua identidade visual atualizada.</p>
-                        <form id="logo-form">
-                            <label class="custom-file-upload" style="background: #fff; border-style: solid;">
-                                <input type="file" id="store-logo" accept="image/*" style="display: none;" onchange="updateLogoName(this)">
+                    <div class="card" style="margin-top: 20px;">
+                        <h3 class="card-title">🏪 Identidade da Loja</h3>
+                        <p style="font-size: 0.75rem; color: #64748b; margin-bottom: 16px;">Personalize a logo e o banner do seu cardápio online.</p>
+                        
+                        <div class="form-group">
+                            <label>Logo da Empresa</label>
+                            <label class="custom-file-upload" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
+                                <input type="file" id="store-logo-input" accept="image/*" style="display: none;" onchange="updateLogoName(this)">
                                 <span id="logo-name-display">📸 Alterar Logo</span>
                             </label>
                             <button type="submit" id="update-logo-btn" class="btn-primary" style="margin-top: 12px; background: var(--gray-800);">Atualizar Logo</button>
@@ -576,6 +578,11 @@
         function updateLogoName(input) {
             const name = input.files[0] ? input.files[0].name : "📸 Alterar Logo";
             document.getElementById('logo-name-display').textContent = name;
+        }
+
+        function updateBannerName(input) {
+            const name = input.files[0] ? input.files[0].name : "🖼️ Alterar Banner";
+            document.getElementById('banner-name-display').textContent = name;
         }
 
         function getFullUrl(path) {
@@ -746,6 +753,59 @@
                 btn.disabled = false;
             }
         });
+
+        async function saveStoreIdentity() {
+            const logoInput = document.getElementById('store-logo-input');
+            const bannerInput = document.getElementById('store-banner-input');
+            const btn = document.getElementById('id-save-btn');
+            
+            if (!logoInput.files[0] && !bannerInput.files[0]) {
+                return alert('Selecione pelo menos um arquivo para alterar.');
+            }
+
+            btn.disabled = true;
+            btn.textContent = "Fazendo upload...";
+
+            try {
+                let logoUrl = localStorage.getItem('store_logo');
+                let bannerUrl = localStorage.getItem('store_banner');
+
+                if (logoInput.files[0]) {
+                    const fileName = `logo-${storeId}-${Date.now()}.jpg`;
+                    const { error } = await supabaseClient.storage.from('produtos').upload(fileName, logoInput.files[0]);
+                    if (error) throw error;
+                    logoUrl = supabaseClient.storage.from('produtos').getPublicUrl(fileName).data.publicUrl;
+                }
+
+                if (bannerInput.files[0]) {
+                    const fileName = `banner-${storeId}-${Date.now()}.jpg`;
+                    const { error } = await supabaseClient.storage.from('produtos').upload(fileName, bannerInput.files[0]);
+                    if (error) throw error;
+                    bannerUrl = supabaseClient.storage.from('produtos').getPublicUrl(fileName).data.publicUrl;
+                }
+
+                // Update on backend
+                const res = await fetch(`${API_BASE_URL}/api/merchant/update-identity`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ store_id: storeId, logo_url: logoUrl, banner_url: bannerUrl })
+                });
+
+                if (res.ok) {
+                    localStorage.setItem('store_logo', logoUrl);
+                    localStorage.setItem('store_banner', bannerUrl);
+                    alert('Identidade atualizada com sucesso!');
+                    updateAvatar();
+                } else {
+                    alert('Erro ao atualizar no servidor.');
+                }
+            } catch (err) {
+                alert('Erro: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Atualizar Identidade";
+            }
+        }
 
         function triggerEdit(index) {
             const p = merchantProducts[index];

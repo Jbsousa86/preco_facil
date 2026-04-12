@@ -264,6 +264,11 @@ async function loadHeroPromotions() {
         carousel.innerHTML = offers.map((o, i) => `
             <div class="carousel-slide" style="position:absolute; inset:0; opacity:${i===0?1:0}; transition: opacity 0.8s ease; cursor:pointer;" onclick="if('${o.link_url}' && '${o.link_url}' !== 'null') window.open('${o.link_url}', '_blank')">
                 <img src="${getFullUrl(o.image_url)}" style="width:100%; height:100%; object-fit:cover;">
+                ${o.title ? `
+                <div style="position:absolute; inset:0; background:linear-gradient(transparent, rgba(0,0,0,0.7)); display:flex; flex-direction:column; justify-content:flex-end; padding:24px; color:#fff;">
+                    <h2 style="margin:0; font-size:1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${o.title}</h2>
+                </div>
+                ` : ''}
             </div>
         `).join('');
         
