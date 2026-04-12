@@ -270,16 +270,19 @@
 
             main {
                 margin-left: 0;
-                padding: 16px; 
+                padding: 12px;
+                width: 100%;
+                box-sizing: border-box;
+                overflow-x: hidden;
             }
 
             /* Botão Sanduíche Flutuante (FAB) no Canto Superior Direito */
             .menu-toggle-fab {
                 position: fixed;
-                top: 16px;
-                right: 16px;
-                width: 48px;
-                height: 48px;
+                top: 12px;
+                right: 12px;
+                width: 44px;
+                height: 44px;
                 background: var(--primary);
                 color: #fff;
                 border: none;
@@ -287,15 +290,10 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 1.25rem;
+                font-size: 1.2rem;
                 box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
                 cursor: pointer;
-                z-index: 1000;
-                transition: transform 0.2s;
-            }
-
-            .menu-toggle-fab:active {
-                transform: scale(0.9);
+                z-index: 1020;
             }
 
             /* Overlay para fechar o menu ao clicar fora */
@@ -305,7 +303,7 @@
                 inset: 0;
                 background: rgba(15, 23, 42, 0.6);
                 backdrop-filter: blur(4px);
-                z-index: 1001; /* Fica entre o main e o sidebar */
+                z-index: 1021; /* Fica entre o main e o sidebar */
             }
 
             .sidebar-overlay.open {
@@ -313,12 +311,51 @@
             }
             
             aside {
-                z-index: 1002; /* Sempre por cima de tudo */
+                z-index: 1022; /* Sempre por cima de tudo */
             }
 
             .kpi-grid {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr; /* Forçando 1 coluna para evitar que o conteúdo fuja */
                 gap: 12px;
+                margin-bottom: 24px;
+            }
+            
+            .kpi-card {
+                padding: 20px;
+                word-wrap: break-word;
+                overflow: hidden;
+            }
+
+            .kpi-value {
+                font-size: 1.8rem;
+                word-break: break-all;
+            }
+
+            .admin-title h1 {
+                font-size: 1.25rem;
+                max-width: 80%;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+
+            #add-store-btn {
+                width: 100%;
+            }
+
+            /* Forçar tabelas a serem roláveis horizontalmente sem quebrar o layout do body */
+            .table-card {
+                width: 100%;
+                overflow: hidden;
+            }
+            
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
         }
         
@@ -483,7 +520,7 @@
             <div class="table-header">
                 <h3 id="table-title">Todos os Comerciantes</h3>
             </div>
-            <div style="overflow-x: auto;">
+            <div class="table-container">
                 <table>
                     <thead>
                         <tr>
