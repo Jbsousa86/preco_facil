@@ -514,7 +514,6 @@
 </head>
 
 <body>
-    <div style="background: yellow; color: black; text-align: center; font-size: 10px; padding: 2px; font-weight: bold;">VERSÃO E-COMMERCE 1.2</div>
     <header class="app-header">
         <div class="header-store-info">
             <a href="index.html" class="back-btn">←</a>
@@ -597,16 +596,6 @@
     </div>
 
     <script>
-        // FORÇAR ATUALIZAÇÃO: Unregister Service Workers antigos
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                for(let registration of registrations) {
-                    registration.unregister();
-                    console.log('SW Unregistered for update');
-                } 
-            });
-        }
-
         const API_BASE_URL = window.location.hostname === 'localhost'
             ? 'http://localhost:3000'
             : 'https://preco-facil.onrender.com';
