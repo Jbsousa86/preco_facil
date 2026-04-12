@@ -78,10 +78,15 @@ function renderResults(data) {
                     const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
                     const finalPrice = isPromo ? p.promo_price : p.price;
                     return `
-                    <div onclick="window.location.href='store_profile.html?id=${p.store_id}'" style="background:#fff; padding:16px; border-radius:12px; cursor:pointer; border:1px solid #fef3c7; transition: transform 0.2s;">
-                        <span style="font-size:0.7rem; font-weight:700; color:#d97706; text-transform:uppercase;">${p.store_name}</span>
-                        <h4 style="margin:4px 0; font-size:1rem;">${p.product_name}</h4>
-                        <div style="font-size:1.5rem; font-weight:800; color:#10b981;">R$ ${parseFloat(finalPrice).toFixed(2)}</div>
+                    <div onclick="window.location.href='store_profile.html?id=${p.store_id}'" style="background:#fff; padding:12px; border-radius:12px; cursor:pointer; border:1px solid #fef3c7; transition: transform 0.2s; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="width:100%; height:80px; background:#f1f5f9; border-radius:8px; overflow:hidden;">
+                            ${p.product_image ? `<img src="${getFullUrl(p.product_image)}" style="width:100%; height:100%; object-fit:cover;">` : '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#cbd5e1;">📦</div>'}
+                        </div>
+                        <div>
+                            <span style="font-size:0.65rem; font-weight:700; color:#d97706; text-transform:uppercase;">${p.store_name}</span>
+                            <h4 style="margin:2px 0; font-size:0.85rem; display:-webkit-box; -webkit-line-clamp:1; line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">${p.product_name}</h4>
+                            <div style="font-size:1.1rem; font-weight:800; color:#10b981;">R$ ${parseFloat(finalPrice).toFixed(2)}</div>
+                        </div>
                     </div>
                     `;
                 }).join('')}
@@ -147,15 +152,18 @@ function renderResults(data) {
                     const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
                     const finalPrice = isPromo ? p.promo_price : p.price;
                     return `
-                    <div class="product-item">
-                        <div class="prod-info">
-                            <span style="font-size:0.65rem; color:var(--primary); font-weight:700; text-transform:uppercase;">${p.category || 'Geral'}</span>
-                            <h4>${p.product_name}</h4>
-                            ${isPromo ? `<div class="promo-timer" data-expires="${p.promo_expires_at}" style="font-size: 0.7rem; color: #f59e0b; font-weight: 700;"></div>` : ''}
+                    <div class="product-item" style="display: flex; gap: 12px; align-items: center;">
+                        <div style="width: 50px; height: 50px; background: #f1f5f9; border-radius: 8px; overflow: hidden; flex-shrink: 0;">
+                            ${p.product_image ? `<img src="${getFullUrl(p.product_image)}" style="width:100%; height:100%; object-fit:cover;">` : '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#94a3b8; font-size:0.8rem;">📦</div>'}
+                        </div>
+                        <div class="prod-info" style="flex-grow: 1;">
+                            <span style="font-size:0.6rem; color:var(--primary); font-weight:700; text-transform:uppercase;">${p.category || 'Geral'}</span>
+                            <h4 style="margin: 2px 0; font-size: 0.9rem;">${p.product_name}</h4>
+                            ${isPromo ? `<div class="promo-timer" data-expires="${p.promo_expires_at}" style="font-size: 0.65rem; color: #f59e0b; font-weight: 700;"></div>` : ''}
                         </div>
                         <div style="text-align:right;">
-                            ${isPromo ? `<div style="font-size: 0.7rem; text-decoration:line-through; color:#94a3b8;">R$ ${parseFloat(p.price).toFixed(2)}</div>` : ''}
-                            <div class="prod-price">R$ ${parseFloat(finalPrice).toFixed(2)}</div>
+                            ${isPromo ? `<div style="font-size: 0.65rem; text-decoration:line-through; color:#94a3b8;">R$ ${parseFloat(p.price).toFixed(2)}</div>` : ''}
+                            <div class="prod-price" style="font-size: 1rem;">R$ ${parseFloat(finalPrice).toFixed(2)}</div>
                         </div>
                     </div>
                     `;
