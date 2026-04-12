@@ -221,12 +221,20 @@
 
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 12px;
             padding: 4px;
         }
+        
+        @media (max-width: 360px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 8px;
+            }
+        }
 
         .product-card {
+            position: relative; /* FUNDAMENTAL para os botões ficarem no lugar certo */
             background: #fff;
             border-radius: 12px;
             overflow: hidden;
@@ -754,7 +762,12 @@
                 return `
                     <div class="product-card" data-id="${p.id}">
                         <div class="product-image-container">
-                            ${p.image_url ? `<img src="${getFullUrl(p.image_url)}" class="product-image" alt="${p.name}">` : `<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#cbd5e1; font-size:2rem;">📦</div>`}
+                            ${p.image_url ? 
+                                `<img src="${getFullUrl(p.image_url)}" class="product-image" alt="${p.name}" onerror="this.src='https://placehold.co/400x400/f8fafc/64748b?text=Produto';">` : 
+                                `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#cbd5e1; background:#f8fafc; font-size:2rem; gap:8px;">
+                                    <span>📦</span>
+                                    <span style="font-size:0.6rem; font-weight:700; color:#94a3b8; text-transform:uppercase;">Sem Foto</span>
+                                 </div>`}
                             ${isPromo ? `<div class="promo-pill">Oferta</div>` : ''}
                         </div>
                         <div class="product-content">
