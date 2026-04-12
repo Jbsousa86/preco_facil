@@ -579,6 +579,16 @@
 
     <script src="assets/app.js"></script>
     <script>
+        // FORÇAR ATUALIZAÇÃO DO CACHE / LIMPEZA DE SW
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+                for(let reg of regs) {
+                    reg.unregister();
+                    console.log('SW Desinstalado para atualização');
+                }
+            });
+        }
+        
         // Adjust empty state visibility
         document.getElementById('search-form').addEventListener('submit', () => {
             document.getElementById('initial-state').style.display = 'none';
