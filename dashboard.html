@@ -510,15 +510,23 @@
 
                 <!-- Product List Section -->
                 <section>
-                    <div class="section-header">
-                        <h2>📦 Seu Catálogo</h2>
-                        <div id="loading-spinner" style="display: none;">
-                            <span style="font-size: 0.8rem; color: var(--gray-600);">Sincronizando...</span>
+                    <div class="section-header" style="flex-direction: column; align-items: start; gap: 16px;">
+                        <button onclick="toggleProductList()" id="toggle-list-btn" class="btn-primary" style="background:#f8fafc; color:var(--primary); border:2px solid var(--primary-light); width: auto; padding: 12px 24px;">
+                            📦 Ver Meus Produtos Cadastrados
+                        </button>
+                        
+                        <div id="product-list-content" style="display: none; width: 100%;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                                <h2 style="font-size: 1.25rem; font-weight: 700;">Seu Catálogo</h2>
+                                <div id="loading-spinner" style="display: none;">
+                                    <span style="font-size: 0.8rem; color: var(--gray-600);">Sincronizando...</span>
+                                </div>
+                            </div>
+                            
+                            <div id="products-list" class="products-grid">
+                                <!-- Products injected here -->
+                            </div>
                         </div>
-                    </div>
-
-                    <div id="products-list" class="products-grid">
-                        <!-- Products injected here -->
                     </div>
                     
                     <div id="empty-state" style="display: none; text-align: center; padding: 3rem; background: #fff; border-radius: var(--radius-md); border: 2px dashed var(--gray-200);">
@@ -585,6 +593,19 @@
             }
         }
         updateAvatar();
+
+        function toggleProductList() {
+            const list = document.getElementById('product-list-content');
+            const btn = document.getElementById('toggle-list-btn');
+            const isHidden = list.style.display === 'none';
+            
+            list.style.display = isHidden ? 'block' : 'none';
+            btn.textContent = isHidden ? '🔼 Esconder Catálogo' : '📦 Ver Meus Produtos Cadastrados';
+            
+            if (isHidden) {
+                list.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
 
         async function loadProducts() {
             const container = document.getElementById('products-list');
@@ -738,6 +759,11 @@
 
             document.getElementById('save-btn').textContent = "Atualizar Produto";
             document.getElementById('cancel-edit-btn').style.display = 'block';
+            
+            // Force show list when editing
+            document.getElementById('product-list-content').style.display = 'block';
+            document.getElementById('toggle-list-btn').textContent = '🔼 Esconder Catálogo';
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 

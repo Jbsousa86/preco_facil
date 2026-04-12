@@ -267,6 +267,10 @@
                 <span class="kpi-label">Bloqueadas</span>
                 <span id="stat-blocked-stores" class="kpi-value">0</span>
             </div>
+            <div class="kpi-card" style="background:var(--primary-light);">
+                <span class="kpi-label" style="color:var(--primary);">Total de Visitas</span>
+                <span id="stat-total-visits" class="kpi-value">0</span>
+            </div>
         </section>
 
         <section class="table-card">
@@ -348,6 +352,11 @@
             document.getElementById('stat-total-stores').innerText = allStores.length;
             document.getElementById('stat-active-stores').innerText = allStores.filter(s => !s.is_blocked).length;
             document.getElementById('stat-blocked-stores').innerText = allStores.filter(s => s.is_blocked).length;
+            
+            // Fetch platform-wide visits
+            fetchAdmin('api/admin/stats').then(res => res.json()).then(data => {
+                document.getElementById('stat-total-visits').innerText = data.visits || 0;
+            }).catch(e => console.error('Erro ao carregar visitas platform wide'));
         }
 
         function showSection(section, el) {
