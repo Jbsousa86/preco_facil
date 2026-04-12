@@ -260,10 +260,41 @@
             aside {
                 transform: translateX(-100%);
             }
+            
+            aside.open {
+                transform: translateX(0);
+            }
 
             main {
                 margin-left: 0;
             }
+
+            .mobile-header-admin {
+                display: flex;
+                background: #fff;
+                padding: 12px 20px;
+                align-items: center;
+                gap: 12px;
+                border-bottom: 1px solid #e2e8f0;
+                position: sticky;
+                top: 0;
+                z-index: 900;
+            }
+            
+            .menu-toggle-btn {
+                background: var(--primary-light);
+                color: var(--primary);
+                border: none;
+                width: 40px;
+                height: 40px;
+                border-radius: 8px;
+                font-size: 1.2rem;
+                cursor: pointer;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .mobile-header-admin { display: none; }
         }
     </style>
 </head>
@@ -295,9 +326,10 @@
         </div>
     </div>
 
-    <aside>
-        <div class="sidebar-header">
+    <aside id="sidebar">
+        <div class="sidebar-header" style="justify-content: space-between;">
             <span style="font-weight: 800; font-size: 1.2rem;">ADMIN PORTAL</span>
+            <button class="menu-toggle" style="background:none; border:none; color:#fff; display:none;" id="close-menu-btn" onclick="toggleSidebar()">&times;</button>
         </div>
         <nav class="nav-menu">
             <div class="nav-item active" onclick="showSection('dashboard', this)">📊 Dashboard</div>
@@ -312,6 +344,11 @@
                 Sair</div>
         </div>
     </aside>
+
+    <div class="mobile-header-admin">
+        <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+        <span style="font-weight: 800;">MASTER ADMIN</span>
+    </div>
 
     <main>
         <header>
@@ -734,6 +771,15 @@
 
         function openModal() { document.getElementById('new-store-modal').style.display = 'flex'; }
         function closeModal() { document.getElementById('new-store-modal').style.display = 'none'; }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const closeBtn = document.getElementById('close-menu-btn');
+            sidebar.classList.toggle('open');
+            if (window.innerWidth <= 1024) {
+                closeBtn.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+            }
+        }
 
         function logoutAdmin() {
             sessionStorage.removeItem('admin_key');
