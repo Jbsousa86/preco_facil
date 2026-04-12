@@ -227,15 +227,16 @@ async function loadCheapest() {
             const container = document.getElementById('cheapest-prices-container');
             if (items.length > 0) {
                 section.style.display = 'block';
-                container.innerHTML = items.map(p => {
+                container.innerHTML = items.slice(0, 10).map(p => {
                     const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
                     const finalPrice = isPromo ? p.promo_price : p.price;
                     return `
-                    <div onclick="window.location.href='store_profile.html?id=${p.store_id}'" style="background:#fff; padding:8px; border-radius:12px; border:1px solid #e2e8f0; cursor:pointer; text-align:center; display: flex; flex-direction: column; gap: 4px;">
-                        <div style="width: 100%; height: 80px; background: #f1f5f9; border-radius: 8px; overflow: hidden; margin-bottom: 4px;">
-                            ${p.image_url ? `<img src="${getFullUrl(p.image_url)}" style="width:100%; height:100%; object-fit:cover;">` : '<div style="display:flex; align-items:center; justify-content:center; height:100%; font-size:1.5rem;">📦</div>'}
+                    <div onclick="window.location.href='store_profile.html?id=${p.store_id}'" style="background:#fff; padding:8px; border-radius:12px; border:1px solid #e2e8f0; cursor:pointer; text-align:center; display: flex; flex-direction: column; gap: 4px; position:relative;">
+                        <div style="position:absolute; top:4px; right:4px; background:var(--primary); color:#fff; font-size:0.55rem; padding:2px 6px; border-radius:4px; font-weight:800; z-index:1;">OFERTA 🔥</div>
+                        <div style="width: 100%; height: 90px; background: #f1f5f9; border-radius: 8px; overflow: hidden; margin-bottom: 4px;">
+                            ${p.image_url ? `<img src="${getFullUrl(p.image_url)}" style="width:100%; height:100%; object-fit:cover;">` : '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#94a3b8; font-size:1.5rem;">📦</div>'}
                         </div>
-                        <div style="font-size: 1rem; font-weight: 800; color: #10b981;">R$ ${parseFloat(finalPrice).toFixed(2)}</div>
+                        <div style="font-size: 1rem; font-weight: 800; color: var(--success);">R$ ${parseFloat(finalPrice).toFixed(2)}</div>
                         <span style="font-size:0.6rem; color:#94a3b8; font-weight:700; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.store_name}</span>
                     </div>
                 `;}).join('');
