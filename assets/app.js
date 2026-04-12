@@ -388,7 +388,7 @@ function shareSearchResults() {
 }
 
 function sharePlatform() {
-    const url = "https://preco-facil.onrender.com";
+    const url = window.location.origin;
     const title = "Mercado Local - Compare e Economize!";
     const text = "Ei! Já conhece o Mercado Local? É muito fácil comparar preços de vários supermercados e lojas da nossa região em um só lugar. Economize tempo e dinheiro:";
 
