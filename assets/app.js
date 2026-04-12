@@ -40,6 +40,7 @@ if (form) {
             }
 
             renderResults(data);
+            document.getElementById('product').value = ''; // Reset input as requested
         } catch (err) {
             console.error(err);
             resultsContainer.innerHTML = '<div style="text-align:center; padding:40px; color: #ef4444;">Erro ao buscar preços. Tente novamente.</div>';
@@ -73,7 +74,7 @@ function renderResults(data) {
     let html = `
         <div id="best-prices-spotlight" style="margin-bottom: 32px; background: #fff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
             <h3 style="margin:0 0 16px 0; color:var(--primary); display:flex; align-items:center; gap:8px; font-size:1.1rem;">
-                <span style="font-size:1.5rem;">🏆</span> Melhores Ofertas Encontradas
+                <span style="font-size:1.5rem;">🔍</span> Os Melhores Preços
             </h3>
             <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap:12px;">
                 ${spotlightItems.map(p => {
