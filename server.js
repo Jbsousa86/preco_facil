@@ -148,8 +148,10 @@ async function initializeDatabase() {
             );
         `).catch(e => console.error('Erro ao criar tabela site_stats:', e.message));
 
-        // --- 2.5 MIGRAÇÕES DE COLUNAS (DESTAQUES) ---
+        // --- 2.5 MIGRAÇÕES DE COLUNAS (DESTAQUES E MÉTRICAS) ---
         await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;').catch(e => {});
+        await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS banner_url TEXT;').catch(e => {});
+        await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS whatsapp_clicks INTEGER DEFAULT 0;').catch(e => {});
         
         console.log("Tabelas base (stores, products, history, stats) criadas.");
 
