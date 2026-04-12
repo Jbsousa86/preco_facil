@@ -512,8 +512,17 @@
                                 <input type="file" id="store-logo-input" accept="image/*" style="display: none;" onchange="updateLogoName(this)">
                                 <span id="logo-name-display">📸 Alterar Logo</span>
                             </label>
-                            <button type="submit" id="update-logo-btn" class="btn-primary" style="margin-top: 12px; background: var(--gray-800);">Atualizar Logo</button>
-                        </form>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 16px;">
+                            <label>Banner de Fundo (Topo)</label>
+                            <label class="custom-file-upload" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
+                                <input type="file" id="store-banner-input" accept="image/*" style="display: none;" onchange="updateBannerName(this)">
+                                <span id="banner-name-display">🖼️ Alterar Banner</span>
+                            </label>
+                        </div>
+
+                        <button onclick="saveStoreIdentity()" id="id-save-btn" class="btn-primary" style="background: var(--secondary); margin-top: 8px;">Atualizar Identidade</button>
                     </div>
                 </aside>
 
@@ -634,7 +643,7 @@
                 const storeInfo = await storeRes.json();
                 document.getElementById('stat-whatsapp-clicks').textContent = storeInfo.whatsapp_clicks || 0;
 
-                const res = await fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}`);
+                const res = await fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}&limit=1000`);
                 merchantProducts = await res.json();
                 
                 // Update stats
@@ -842,41 +851,6 @@
             const existing = document.getElementById('existing-image-url');
             if (existing) existing.value = '';
         }
-
-        // --- Logo Update ---
-        document.getElementById('logo-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('update-logo-btn');
-            const fileInput = document.getElementById('store-logo');
-
-            if (!fileInput.files[0]) return alert('Selecione uma imagem');
-
-            btn.disabled = true;
-            btn.textContent = "Subindo...";
-
-            try {
-                const fileName = `logo-${storeId}-${Date.now()}.png`;
-                const { error } = await supabaseClient.storage.from('logos').upload(fileName, fileInput.files[0]);
-                if (error) throw error;
-                
-                const url = supabaseClient.storage.from('logos').getPublicUrl(fileName).data.publicUrl;
-                await fetch(`${API_BASE_URL}/api/merchant/update-logo`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ store_id: storeId, logo_url: url })
-                });
-
-                localStorage.setItem('store_logo', url);
-                updateAvatar();
-                alert('Logo atualizada!');
-                document.getElementById('logo-name-display').textContent = "📸 Alterar Logo";
-            } catch (err) {
-                alert('Erro: ' + err.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = "Atualizar Logo";
-            }
-        });
 
         function logout() {
             localStorage.clear();
