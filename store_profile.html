@@ -807,9 +807,18 @@
 
             updateCartSummary();
             
-            // Se o modal estiver aberto, atualiza a lista lá também
-            if (document.getElementById('cart-modal').style.display === 'flex') {
-                renderCartOverlay();
+            // ATUALIZAÇÃO DIRETA NO MODAL (Mais rápido e seguro)
+            const modalOpen = document.getElementById('cart-modal').style.display === 'flex';
+            if (modalOpen) {
+                const item = cart[prodId];
+                if (!item) {
+                    renderCartOverlay(); // Se removeu, re-renderiza tudo
+                } else {
+                    const qtyLabel = document.getElementById(`modal-qty-${prodId}`);
+                    const lineText = document.getElementById(`modal-line-text-${prodId}`);
+                    if (qtyLabel) qtyLabel.innerText = item.qty;
+                    if (lineText) lineText.innerText = `${item.qty}x R$ ${parseFloat(item.price).toFixed(2)}`;
+                }
             }
         }
 
@@ -863,14 +872,14 @@
             for (const id in cart) {
                 const item = cart[id];
                 list.insertAdjacentHTML('beforeend', `
-                    <div class="cart-item">
+                    <div class="cart-item" id="modal-item-${item.id}">
                         <div class="cart-item-info">
                             <h4 style="margin:0; font-size:0.9rem;">${item.name}</h4>
-                            <span style="font-size:0.8rem; color:#64748b;">R$ ${parseFloat(item.price).toFixed(2)} un.</span>
+                            <span id="modal-line-text-${item.id}" style="font-size:0.8rem; color:#64748b;">${item.qty}x R$ ${parseFloat(item.price).toFixed(2)}</span>
                         </div>
                         <div class="quantity-control" style="display:flex; margin-top:0; background:#f8fafc; padding:2px; border-radius:8px;">
                             <button class="qty-btn" style="width:28px; height:28px;" onclick="updateCart('${item.id}', -1, event)">-</button>
-                            <span style="font-weight:700; margin: 0 10px; min-width:20px; text-align:center;">${item.qty}</span>
+                            <span id="modal-qty-${item.id}" style="font-weight:700; margin: 0 10px; min-width:20px; text-align:center;">${item.qty}</span>
                             <button class="qty-btn" style="width:28px; height:28px;" onclick="updateCart('${item.id}', 1, event)">+</button>
                         </div>
                     </div>
