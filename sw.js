@@ -1,5 +1,5 @@
 // sw.js - Service Worker for PWA offline support
-const CACHE_NAME = 'preco-facil-v51';
+const CACHE_NAME = 'preco-facil-v70';
 const FILES_TO_CACHE = [
     '/',
     '/index.html',
@@ -42,7 +42,7 @@ self.addEventListener('activate', (evt) => {
 // Estratégia Network First: Tenta internet primeiro, se falhar pega o cache
 self.addEventListener('fetch', (evt) => {
     if (evt.request.method !== 'GET') return;
-    
+
     evt.respondWith(
         fetch(evt.request).then(response => {
             // Se a rede funcionar, clona e atualiza o cache
