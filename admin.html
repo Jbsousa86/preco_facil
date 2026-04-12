@@ -182,16 +182,19 @@
 
 <body>
     <!-- Admin Login Overlay -->
-    <div id="admin-login-overlay" style="position:fixed; inset:0; background:var(--sidebar-bg); z-index:5000; display:flex; align-items:center; justify-content:center; padding:20px;">
+    <div id="admin-login-overlay" style="position:fixed; inset:0; background:linear-gradient(135deg, #1e293b, #0f172a); z-index:5000; display:flex; align-items:center; justify-content:center; padding:20px;">
         <div style="background:#fff; width:100%; max-width:400px; padding:40px; border-radius:24px; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
-            <div style="font-size:3rem; margin-bottom:16px;">🛡️</div>
-            <h2 style="margin:0 0 8px 0; color:#0f172a;">Acesso Restrito</h2>
-            <p style="color:#64748b; margin-bottom:32px;">Insira a chave mestra para gerenciar a plataforma.</p>
+            <div style="font-size:3.5rem; margin-bottom:16px;">🔐</div>
+            <h2 style="margin:0 0 8px 0; color:#0f172a; font-weight:800; font-size:1.75rem;">Portal Master</h2>
+            <p style="color:#64748b; margin-bottom:32px; font-weight:500;">Autenticação administrativa necessária.</p>
             <form id="admin-login-form">
-                <input type="password" id="admin-key-input" placeholder="••••••••" required style="width:100%; padding:16px; border:1px solid #e2e8f0; border-radius:12px; font-size:1.25rem; text-align:center; margin-bottom:20px;">
-                <button type="submit" style="width:100%; padding:16px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-weight:700; font-size:1rem; cursor:pointer;">Entrar no Painel</button>
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; text-align:left; font-size:0.75rem; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:6px;">Chave Mestra</label>
+                    <input type="password" id="admin-key-input" placeholder="••••••••" required style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:12px; font-size:1.5rem; text-align:center; transition:0.3s; box-sizing:border-box;">
+                </div>
+                <button type="submit" style="width:100%; padding:16px; background:var(--primary); color:#fff; border:none; border-radius:14px; font-weight:700; font-size:1rem; cursor:pointer; box-shadow:0 4px 6px -1px rgba(37,99,235,0.2);">Acessar Painel</button>
             </form>
-            <a href="index.html" style="display:block; margin-top:24px; color:#64748b; text-decoration:none; font-size:0.9rem; font-weight:600;">← Voltar ao Início</a>
+            <a href="index.html" style="display:block; margin-top:24px; color:#94a3b8; text-decoration:none; font-size:0.85rem; font-weight:600;">← Voltar para o Site</a>
         </div>
     </div>
 
@@ -424,7 +427,7 @@
                             <button onclick="toggleBlock(${s.id}, ${s.is_blocked ? true : false})" class="btn-icon" title="${s.is_blocked ? 'Desbloquear' : 'Bloquear'}">
                                 ${s.is_blocked ? '🔓' : '🚫'}
                             </button>
-                            <button onclick="deleteStore(${s.id})" class="btn-icon" title="Excluir Permanentemente">🗑️</button>
+                            <button onclick="deleteStore(${s.id}, '${s.name.replace(/'/g, "\\'")}')" class="btn-icon" title="Excluir Permanentemente" style="color:var(--danger);">🗑️</button>
                         </div>
                     </td>
                 </tr>
@@ -487,10 +490,28 @@
             if (res.ok) loadStores();
         }
 
-        async function deleteStore(id) {
-            if (!confirm('ATENÇÃO: Isso apagará PARA SEMPRE a loja e todos os produtos dela. Continuar?')) return;
-            const res = await fetchAdmin(`api/admin/stores/${id}`, { method: 'DELETE' });
-            if (res.ok) loadStores();
+        async function deleteStore(id, name) {
+            const doubleCheck = confirm(`⚠️ CUIDADO: Você está prestes a excluir o comerciante "${name}".\n\nIsso apagará permanentemente todos os produtos, preços e histórico desta loja sem possibilidade de volta.\n\nDeseja continuar?`);
+            if (!doubleCheck) return;
+
+            const finalCheck = prompt(`Para confirmar a EXCLUSÃO TOTAL, digite o nome da loja abaixo exatamente como "${name}":`);
+            if (finalCheck !== name) {
+                alert('Nome não confere. Operação cancelada por segurança.');
+                return;
+            }
+
+            try {
+                const res = await fetchAdmin(`api/admin/stores/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    alert('Lojista excluído para sempre.');
+                    loadStores();
+                } else {
+                    alert('Erro ao excluir do servidor.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Erro na conexão.');
+            }
         }
 
         function getFullUrl(path) {
