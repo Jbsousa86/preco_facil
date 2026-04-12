@@ -267,7 +267,7 @@ async function loadHeroPromotions() {
             return `
                 <div class="carousel-slide" 
                      data-has-link="${link ? 'true' : 'false'}"
-                     style="position:absolute; inset:0; opacity:${isActive?1:0}; pointer-events:${(isActive && link)?'auto':'none'}; transition: opacity 0.8s ease; ${link ? 'cursor:pointer;' : 'cursor:default;'}" 
+                     style="position:absolute; inset:0; opacity:${isActive?1:0}; visibility:${isActive?'visible':'hidden'}; transition: opacity 0.8s ease, visibility 0.8s; ${link ? 'cursor:pointer;' : 'cursor:default;'}" 
                      ${link ? `onclick="window.open('${link.startsWith('http') ? link : 'https://' + link}', '_blank')"` : ''}>
                     <img src="${getFullUrl(o.image_url)}" style="width:100%; height:100%; object-fit:cover;">
                     ${o.title ? `
@@ -291,7 +291,7 @@ async function loadHeroPromotions() {
                 if(!slides.length) return;
                 
                 slides[heroCarouselIndex].style.opacity = 0;
-                slides[heroCarouselIndex].style.pointerEvents = 'none';
+                slides[heroCarouselIndex].style.visibility = 'hidden';
                 dotEls[heroCarouselIndex].style.background = 'rgba(0,0,0,0.2)';
                 dotEls[heroCarouselIndex].style.width = '12px';
                 
@@ -299,8 +299,7 @@ async function loadHeroPromotions() {
                 
                 const nextSlide = slides[heroCarouselIndex];
                 nextSlide.style.opacity = 1;
-                // Só ativa o clique se o próximo slide TIVER um link
-                nextSlide.style.pointerEvents = nextSlide.getAttribute('data-has-link') === 'true' ? 'auto' : 'none';
+                nextSlide.style.visibility = 'visible';
                 
                 dotEls[heroCarouselIndex].style.background = 'var(--primary)';
                 dotEls[heroCarouselIndex].style.width = '24px';
