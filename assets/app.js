@@ -1,6 +1,6 @@
 // assets/app.js
 // Frontend logic for Price Comparison MVP
-const API_BASE_URL = window.location.hostname === 'localhost'
+const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
     ? 'http://localhost:3000'
     : 'https://preco-facil.onrender.com';
 const form = document.getElementById('search-form');
