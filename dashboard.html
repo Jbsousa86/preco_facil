@@ -362,7 +362,7 @@
         .floating-support-btn {
             position: fixed;
             bottom: 24px;
-            right: 24px;
+            left: 24px;
             background: var(--success);
             color: #fff;
             width: 56px;
@@ -529,10 +529,11 @@
                 </section>
             </div>
         </main>
-    </div>
 
-    <!-- Floating Support -->
-    <a href="https://wa.me/5563992225774" target="_blank" class="floating-support-btn" title="Suporte">💬</a>
+        <footer style="text-align: center; padding: 3rem 1rem; color: var(--gray-600); font-size: 0.85rem; border-top: 1px solid var(--gray-100); background: #fff;">
+            &copy; 2026 JbsousaTech Hub Admin - Todos os direitos reservados
+        </footer>
+    </div>
 
     <script>
         const API_BASE_URL = window.location.hostname === 'localhost'
@@ -789,14 +790,7 @@
             window.location.href = 'index.html';
         }
 
-        // Global Footer
-        const footer = document.createElement('footer');
-        footer.style.textAlign = 'center';
-        footer.style.padding = '3rem 1rem';
-        footer.style.color = 'var(--gray-600)';
-        footer.style.fontSize = '0.85rem';
-        footer.innerHTML = `&copy; ${new Date().getFullYear()} JbsousaTech Hub Admin - Todos os direitos reservados`;
-        document.body.appendChild(footer);
+        // Removed redundant footer script
 
         loadProducts();
     </script>
