@@ -4,94 +4,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Comerciante - Mercado Local</title>
+    <title>Login do Comerciante - Mercado Local</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css">
     <style>
-        .login-container {
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --gray-100: #f1f5f9;
+            --gray-600: #475569;
+            --gray-800: #1e293b;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #fff;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-logo { height: 40px; }
+        .header-title { font-size: 1.25rem; font-weight: 700; color: var(--primary); margin: 0; }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: #fff;
+            width: 100%;
             max-width: 400px;
-            margin: 4rem auto;
-            padding: 2rem;
-            background: linear-gradient(135deg, hsl(var(--primary-h, 220), var(--primary-s, 90%), 92%), #ffffff);
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-header h2 { margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--gray-800); }
+        .login-header p { color: var(--gray-600); margin: 8px 0 0; font-size: 0.95rem; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
-            border: 1px solid hsl(var(--primary-h, 220), var(--primary-s, 90%), 85%);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-
-        h2 {
-            text-align: center;
-            color: var(--text-main, #1f2937);
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-muted, #6b7280);
-        }
-
-        input {
-            width: 100%;
-            padding: 0.8rem;
-            border-radius: 6px;
-            border: 1px solid #d1d5db;
-            background: #f9fafb;
-            color: var(--text-main, #1f2937);
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 0.8rem;
-            background: hsl(var(--primary-h, 220), var(--primary-s, 90%), var(--primary-l, 50%));
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
             font-size: 1rem;
-            margin-top: 1rem;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
         }
 
-        .error {
-            color: #ff5252;
+        .form-control:focus { outline: none; border-color: var(--primary); color: var(--gray-800); }
+
+        .btn-login {
+            width: 100%;
+            background: var(--primary);
+            color: #fff;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: filter 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover { filter: brightness(1.1); }
+
+        .error-message {
+            background: #fef2f2;
+            color: #b91c1c;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
             text-align: center;
-            margin-top: 1rem;
+            margin-bottom: 20px;
             display: none;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.9rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .login-card { padding: 24px; }
         }
     </style>
 </head>
 
 <body>
     <header>
-        <div class="header-content">
-            <img src="assets/logo.png" alt="Mercado Local" class="logo">
-            <h1>Área do Comerciante</h1>
-        </div>
+        <img src="assets/logo.png" alt="Logo" class="header-logo">
+        <h1 class="header-title">Vendedor Hub</h1>
     </header>
+
     <main>
-        <div class="login-container">
-            <h2>Acesse sua loja</h2>
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Bem-vindo de volta</h2>
+                <p>Acesse o painel da sua loja para gerenciar produtos e preços.</p>
+            </div>
+
+            <div id="error-msg" class="error-message"></div>
+
             <form id="login-form">
                 <div class="form-group">
                     <label for="store-id">ID da Loja</label>
-                    <input type="number" id="store-id" required placeholder="Ex.: 1">
+                    <input type="number" id="store-id" class="form-control" placeholder="Seu ID numérico" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">Senha</label>
-                    <input type="password" id="password" required placeholder="Senha">
+                    <label for="password">Senha de Acesso</label>
+                    <input type="password" id="password" class="form-control" placeholder="Sua senha secreta" required>
                 </div>
-                <button type="submit">Entrar</button>
-                <div id="error-msg" class="error"></div>
+                <button type="submit" id="btn-submit" class="btn-login">Acessar Painel</button>
             </form>
-            <p style="text-align: center; margin-top: 1rem;"><a href="index.html" style="color: hsl(var(--primary-h, 220), var(--primary-s, 90%), var(--primary-l, 50%)); text-decoration: none;">Voltar para busca</a></p>
+
+            <a href="index.html" class="back-link">← Voltar para a busca</a>
         </div>
     </main>
 
-    <!-- Botão Flutuante de Suporte -->
-    <a href="https://wa.me/5563992225774" target="_blank" class="floating-support-btn" title="Falar com Suporte">🎧</a>
+    <footer style="text-align: center; padding: 24px; color: var(--gray-600); font-size: 0.85rem;">
+        &copy; 2026 JbsousaTech - Todos os direitos reservados
+    </footer>
 
     <script>
         const API_BASE_URL = window.location.hostname === 'localhost' 
@@ -100,8 +166,14 @@
 
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = document.getElementById('btn-submit');
             const id = document.getElementById('store-id').value;
             const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('error-msg');
+
+            btn.disabled = true;
+            btn.textContent = "Verificando...";
+            errorEl.style.display = 'none';
 
             try {
                 const res = await fetch(`${API_BASE_URL}/api/login`, {
@@ -117,24 +189,17 @@
                     localStorage.setItem('store_logo', data.logo_url);
                     window.location.href = 'dashboard.html';
                 } else {
-                    const errEl = document.getElementById('error-msg');
-                    errEl.textContent = data.error || 'Erro ao entrar';
-                    errEl.style.display = 'block';
+                    errorEl.textContent = data.error || 'Credenciais inválidas';
+                    errorEl.style.display = 'block';
                 }
             } catch (err) {
-                console.error(err);
-                alert('Erro de conexão');
+                errorEl.textContent = 'Erro de conexão com o servidor.';
+                errorEl.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Acessar Painel";
             }
         });
-
-        // Footer Global - JBSousaTech
-        const footer = document.createElement('footer');
-        footer.innerHTML = `
-            <div style="text-align: center; padding: 20px; margin-top: 40px; border-top: 1px solid var(--border-color, #e5e7eb); color: var(--text-muted, #6b7280); font-size: 0.9rem;">
-                &copy; ${new Date().getFullYear()} JBSousaTech - Todos os direitos reservados
-            </div>
-        `;
-        document.body.appendChild(footer);
     </script>
 </body>
 

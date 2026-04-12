@@ -15,6 +15,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/uploads', express.static('uploads'));
+app.use(express.static(__dirname)); // <-- Serve os arquivos HTML (admin.html, index.html, etc)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Configuração do Multer para Uploads
@@ -146,6 +147,9 @@ async function initializeDatabase() {
                 stat_value BIGINT DEFAULT 0
             );
         `).catch(e => console.error('Erro ao criar tabela site_stats:', e.message));
+
+        // --- 2.5 MIGRAÇÕES DE COLUNAS (DESTAQUES) ---
+        await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;').catch(e => {});
         
         console.log("Tabelas base (stores, products, history, stats) criadas.");
 
@@ -173,6 +177,9 @@ async function initializeDatabase() {
             ALTER TABLE stores ADD COLUMN IF NOT EXISTS number TEXT;
             ALTER TABLE stores ADD COLUMN IF NOT EXISTS neighborhood TEXT;
             ALTER TABLE stores ADD COLUMN IF NOT EXISTS phone TEXT;
+            ALTER TABLE stores ADD COLUMN IF NOT EXISTS banner_url TEXT;
+            ALTER TABLE stores ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
+            ALTER TABLE stores ADD COLUMN IF NOT EXISTS whatsapp_clicks INTEGER DEFAULT 0;
         `);
         // Products
         await pool.query(`
@@ -201,7 +208,7 @@ app.get('/api/store/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const client = await pool.connect();
-        const result = await client.query('SELECT id, name, logo_url, street, number, neighborhood, phone FROM stores WHERE id = $1', [id]);
+        const result = await client.query('SELECT id, name, logo_url, banner_url, street, number, neighborhood, phone, whatsapp_clicks FROM stores WHERE id = $1', [id]);
         client.release();
         if (result.rows.length > 0) {
             res.json(result.rows[0]);
@@ -214,12 +221,26 @@ app.get('/api/store/:id', async (req, res) => {
     }
 });
 
+// Endpoint: POST /api/store/:id/track_whatsapp
+app.post('/api/store/:id/track_whatsapp', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const client = await pool.connect();
+        await client.query('UPDATE stores SET whatsapp_clicks = whatsapp_clicks + 1 WHERE id = $1', [id]);
+        client.release();
+        res.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
 // Endpoint: GET /api/stores
 app.get('/api/stores', async (req, res) => {
     try {
         const client = await pool.connect();
         const result = await client.query(`
-            SELECT s.id, s.name, s.logo_url, s.is_blocked,
+            SELECT s.id, s.name, s.logo_url, s.banner_url, s.is_blocked, s.is_featured, s.whatsapp_clicks,
             EXISTS (
                 SELECT 1 FROM prices p 
                 WHERE p.store_id = s.id 
@@ -227,7 +248,7 @@ app.get('/api/stores', async (req, res) => {
                 AND p.promo_expires_at > NOW()
             ) as has_promo
             FROM stores s 
-            ORDER BY s.name
+            ORDER BY s.is_featured DESC, s.name
         `);
         client.release();
         res.json(result.rows);
@@ -624,6 +645,42 @@ app.patch('/api/admin/stores/:id/block', async (req, res) => {
         await client.query('UPDATE stores SET is_blocked = $1 WHERE id = $2', [is_blocked, id]);
         client.release();
         res.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// PATCH /api/admin/stores/:id/feature - Destacar/Remover destaque de loja
+app.patch('/api/admin/stores/:id/feature', async (req, res) => {
+    const { id } = req.params;
+    const { is_featured } = req.body;
+    try {
+        const client = await pool.connect();
+        await client.query('UPDATE stores SET is_featured = $1 WHERE id = $2', [is_featured, id]);
+        client.release();
+        res.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// Endpoint: GET /api/prices/cheapest - 5 preços mais baratos globais
+app.get('/api/prices/cheapest', async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query(
+            `SELECT s.id as store_id, s.name as store_name, pr.price, pr.promo_price, pr.promo_expires_at, p.name as product_name
+             FROM prices pr
+             JOIN products p ON p.id = pr.product_id
+             JOIN stores s ON s.id = pr.store_id
+             WHERE (s.is_blocked IS NULL OR s.is_blocked = FALSE)
+             ORDER BY COALESCE(CASE WHEN pr.promo_expires_at > NOW() THEN pr.promo_price END, pr.price) ASC
+             LIMIT 5`
+        );
+        client.release();
+        res.json(result.rows);
     } catch (e) {
         console.error(e);
         res.status(500).json({ error: e.message });

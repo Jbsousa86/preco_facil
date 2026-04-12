@@ -1,415 +1,513 @@
-<!-- c:\Users\Usuário\Desktop\preco_facil\admin.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Mercado Local</title>
+    <title>Master Admin - Mercado Local</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css">
     <style>
-        .admin-container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .stat-card { background: linear-gradient(135deg, hsl(var(--primary-h, 220), var(--primary-s, 90%), 92%), #ffffff); padding: 1.5rem; border-radius: 8px; text-align: center; border: 1px solid hsl(var(--primary-h, 220), var(--primary-s, 90%), 85%); color: var(--text-main, #1f2937); }
-        .stat-number { font-size: 2.5rem; font-weight: bold; color: #4CAF50; display: block; }
-        
-        .admin-section { background: linear-gradient(135deg, hsl(var(--primary-h, 220), var(--primary-s, 90%), 92%), #ffffff); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid hsl(var(--primary-h, 220), var(--primary-s, 90%), 85%); }
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e5e7eb; color: var(--text-main, #1f2937); }
-        th { color: #e91e63; }
-        
-        .action-btn { padding: 5px 10px; border-radius: 4px; cursor: pointer; border: none; margin-right: 5px; color: white; }
-        .btn-edit { background: #2196F3; }
-        .btn-delete { background: #f44336; }
-        .btn-block { background: #ff9800; }
-        .btn-unblock { background: #4CAF50; }
-        
-        .form-inline { display: flex; gap: 10px; margin-bottom: 1rem; background: #f9fafb; padding: 1rem; border-radius: 8px; flex-wrap: wrap; border: 1px solid #e5e7eb; }
-        .form-inline input { margin: 0; flex: 1; min-width: 150px; }
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --secondary: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-main: #f8fafc;
+            --sidebar-bg: #1e293b;
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+        }
 
-        @media (max-width: 768px) {
-            .form-inline {
-                flex-direction: column;
-            }
-            .form-inline input, .form-inline button {
-                width: 100% !important;
-            }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-main);
+            color: #1e293b;
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        aside {
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-logo { height: 32px; filter: brightness(0) invert(1); }
+
+        .nav-menu { padding: 20px 0; flex-grow: 1; }
+        .nav-item {
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #94a3b8;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+        .nav-item.active { border-left: 4px solid var(--primary); }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            margin-left: 260px;
+            padding: 32px;
+            max-width: 1400px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .admin-title h1 { margin: 0; font-size: 1.5rem; font-weight: 700; }
+        .admin-title p { margin: 4px 0 0; color: var(--secondary); font-size: 0.9rem; }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .kpi-card {
+            background: #fff;
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--card-shadow);
+            border: 1px solid #e2e8f0;
+        }
+
+        .kpi-label { font-size: 0.85rem; color: var(--secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .kpi-value { font-size: 2rem; font-weight: 800; margin: 8px 0; display: block; }
+
+        /* Table Area */
+        .table-card {
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--card-shadow);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            background: #f8fafc;
+            text-align: left;
+            padding: 16px 24px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--secondary);
+            font-weight: 700;
+        }
+        td { padding: 16px 24px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; vertical-align: middle; }
+
+        .store-cell { display: flex; align-items: center; gap: 12px; }
+        .store-icon { width: 40px; height: 40px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-success { background: #ecfdf5; color: var(--success); }
+        .badge-danger { background: #fef2f2; color: var(--danger); }
+        .badge-warning { background: #fff7ed; color: var(--warning); }
+
+        .actions-cell { display: flex; gap: 8px; }
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn-icon:hover { background: #f8fafc; transform: translateY(-1px); }
+        .btn-icon.active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+
+        @media (max-width: 1024px) {
+            aside { transform: translateX(-100%); }
+            main { margin-left: 0; }
         }
     </style>
 </head>
-<body>
-    <header>
-        <div class="header-content">
-            <h1>Painel Administrativo</h1>
-            <a href="index.html" class="button">Voltar ao Início</a>
-        </div>
-    </header>
 
-    <main class="admin-container">
-        <!-- Admin Login Bar -->
-        <div id="admin-login" style="margin-bottom:1rem;">
-            <form id="admin-login-form" class="form-inline" style="align-items:center;">
-                <input type="password" id="admin-key-input" placeholder="Chave de administrador" style="flex:1;" required>
-                <button type="submit" style="width:auto;">Entrar</button>
-                <button type="button" id="admin-logout" style="width:auto; background:#f44336; display:none; margin-left:8px;">Sair</button>
+<body>
+    <!-- Admin Login Overlay -->
+    <div id="admin-login-overlay" style="position:fixed; inset:0; background:var(--sidebar-bg); z-index:5000; display:flex; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:#fff; width:100%; max-width:400px; padding:40px; border-radius:24px; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+            <div style="font-size:3rem; margin-bottom:16px;">🛡️</div>
+            <h2 style="margin:0 0 8px 0; color:#0f172a;">Acesso Restrito</h2>
+            <p style="color:#64748b; margin-bottom:32px;">Insira a chave mestra para gerenciar a plataforma.</p>
+            <form id="admin-login-form">
+                <input type="password" id="admin-key-input" placeholder="••••••••" required style="width:100%; padding:16px; border:1px solid #e2e8f0; border-radius:12px; font-size:1.25rem; text-align:center; margin-bottom:20px;">
+                <button type="submit" style="width:100%; padding:16px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-weight:700; font-size:1rem; cursor:pointer;">Entrar no Painel</button>
             </form>
+            <a href="index.html" style="display:block; margin-top:24px; color:#64748b; text-decoration:none; font-size:0.9rem; font-weight:600;">← Voltar ao Início</a>
         </div>
-        <!-- Relatórios -->
-        <section>
-            <h2>Relatórios do Sistema</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <span class="stat-number" id="stat-stores">-</span>
-                    Comerciantes
+    </div>
+
+    <aside>
+        <div class="sidebar-header">
+            <span style="font-weight: 800; font-size: 1.2rem;">ADMIN PORTAL</span>
+        </div>
+        <nav class="nav-menu">
+            <div class="nav-item active" onclick="showSection('dashboard', this)">📊 Dashboard</div>
+            <div class="nav-item" onclick="showSection('lojistas', this)">🏪 Lojistas</div>
+            <div class="nav-item" onclick="showSection('destaques', this)">💎 Destaques</div>
+            <div class="nav-item" onclick="showSection('seguranca', this)">🛡️ Segurança</div>
+        </nav>
+        <div style="padding: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <a href="index.html" class="nav-item" style="padding: 0;">⬅️ Ir para o Site</a>
+            <div onclick="logoutAdmin()" class="nav-item" style="padding: 0; margin-top: 16px; color: var(--danger);">🚪 Sair</div>
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <div class="admin-title">
+                <h1 id="page-title">Painel Gestão Master</h1>
+                <p id="current-date">Carregando dados...</p>
+            </div>
+            <button id="add-store-btn" onclick="openModal()" class="btn-icon" style="width: auto; padding: 0 20px; height: 44px; background: var(--primary); color: #fff; border:none; font-weight: 700; border-radius: 12px;">+ Novo Lojista</button>
+        </header>
+
+        <!-- New Store Modal -->
+        <div id="new-store-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+            <div style="background:#fff; width:100%; max-width:500px; padding:32px; border-radius:24px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                    <h2 style="margin:0; font-size:1.25rem;">🆕 Cadastrar Novo Lojista</h2>
+                    <button onclick="closeModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-number" id="stat-products">-</span>
-                    Produtos Cadastrados
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number" id="stat-prices">-</span>
-                    Preços Coletados
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number" id="stat-visits">-</span>
-                    Visitas ao App
-                </div>
+                <form id="add-store-form">
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Nome da Loja</label>
+                        <input type="text" id="new-name" required placeholder="Ex: Supermercado Preço Bom" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
+                    <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Telefone/Whats</label>
+                            <input type="text" id="new-phone" placeholder="(63) 9999-9999" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Senha Provisória</label>
+                            <input type="text" id="new-pass" required placeholder="Senha123" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:24px;">
+                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Bairro</label>
+                        <input type="text" id="new-neighborhood" placeholder="Setor Central" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
+                    <button type="submit" style="width:100%; padding:16px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-weight:700; cursor:pointer;">Finalizar Cadastro</button>
+                </form>
+            </div>
+        </div>
+
+        <section id="kpi-section" class="kpi-grid">
+            <div class="kpi-card" onclick="showSection('lojistas', document.querySelectorAll('.nav-item')[1])" style="cursor:pointer;">
+                <span class="kpi-label">Total de Lojas</span>
+                <span id="stat-total-stores" class="kpi-value">0</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-label">Lojas Ativas</span>
+                <span id="stat-active-stores" class="kpi-value">0</span>
+            </div>
+            <div class="kpi-card" onclick="showSection('seguranca', document.querySelectorAll('.nav-item')[3])" style="cursor:pointer;">
+                <span class="kpi-label">Bloqueadas</span>
+                <span id="stat-blocked-stores" class="kpi-value">0</span>
             </div>
         </section>
 
-        <!-- Gerenciamento de Comerciantes -->
-        <section class="admin-section">
-            <h2>Gerenciar Comerciantes</h2>
-            
-            <!-- Formulário de Adição -->
-            <form id="add-store-form" class="form-inline">
-                <input type="text" id="new-name" placeholder="Nome da Loja" required>
-                <input type="text" id="new-street" placeholder="Rua">
-                <input type="text" id="new-number" placeholder="Nº" style="flex: 0 0 60px; min-width: 60px;">
-                <input type="text" id="new-neighborhood" placeholder="Bairro">
-                <input type="text" id="new-phone" placeholder="Telefone">
-                <input type="text" id="new-pass" placeholder="Senha de Acesso" required>
-                <button type="submit" style="width: auto; margin: 0;">Adicionar Loja</button>
-            </form>
-
-            <!-- Lista -->
+        <section class="table-card">
+            <div class="table-header">
+                <h3 id="table-title">Todos os Comerciantes</h3>
+            </div>
             <div style="overflow-x: auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Endereço</th>
-                        <th>Contato</th>
-                        <th>Senha</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="stores-table">
-                    <!-- Lojas carregadas via JS -->
-                </tbody>
-            </table>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Estabelecimento</th>
+                            <th>Status</th>
+                            <th>Destaque</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stores-table">
+                        <tr><td colspan="4" style="text-align:center; padding:40px;">Carregando lojistas...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </section>
     </main>
 
-    <!-- Botão Flutuante de Suporte -->
-    <a href="https://wa.me/5511999999999" target="_blank" class="floating-support-btn" title="Falar com Suporte">🎧</a>
-
     <script>
-        // URL base da API do backend
-        const API_URL = 'https://preco-facil.onrender.com';
+        const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === "" || window.location.protocol === 'file:')
+            ? 'http://localhost:3000' 
+            : 'https://preco-facil.onrender.com';
 
-        function clearAdminAuth() {
-          sessionStorage.removeItem('admin_key');}
+        const adminKey = sessionStorage.getItem('admin_key');
+        let allStores = [];
+        let currentSection = 'dashboard';
 
+        // Check Auth and Start
+        if (adminKey) {
+            document.getElementById('admin-login-overlay').style.display = 'none';
+            init();
+        }
 
-       async function loginWithKey(key) {
-    const res = await fetch(`${API_URL}/api/admin/login`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-admin-key': key // Envia a chave aqui para o "porteiro" deixar passar
-        },
-        body: JSON.stringify({ key }) // Envia a chave aqui para o corpo da mensagem
-    });
+        async function init() {
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            await loadStores();
+        }
 
-    if (!res.ok) throw new Error('Chave inválida');
+        async function fetchAdmin(endpoint, options = {}) {
+            const key = sessionStorage.getItem('admin_key') || '';
+            const res = await fetch(`${API_URL}/${endpoint.replace(/^\//, '')}`, {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    'Content-Type': 'application/json',
+                    'x-admin-key': key
+                }
+            });
+            if (res.status === 401 || res.status === 403) {
+                if (sessionStorage.getItem('admin_key')) {
+                    alert('Sessão expirada ou chave inválida.');
+                    logoutAdmin();
+                }
+            }
+            return res;
+        }
 
-    // SALVA A CHAVE: Isso é fundamental para as estatísticas carregarem depois
-    sessionStorage.setItem('admin_key', key); 
-    
-    const data = await res.json();
-    return data;
-}
-
-        // Simple UI prompt fallback to get key from user (used only if needed)
-        async function promptForAdminKey() {
-            const key = window.prompt('Informe a chave de administrador (será enviada ao servidor para login):');
-            if (!key) return null;
+        async function loadStores() {
             try {
-                await loginWithKey(key);
-                // store raw key briefly to allow retry if cookie not set; will be cleared on logout
-                sessionStorage.setItem('admin_key', key);
-                return true;
-            } catch (e) {
-                alert('Chave inválida');
-                return null;
+                const res = await fetchAdmin('api/admin/stores');
+                if (!res.ok) throw new Error('Falha ao carregar lojas');
+                allStores = await res.json();
+                
+                updateKPIs();
+                renderStoresTable();
+            } catch (e) { 
+                console.error(e);
+                document.getElementById('stores-table').innerHTML = `<tr><td colspan="4" style="text-align:center; padding:40px; color:var(--danger);">Erro ao carregar dados. Verifique a conexão.</td></tr>`;
             }
         }
 
-     async function fetchAdmin(endpoint, options = {}) {
-    const key = sessionStorage.getItem('admin_key'); 
-
-    options.headers = {
-        ...options.headers,
-        'Content-Type': 'application/json',
-        'x-admin-key': key 
-    };
-
-    // Remove a barra inicial do endpoint se ela existir para evitar // na URL
-    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-    
-    // Monta a URL garantindo que o API_URL apareça apenas uma vez
-    const finalURL = `${API_URL}/${cleanEndpoint}`;
-
-    const res = await fetch(finalURL, options);
-
-    if (res.status === 401 || res.status === 403) {
-        sessionStorage.removeItem('admin_key');
-        alert('Sessão expirada. Por favor, faça login novamente.');
-        location.reload();
-    }
-
-    return res;
-}
-
-        // Carregar Estatísticas
-        // --- Carregar Estatísticas do Sistema ---
-async function loadStats() {
-    try {
-        // Chamando via fetchAdmin para garantir o envio da chave x-admin-key
-        const res = await fetchAdmin('api/admin/stats');
-        
-        if (!res.ok) throw new Error('Falha ao carregar estatísticas');
-        
-        const data = await res.json();
-        
-        // Atualiza os números na tela
-        document.getElementById('stat-stores').innerText = data.stores || 0;
-        document.getElementById('stat-products').innerText = data.products || 0;
-        document.getElementById('stat-prices').innerText = data.prices || 0;
-        document.getElementById('stat-visits').innerText = data.visits || 0;
-        
-    } catch (e) {
-        console.error('Erro em loadStats:', e);
-    }
-}
-
-       // --- Carregar Lista de Comerciantes ---
-async function loadStores() {
-    const tbody = document.getElementById('stores-table');
-    tbody.innerHTML = '<tr><td colspan="7">Carregando comerciantes...</td></tr>';
-    
-    try {
-        const res = await fetchAdmin('api/admin/stores');
-        
-        if (!res.ok) throw new Error('Falha ao carregar lojas');
-        
-        const stores = await res.json();
-        
-        if (stores.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7">Nenhum comerciante cadastrado.</td></tr>';
-            return;
+        function updateKPIs() {
+            document.getElementById('stat-total-stores').innerText = allStores.length;
+            document.getElementById('stat-active-stores').innerText = allStores.filter(s => !s.is_blocked).length;
+            document.getElementById('stat-blocked-stores').innerText = allStores.filter(s => s.is_blocked).length;
         }
 
-        tbody.innerHTML = stores.map(store => `
-            <tr>
-                <td>${store.id}</td>
-                <td>
-                    <span id="name-${store.id}">${store.name}</span>
-                    <input type="text" id="input-name-${store.id}" value="${store.name}" style="display:none; width: 100%;">
-                </td>
-                <td>
-                    <span id="addr-${store.id}">${store.street || ''}, ${store.number || ''} - ${store.neighborhood || ''}</span>
-                    <div id="input-addr-${store.id}" style="display:none;">
-                        <input type="text" id="input-street-${store.id}" value="${store.street || ''}" placeholder="Rua" style="width: 100%; margin-bottom: 2px;">
-                        <div style="display:flex; gap:2px;">
-                            <input type="text" id="input-number-${store.id}" value="${store.number || ''}" placeholder="Nº" style="width: 50px;">
-                            <input type="text" id="input-neighborhood-${store.id}" value="${store.neighborhood || ''}" placeholder="Bairro" style="flex:1;">
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <span id="phone-${store.id}">${store.phone || '-'}</span>
-                    <input type="text" id="input-phone-${store.id}" value="${store.phone || ''}" style="display:none; width: 100%;">
-                </td>
-                <td>
-                    <span id="pass-${store.id}">${store.password}</span>
-                    <input type="text" id="input-pass-${store.id}" value="${store.password}" style="display:none; width: 100%;">
-                </td>
-                <td>
-                    ${store.is_blocked ? '<span style="color:#ff5252">Bloqueado</span>' : '<span style="color:#4CAF50">Ativo</span>'}
-                </td>
-                <td>
-                    <button class="action-btn btn-edit" onclick="toggleEdit(${store.id})" id="btn-edit-${store.id}">Editar</button>
-                    <button class="action-btn btn-edit" onclick="saveEdit(${store.id})" id="btn-save-${store.id}" style="display:none; background:#4CAF50;">Salvar</button>
-                    <button class="action-btn ${store.is_blocked ? 'btn-unblock' : 'btn-block'}" onclick="toggleBlock(${store.id}, ${store.is_blocked})">
-                        ${store.is_blocked ? 'Desbloquear' : 'Bloquear'}
-                    </button>
-                    <button class="action-btn btn-delete" onclick="deleteStore(${store.id})">Excluir</button>
-                </td>
-            </tr>
-        `).join('');
-    } catch (e) {
-        console.error('Erro em loadStores:', e);
-        tbody.innerHTML = '<tr><td colspan="7" style="color:red">Erro ao carregar dados. Verifique a chave administrativa.</td></tr>';
-    }
-}
+        function showSection(section, el) {
+            currentSection = section;
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (el) el.classList.add('active');
 
-        // Adicionar Loja
+            const titles = {
+                'dashboard': 'Painel Gestão Master',
+                'lojistas': 'Gerência de Lojistas',
+                'destaques': 'Curadoria de Destaques',
+                'seguranca': 'Segurança e Bloqueios'
+            };
+            document.getElementById('page-title').innerText = titles[section] || 'Painel Admin';
+            document.getElementById('table-title').innerText = section === 'dashboard' ? 'Todos os Comerciantes' : section.toUpperCase();
+
+            document.getElementById('kpi-section').style.display = section === 'dashboard' ? 'grid' : 'none';
+            document.getElementById('add-store-btn').style.display = (section === 'dashboard' || section === 'lojistas') ? 'block' : 'none';
+
+            renderStoresTable();
+        }
+
+        function renderStoresTable() {
+            let filtered = allStores;
+
+            if (currentSection === 'lojistas') {
+                // In Lojistas view, show ONLY active ones
+                filtered = allStores.filter(s => !s.is_blocked);
+            } else if (currentSection === 'destaques') {
+                // Featured ones only
+                filtered = allStores.filter(s => s.is_featured);
+            } else if (currentSection === 'seguranca') {
+                // Blocked ones only (Here is where 'Bar do Querido' will be!)
+                filtered = allStores.filter(s => s.is_blocked);
+            } else {
+                // Dashboard: show ALL by default
+                filtered = allStores;
+            }
+
+            const table = document.getElementById('stores-table');
+            if (filtered.length === 0) {
+                const msgs = {
+                    'lojistas': 'Nenhuma loja ativa encontrada.',
+                    'destaques': 'Você ainda não possui lojas em destaque na home.',
+                    'seguranca': 'Boa notícia! Nenhuma loja bloqueada ou suspensa.',
+                    'dashboard': 'Nenhuma loja cadastrada no sistema.'
+                };
+                table.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:40px; color:var(--secondary); background:#f8fafc; border-radius:12px;">${msgs[currentSection] || 'Lista vazia.'}</td></tr>`;
+                return;
+            }
+
+            table.innerHTML = filtered.map(s => `
+                <tr>
+                    <td>
+                        <div class="store-cell">
+                            <div class="store-icon">
+                                ${s.logo_url ? `<img src="${getFullUrl(s.logo_url)}" style="width:100%; height:100%; object-fit:cover;">` : s.name.charAt(0)}
+                            </div>
+                            <div>
+                                <div style="font-weight:700;">${s.name}</div>
+                                <div style="font-size:0.75rem; color:var(--secondary);">ID: #${s.id}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge ${s.is_blocked ? 'badge-danger' : 'badge-success'}">
+                            ${s.is_blocked ? 'Bloqueado' : 'Ativo'}
+                        </span>
+                    </td>
+                    <td>
+                        <button onclick="toggleFeatured(${s.id}, ${s.is_featured ? true : false})" class="btn-icon ${s.is_featured ? 'active' : ''}" title="Destaque Home">
+                            ${s.is_featured ? '⭐' : '☆'}
+                        </button>
+                    </td>
+                    <td>
+                        <div class="actions-cell">
+                            <button onclick="toggleBlock(${s.id}, ${s.is_blocked ? true : false})" class="btn-icon" title="${s.is_blocked ? 'Desbloquear' : 'Bloquear'}">
+                                ${s.is_blocked ? '🔓' : '🚫'}
+                            </button>
+                            <button onclick="deleteStore(${s.id})" class="btn-icon" title="Excluir Permanentemente">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const key = document.getElementById('admin-key-input').value;
+            const res = await fetch(`${API_URL}/api/admin/stats`, {
+                headers: { 'x-admin-key': key }
+            });
+
+            if (res.ok) {
+                sessionStorage.setItem('admin_key', key);
+                location.reload();
+            } else {
+                alert('Chave mestra inválida.');
+            }
+        });
+
         document.getElementById('add-store-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = document.getElementById('new-name').value;
-            const password = document.getElementById('new-pass').value;
-            const street = document.getElementById('new-street').value;
-            const number = document.getElementById('new-number').value;
-            const neighborhood = document.getElementById('new-neighborhood').value;
-            const phone = document.getElementById('new-phone').value;
+            const body = {
+                name: document.getElementById('new-name').value,
+                password: document.getElementById('new-pass').value,
+                neighborhood: document.getElementById('new-neighborhood').value,
+                phone: document.getElementById('new-phone').value,
+            };
 
             const res = await fetchAdmin('api/admin/stores', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ name, password, street, number, neighborhood, phone })
+                body: JSON.stringify(body)
             });
 
-            if(res.ok) {
+            if (res.ok) {
+                closeModal();
                 document.getElementById('add-store-form').reset();
-                loadStores();
-                loadStats();
+                init();
             } else {
                 const data = await res.json();
-                alert('Erro: ' + (data.error || 'Falha ao adicionar loja'));
+                alert('Erro: ' + data.error);
             }
         });
 
-        // Editar Loja (UI)
-        window.toggleEdit = (id) => {
-            document.getElementById(`name-${id}`).style.display = 'none';
-            document.getElementById(`pass-${id}`).style.display = 'none';
-            document.getElementById(`addr-${id}`).style.display = 'none';
-            document.getElementById(`phone-${id}`).style.display = 'none';
-            document.getElementById(`input-name-${id}`).style.display = 'block';
-            document.getElementById(`input-pass-${id}`).style.display = 'block';
-            document.getElementById(`input-addr-${id}`).style.display = 'block';
-            document.getElementById(`input-phone-${id}`).style.display = 'block';
-            document.getElementById(`btn-edit-${id}`).style.display = 'none';
-            document.getElementById(`btn-save-${id}`).style.display = 'inline-block';
-        };
-
-        // Salvar Edição
-        window.saveEdit = async (id) => {
-            const name = document.getElementById(`input-name-${id}`).value;
-            const password = document.getElementById(`input-pass-${id}`).value;
-            const street = document.getElementById(`input-street-${id}`).value;
-            const number = document.getElementById(`input-number-${id}`).value;
-            const neighborhood = document.getElementById(`input-neighborhood-${id}`).value;
-            const phone = document.getElementById(`input-phone-${id}`).value;
-
-            const res = await fetchAdmin(`api/admin/stores/${id}`, {
-                  method: 'PUT',
-                  body: JSON.stringify({ name, password, street, number, neighborhood, phone })
-        });
-
-
-            if(res.ok) {
-                loadStores();
-            } else {
-                alert('Erro ao atualizar');
-            }
-        };
-
-        // Bloquear/Desbloquear Loja
-        window.toggleBlock = async (id, currentStatus) => {
-            const newStatus = !currentStatus;
-            if(!confirm(`Deseja realmente ${newStatus ? 'bloquear' : 'desbloquear'} esta loja?`)) return;
-
+        async function toggleBlock(id, current) {
+            if (!confirm('Deseja alterar o status desta loja?')) return;
             const res = await fetchAdmin(`api/admin/stores/${id}/block`, {
-                  method: 'PATCH',
-                  body: JSON.stringify({ is_blocked: newStatus })
+                method: 'PATCH',
+                body: JSON.stringify({ is_blocked: !current })
             });
-
-            
-            if(res.ok) loadStores();
-            else alert('Erro ao alterar status');
-        };
-
-        // Excluir Loja
-        window.deleteStore = async (id) => {
-            if(!confirm('Tem certeza? Isso apagará todos os preços desta loja.')) return;
-            
-            const res = await fetchAdmin(`api/admin/stores/${id}`, { method: 'DELETE'});
-
-            if(res.ok) {
-                loadStores();
-                loadStats();
-            } else {
-                alert('Erro ao excluir');
-            }
-        };
-
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', () => {
-             const loginBar = document.getElementById('admin-login');
-             const logoutBtn = document.getElementById('admin-logout');
-
-             const adminKey = sessionStorage.getItem('admin_key');
-
-             if (!adminKey) {
-                 // NÃO LOGADO → MOSTRA LOGIN
-                 loginBar.style.display = 'block';
-                 logoutBtn.style.display = 'none';
-            } else {
-                 // LOGADO → CARREGA DADOS
-                 loginBar.style.display = 'none';
-                 logoutBtn.style.display = 'inline-block';
-                 loadStats();
-                 loadStores();
-          }
-
-                    // Login
-        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const key = document.getElementById('admin-key-input').value.trim();
-
-            try {
-                 await loginWithKey(key);
-                 document.getElementById('admin-key-input').value = '';
-                 loginBar.style.display = 'none';
-                 logoutBtn.style.display = 'inline-block';
-                 loadStats();
-                 loadStores();
-            } catch (err) {
-                alert('Falha no login: chave inválida');
+            if (res.ok) loadStores();
         }
-    });
 
-    // Logout
-    logoutBtn.addEventListener('click', () => {
-        clearAdminAuth();
-        location.reload();
-    });
+        async function toggleFeatured(id, current) {
+            const res = await fetchAdmin(`api/admin/stores/${id}/feature`, {
+                method: 'PATCH',
+                body: JSON.stringify({ is_featured: !current })
+            });
+            if (res.ok) loadStores();
+        }
 
-    // Footer
-    const footer = document.createElement('footer');
-    footer.innerHTML = `
-        <div style="text-align: center; padding: 20px; margin-top: 40px; border-top: 1px solid #333; color: #888; font-size: 0.9rem;">
-            &copy; ${new Date().getFullYear()} JbsousaTech - Todos os direitos reservados
-        </div>
-    `;
-    document.body.appendChild(footer);
-});
+        async function deleteStore(id) {
+            if (!confirm('ATENÇÃO: Isso apagará PARA SEMPRE a loja e todos os produtos dela. Continuar?')) return;
+            const res = await fetchAdmin(`api/admin/stores/${id}`, { method: 'DELETE' });
+            if (res.ok) loadStores();
+        }
 
+        function getFullUrl(path) {
+            if (!path || path === 'null' || String(path).trim() === '') return '';
+            const cleanPath = String(path).trim();
+            if (cleanPath.startsWith('http') || cleanPath.startsWith('//')) return cleanPath;
+            return `${API_URL}/${cleanPath.replace(/^\//, '')}`;
+        }
+
+        function openModal() { document.getElementById('new-store-modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('new-store-modal').style.display = 'none'; }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('admin_key');
+            location.reload();
+        }
     </script>
 </body>
+
 </html>

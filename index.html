@@ -4,154 +4,503 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mercado Local</title>
+    <title>Mercado Local - Comparador de Preços</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css" />
-    <!-- Leaflet CSS (sem integrity para evitar erro de mismatch) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <link rel="manifest" href="manifest.json" />
     <style>
-        /* Estilos para o agrupamento por loja */
-        .store-block {
-            background: linear-gradient(135deg, hsl(220, 90%, 92%), #ffffff);
-            border: 1px solid hsl(220, 90%, 85%);
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --bg-body: #f8fafc;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
 
-        .store-header {
-            margin: 0 0 1rem 0;
-            color: #2563eb;
-            /* Cor de destaque */
-            font-size: 1.2rem;
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 0.5rem;
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-body);
+            color: #1e293b;
+            margin: 0;
         }
 
-        .product-result-item {
+        header {
+            background: #fff;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #f3f4f6;
+            align-items: center;
         }
 
-        .product-result-item:last-child {
-            border-bottom: none;
+        .header-logo-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .product-price {
-            color: #4CAF50;
-            font-weight: bold;
+        .logo-img {
+            height: 48px;
         }
 
-        /* Responsividade para Mobile */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-                gap: 1rem;
-            }
-
-            #search-form {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            #search-form input,
-            #search-form button {
-                width: 100%;
-                box-sizing: border-box;
-            }
-
-            .results-list {
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            /* CORREÇÃO: Garante que as Ofertas em Destaque fiquem em linha (Roll/Carousel) */
-            #offers-container {
-                flex-direction: row !important;
-                overflow-x: auto !important;
-                justify-content: flex-start;
-            }
-
-            /* CORREÇÃO: Ajusta os cards da busca para caberem na tela (Responsividade) */
-            #results .result-card {
-                display: flex;
-                flex-direction: row;
-                width: 100%;
-                box-sizing: border-box;
-                overflow: hidden;
-                /* Impede que o card estoure a largura */
-            }
-
-            #results .store-info {
-                flex: 1;
-                /* Ocupa o espaço restante */
-                min-width: 0;
-                /* CRÍTICO: Permite que o texto seja cortado (ellipsis) */
-                padding-right: 5px;
-            }
-
-            /* Garante que textos longos não quebrem o layout */
-            #results .store-info h3,
-            #results .store-info p,
-            #results .store-info span {
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0;
         }
+
+        .install-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: none; /* Injected by script */
+        }
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px 16px;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .hero-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+
+        .hero-section p {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        /* Search Section */
+        .search-card {
+            background: #fff;
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 32px;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            border: 1px solid #cbd5e1;
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+
+        .search-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 0 24px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            cursor: pointer;
+            transition: filter 0.2s;
+        }
+
+        .search-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        /* Trending Tags */
+        .trending-tags-box {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .trending-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .tag {
+            background: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* Results */
+        .store-block {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid #e2e8f0;
+        }
+
+        .store-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        .store-info-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .store-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            text-decoration: none;
+        }
+
+        .store-name:hover { color: var(--primary); }
+
+        .view-store-btn {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f8fafc;
+        }
+
+        .product-item:last-child { border: none; }
+
+        .prod-info h4 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .prod-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        /* Merchant Promo */
+        .merchant-card {
+            background: linear-gradient(135deg, #4f46e5, #9333ea);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            color: #fff;
+            text-align: center;
+            margin-top: 48px;
+        }
+
+        .merchant-card h3 { margin: 0 0 8px; font-size: 1.5rem; }
+        .merchant-card p { opacity: 0.9; margin-bottom: 20px; }
+
+        .btn-white {
+            background: #fff;
+            color: #4f46e5;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .mobile-menu-btn { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray-800); }
+
+        @media (max-width: 600px) {
+            .search-bar { flex-direction: column; }
+            .search-btn { padding: 14px; }
+            header { padding: 1rem; }
+            .header-title { font-size: 1.25rem; }
+            .header-nav { display: none; }
+            .mobile-menu-btn { display: block; }
+        }
+
+        /* Portal Navigation Styles - Modernized */
+        .header-nav { display: flex; align-items: center; gap: 12px; }
+        
+        .nav-link { 
+            text-decoration: none; 
+            color: #64748b; 
+            font-weight: 600; 
+            font-size: 0.85rem; 
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover { 
+            color: var(--primary); 
+            background: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .nav-link.active { 
+            color: var(--primary); 
+            background: var(--primary-light); 
+            border: 1px solid var(--primary-light);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+        }
+
+        .install-btn {
+            background: #10b981;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            display: none;
+            margin-left: 8px;
+        }
+
+        .install-btn:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+        
+        .mobile-nav { 
+            display: none; 
+            flex-direction: column; 
+            background: #fff; 
+            padding: 16px; 
+            border-bottom: 1px solid #e2e8f0;
+            gap: 12px;
+        }
+        .mobile-nav a { text-decoration: none; color: var(--gray-800); font-weight: 600; }
     </style>
+    <script>
+        function toggleMobileMenu() {
+            const nav = document.getElementById('mobile-nav');
+            nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function showView(mode) {
+            const ids = ['hero-carousel-section', 'all-merchants-section', 'offers-section', 'results', 'initial-state', 'merchant-portal-section'];
+            const classes = ['.search-card', '.hero-section'];
+            
+            // Handle Active State
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            if(mode === 'home') document.getElementById('nav-home').classList.add('active');
+            if(mode === 'stores') document.getElementById('nav-stores').classList.add('active');
+            if(mode === 'merchant') document.getElementById('nav-merchant').classList.add('active');
+
+            // Default: Hide almost everything
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.style.display = 'none';
+            });
+            classes.forEach(cls => {
+                const el = document.querySelector(cls);
+                if(el) el.style.display = 'none';
+            });
+
+            if (mode === 'home') {
+                // Restore Home View (Logic-based restore)
+                ids.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(id === 'hero-carousel-section' || id === 'offers-section') {
+                        // For the reload to work without infinite loop, we only do it if we are switching back to home from elsewhere
+                        if (window.lastMode && window.lastMode !== 'home') {
+                            window.location.reload(); 
+                        }
+                    } else if(el && id !== 'merchant-portal-section' && id !== 'results') {
+                        el.style.display = '';
+                    }
+                });
+                classes.forEach(cls => {
+                    const el = document.querySelector(cls);
+                    if(el) el.style.display = '';
+                });
+            } else if (mode === 'stores') {
+                const el = document.getElementById('all-merchants-section');
+                if(el) {
+                    el.style.display = 'block';
+                    el.scrollIntoView({ behavior: 'smooth' });
+                }
+            } else if (mode === 'merchant') {
+                const el = document.getElementById('merchant-portal-section');
+                if(el) {
+                    el.style.display = 'block';
+                    el.scrollIntoView({ behavior: 'smooth' });
+                    
+                    if (!document.getElementById('back-to-consumer')) {
+                        const backBtn = document.createElement('button');
+                        backBtn.id = 'back-to-consumer';
+                        backBtn.innerText = '← Voltar para a Busca';
+                        backBtn.className = 'btn-white';
+                        backBtn.style.marginTop = '20px';
+                        backBtn.style.background = 'transparent';
+                        backBtn.style.border = '1px solid rgba(255,255,255,0.5)';
+                        backBtn.style.color = '#fff';
+                        backBtn.onclick = () => showView('home');
+                        el.appendChild(backBtn);
+                    }
+                }
+            }
+            window.lastMode = mode;
+        }
+
+        // Initialize Home View on Load
+        window.addEventListener('load', () => { window.lastMode = 'home'; });
+    </script>
 </head>
 
 <body>
     <header>
-        <div class="header-content">
-            <img src="assets/logo.png" alt="Mercado Local Logo" class="logo" />
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <h1>Mercado Local</h1>
-                <button id="install-btn" class="install-button">📲 Instalar App</button>
+        <div class="header-logo-group">
+            <img src="assets/logo.png" alt="Logo" class="logo-img">
+            <h1 class="header-title">Mercado Local</h1>
+        </div>
+        <nav class="header-nav">
+            <a href="javascript:void(0)" id="nav-home" onclick="showView('home')" class="nav-link active">Início</a>
+            <a href="javascript:void(0)" id="nav-stores" onclick="showView('stores')" class="nav-link">Lojas</a>
+            <a href="javascript:void(0)" id="nav-merchant" onclick="showView('merchant')" class="nav-link merchant-link">Sou Lojista</a>
+            <button id="install-btn" class="install-btn">📲 Instalar</button>
+        </nav>
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+    </header>
+
+    <div id="mobile-nav" class="mobile-nav">
+        <a href="javascript:void(0)" onclick="showView('home'); toggleMobileMenu()">Início</a>
+        <a href="javascript:void(0)" onclick="showView('stores'); toggleMobileMenu()">Lojas</a>
+        <a href="javascript:void(0)" onclick="showView('merchant'); toggleMobileMenu()">Sou Lojista</a>
+    </div>
+
+    <main>
+        <section class="hero-section">
+            <h2>Compare e economize.</h2>
+            <p>Encontre os melhores preços perto de você.</p>
+        </section>
+
+        <!-- Hero Promotion Carousel -->
+        <section id="hero-carousel-section" style="display: none; margin-bottom: 32px;">
+            <div id="hero-carousel" style="width: 100%; height: 250px; border-radius: var(--radius-lg); overflow: hidden; position: relative; box-shadow: var(--shadow);">
+                <!-- Promotion slides will be injected here -->
+            </div>
+            <div id="hero-dots" style="display: flex; justify-content: center; gap: 8px; margin-top: 10px;"></div>
+        </section>
+
+        <!-- Merchant Info Section (Hidden by default) -->
+        <section id="merchant-portal-section" style="display: none; margin-bottom: 48px; background: linear-gradient(135deg, #4f46e5, #9333ea); padding: 32px; border-radius: var(--radius-lg); color: #fff; text-align: center;">
+            <h3>Sua loja no centro das atenções</h3>
+            <p style="margin-bottom: 24px;">Cadastre-se hoje e comece a vender no Mercado Local.</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <a href="login.html" class="btn-white">Entrar no Painel</a>
+                <a href="https://wa.me/5563992225774" target="_blank" class="btn-white" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #fff;">Falar com Consultor</a>
+            </div>
+        </section>
+
+        <!-- All Merchants Section -->
+        <section id="all-merchants-section" style="margin-bottom: 32px;">
+            <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                <span>🏪</span> Lojistas Parceiros
+            </h3>
+            <div id="all-stores-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 16px;">
+                <!-- All stores will be injected here via app.js -->
+            </div>
+        </section>
+
+        <section class="search-card">
+            <form id="search-form" class="search-bar">
+                <input type="text" id="product" class="search-input" placeholder="O que você busca hoje? (ex: Arroz, Café)" required autofocus>
+                <button type="submit" class="search-btn">Buscar Preços</button>
+            </form>
+            
+            <div id="trending-container" class="trending-tags-box" style="display: none;">
+                <span class="trending-label">🔥 Buscas:</span>
+                <div id="trending-tags" style="display: contents;"></div>
+            </div>
+        </section>
+
+        <!-- Top 5 Cheapest Prices Section -->
+        <section id="cheapest-prices-section" style="margin-bottom: 32px; display: none;">
+            <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                <span>💰</span> Top 5 Preços do Dia
+            </h3>
+            <div id="cheapest-prices-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+                <!-- Cheap prices injected here -->
+            </div>
+        </section>
+
+        <div id="offers-section" style="display: none; margin-bottom: 32px;">
+            <h3 style="margin-bottom: 16px;">✨ Ofertas Imperdíveis</h3>
+            <div id="offers-container" style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none;">
+                <!-- Offers injected here -->
             </div>
         </div>
-    </header>
-    <main>
-        <section class="merchant-section" id="merchant-block">
-            <h3>É um comerciante?</h3>
-            <p>Cadastre sua loja e exiba seus produtos para milhares de clientes.</p>
-            <a href="login.html" class="button">Acessar área do comerciante</a>
-        </section>
-        <section id="offers-section" style="display: none; margin-bottom: 1.5rem;">
-            <h3 style="color: #1f2937; margin-top: 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem;">🔥
-                Ofertas em Destaque</h3>
-            <div id="offers-container" class="results-list"></div>
-        </section>
-        <section class="search-section">
-            <form id="search-form">
-                <label for="product">Buscar Produto:</label>
-                <input type="text" id="product" name="product" required placeholder="ex.: Açúcar, Arroz, Café..." />
-                <button type="submit">Comparar Preços</button>
-            </form>
-            <div id="trending-container" style="margin-top: 1rem; display: none;">
-                <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 0.5rem;">Mais procurados:</p>
-                <div id="trending-tags" style="display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
-            </div>
-        </section>
-        <section id="results" class="results-section">
-            <!-- Results will be injected here -->
-            <div class="empty-state">
-                Digite um produto acima para ver os melhores preços perto de você.
+
+        <section id="results" class="results-container">
+            <!-- Results injected here -->
+            <div id="initial-state" style="text-align: center; padding: 48px 0; color: #94a3b8;">
+                <div style="font-size: 3.5rem; margin-bottom: 16px;">🏢</div>
+                <p>Economize tempo e dinheiro comparando os preços dos mercados da sua região.</p>
             </div>
         </section>
     </main>
 
-    <!-- Botão Flutuante de Suporte -->
-    <a href="https://wa.me/5563992225774" target="_blank" class="floating-support-btn" title="Falar com Suporte">🎧</a>
+    <a href="https://wa.me/5563992225774" target="_blank" class="floating-support-btn" title="Suporte">💬</a>
 
     <script src="assets/app.js"></script>
+    <script>
+        // Adjust empty state visibility
+        document.getElementById('search-form').addEventListener('submit', () => {
+            document.getElementById('initial-state').style.display = 'none';
+        });
+    </script>
 </body>
 
 </html>
