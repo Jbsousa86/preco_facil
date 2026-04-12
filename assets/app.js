@@ -261,16 +261,20 @@ async function loadHeroPromotions() {
         
         section.style.display = 'block';
         
-        carousel.innerHTML = offers.map((o, i) => `
-            <div class="carousel-slide" style="position:absolute; inset:0; opacity:${i===0?1:0}; transition: opacity 0.8s ease; cursor:pointer;" onclick="if('${o.link_url}' && '${o.link_url}' !== 'null') window.open('${o.link_url}', '_blank')">
-                <img src="${getFullUrl(o.image_url)}" style="width:100%; height:100%; object-fit:cover;">
-                ${o.title ? `
-                <div style="position:absolute; inset:0; background:linear-gradient(transparent, rgba(0,0,0,0.7)); display:flex; flex-direction:column; justify-content:flex-end; padding:24px; color:#fff;">
-                    <h2 style="margin:0; font-size:1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${o.title}</h2>
+        carousel.innerHTML = offers.map((o, i) => {
+            const link = (o.link_url && o.link_url !== 'null' && String(o.link_url).trim() !== '') ? o.link_url : '';
+            return `
+                <div class="carousel-slide" style="position:absolute; inset:0; opacity:${i===0?1:0}; pointer-events:${i===0?'auto':'none'}; transition: opacity 0.8s ease; ${link ? 'cursor:pointer;' : ''}" 
+                     ${link ? `onclick="window.open('${link.startsWith('http') ? link : 'https://' + link}', '_blank')"` : ''}>
+                    <img src="${getFullUrl(o.image_url)}" style="width:100%; height:100%; object-fit:cover;">
+                    ${o.title ? `
+                    <div style="position:absolute; inset:0; background:linear-gradient(transparent, rgba(0,0,0,0.7)); display:flex; flex-direction:column; justify-content:flex-end; padding:24px; color:#fff;">
+                        <h2 style="margin:0; font-size:1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${o.title}</h2>
+                    </div>
+                    ` : ''}
                 </div>
-                ` : ''}
-            </div>
-        `).join('');
+            `;
+        }).join('');
         
         dots.innerHTML = offers.map((_, i) => `
             <div class="dot" style="width:12px; height:4px; border-radius:2px; background:${i===0?'var(--primary)':'rgba(0,0,0,0.2)'}; transition: all 0.3s;"></div>

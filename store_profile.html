@@ -349,25 +349,42 @@
         /* Floating Cart */
         .cart-bar {
             position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 32px);
-            max-width: 500px;
-            background: var(--primary); /* Usar cor de destaque para a sacola */
+            bottom: 24px;
+            right: 24px;
+            width: 64px;
+            height: 64px;
+            background: var(--primary);
             color: #fff;
-            padding: 16px 24px;
-            border-radius: 24px;
+            border-radius: 50%;
             display: none;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
             z-index: 1000;
+            cursor: pointer;
             animation: slideUp 0.3s ease-out;
-            transition: transform 0.2s, background 0.2s;
+            transition: transform 0.2s;
         }
 
-        .cart-bar:active { transform: translateX(-50%) scale(0.98); }
+        .cart-bar:active { transform: scale(0.9); }
+
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 4px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+        }
 
         @keyframes slideUp {
             from { transform: translate(-50%, 100%); opacity: 0; }
@@ -576,14 +593,10 @@
         </section>
     </main>
 
-    <div id="cart-bar" class="cart-bar" onclick="openCart()" style="cursor:pointer;">
-        <div class="cart-info" style="flex:1; justify-content: space-between;">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <span style="font-size:1.4rem;">🛍️</span>
-                <span id="cart-summary-qty" class="cart-count">0 items</span>
-            </div>
-            <span id="cart-summary-total" class="cart-total">R$ 0,00</span>
-        </div>
+    <!-- Floating Cart Button (Circle) -->
+    <div id="cart-bar" class="cart-bar" onclick="openCart()">
+        <span style="font-size: 1.8rem;">🛒</span>
+        <div id="cart-summary-qty" class="cart-badge">0</div>
     </div>
 
     <!-- Cart Modal -->
@@ -826,8 +839,7 @@
             const cartBar = document.getElementById('cart-bar');
             if (count > 0) {
                 cartBar.style.display = 'flex';
-                document.getElementById('cart-summary-qty').innerText = `${count} ${count === 1 ? 'item' : 'items'}`;
-                document.getElementById('cart-summary-total').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+                document.getElementById('cart-summary-qty').innerText = count;
                 document.getElementById('modal-cart-total').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
             } else {
                 cartBar.style.display = 'none';
