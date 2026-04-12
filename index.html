@@ -25,6 +25,13 @@
             background-color: var(--bg-body);
             color: #1e293b;
             margin: 0;
+            overflow-x: hidden; /* Fix screen dancing */
+            width: 100%;
+        }
+
+        html {
+            overflow-x: hidden;
+            width: 100%;
         }
 
         header {
@@ -69,12 +76,13 @@
         main {
             max-width: 800px;
             margin: 0 auto;
-            padding: 24px 16px;
+            padding: 16px 12px; /* Reduced padding */
+            box-sizing: border-box;
         }
 
         .hero-section {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 20px; /* Reduced margin */
         }
 
         .hero-section h2 {
