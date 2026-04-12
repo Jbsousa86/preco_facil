@@ -454,12 +454,14 @@
             <img src="assets/logo.png" alt="Logo" class="logo-img">
             <h1 class="header-title">Mercado Local</h1>
         </div>
-        <nav class="header-nav">
-            <a href="javascript:void(0)" id="nav-home" onclick="showView('home')" class="nav-link active">Início</a>
-            <a href="javascript:void(0)" id="nav-stores" onclick="showView('stores')" class="nav-link">Lojas</a>
-            <a href="javascript:void(0)" id="nav-merchant" onclick="showView('merchant')" class="nav-link merchant-link">Sou Lojista</a>
+        <div style="display: flex; align-items: center; gap: 8px;">
             <button id="install-btn" class="install-btn">📲 Instalar</button>
-        </nav>
+            <nav class="header-nav">
+                <a href="javascript:void(0)" id="nav-home" onclick="showView('home')" class="nav-link active">Início</a>
+                <a href="javascript:void(0)" id="nav-stores" onclick="showView('stores')" class="nav-link">Lojas</a>
+                <a href="javascript:void(0)" id="nav-merchant" onclick="showView('merchant')" class="nav-link merchant-link">Sou Lojista</a>
+            </nav>
+        </div>
         <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
     </header>
 
