@@ -537,6 +537,9 @@
             <div id="category-scroller" class="category-scroller">
                 <!-- Categories will be injected here -->
             </div>
+            <button id="menu-cart-btn" onclick="openCart()" style="display:none; width:100%; margin-top:12px; background:var(--primary); color:#fff; border:none; padding:12px; border-radius:12px; font-weight:700; align-items:center; justify-content:center; gap:8px;">
+                <span>🛒</span> Ver Minha Sacola (<span id="menu-cart-count">0</span>)
+            </button>
         </nav>
 
         <section class="products-section">
@@ -736,7 +739,7 @@
                             </div>
                             
                             <div id="add-btn-${p.id}" class="add-btn" style="display:${qty > 0 ? 'none' : 'flex'}" onclick="updateCart('${p.id}', 1, event)">
-                                🛒
+                                <span>+</span>
                             </div>
                             
                             <div id="qty-ctrl-${p.id}" class="quantity-control" style="display:${qty > 0 ? 'flex' : 'none'}; margin-top: 8px;">
@@ -791,13 +794,24 @@
             }
 
             const cartBar = document.getElementById('cart-bar');
-            if (count > 0) {
-                cartBar.style.display = 'flex';
-                document.getElementById('cart-summary-qty').innerText = count;
-                document.getElementById('modal-cart-total').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
-            } else {
-                cartBar.style.display = 'none';
+            if (cartBar) {
+                if (count > 0) {
+                    cartBar.style.display = 'flex';
+                    document.getElementById('cart-summary-qty').innerText = count;
+                } else {
+                    cartBar.style.display = 'none';
+                }
             }
+            
+            // Atualiza o botão de ver sacola no menu se ele existir
+            const menuCartBtn = document.getElementById('menu-cart-btn');
+            if (menuCartBtn) {
+                menuCartBtn.style.display = count > 0 ? 'flex' : 'none';
+                document.getElementById('menu-cart-count').innerText = count;
+            }
+            
+            const modalTotal = document.getElementById('modal-cart-total');
+            if (modalTotal) modalTotal.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
         }
 
         function openCart() {
