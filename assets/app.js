@@ -263,12 +263,15 @@ async function loadHeroPromotions() {
         
         carousel.innerHTML = offers.map((o, i) => {
             const link = (o.link_url && o.link_url !== 'null' && String(o.link_url).trim() !== '') ? o.link_url : '';
+            const isActive = (i === 0);
             return `
-                <div class="carousel-slide" style="position:absolute; inset:0; opacity:${i===0?1:0}; pointer-events:${i===0?'auto':'none'}; transition: opacity 0.8s ease; ${link ? 'cursor:pointer;' : ''}" 
+                <div class="carousel-slide" 
+                     data-has-link="${link ? 'true' : 'false'}"
+                     style="position:absolute; inset:0; opacity:${isActive?1:0}; pointer-events:${(isActive && link)?'auto':'none'}; transition: opacity 0.8s ease; ${link ? 'cursor:pointer;' : 'cursor:default;'}" 
                      ${link ? `onclick="window.open('${link.startsWith('http') ? link : 'https://' + link}', '_blank')"` : ''}>
                     <img src="${getFullUrl(o.image_url)}" style="width:100%; height:100%; object-fit:cover;">
                     ${o.title ? `
-                    <div style="position:absolute; inset:0; background:linear-gradient(transparent, rgba(0,0,0,0.7)); display:flex; flex-direction:column; justify-content:flex-end; padding:24px; color:#fff;">
+                    <div style="position:absolute; inset:0; background:linear-gradient(transparent, rgba(0,0,0,0.7)); display:flex; flex-direction:column; justify-content:flex-end; padding:24px; color:#fff; pointer-events:none;">
                         <h2 style="margin:0; font-size:1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${o.title}</h2>
                     </div>
                     ` : ''}
@@ -294,8 +297,11 @@ async function loadHeroPromotions() {
                 
                 heroCarouselIndex = (heroCarouselIndex + 1) % offers.length;
                 
-                slides[heroCarouselIndex].style.opacity = 1;
-                slides[heroCarouselIndex].style.pointerEvents = 'auto';
+                const nextSlide = slides[heroCarouselIndex];
+                nextSlide.style.opacity = 1;
+                // Só ativa o clique se o próximo slide TIVER um link
+                nextSlide.style.pointerEvents = nextSlide.getAttribute('data-has-link') === 'true' ? 'auto' : 'none';
+                
                 dotEls[heroCarouselIndex].style.background = 'var(--primary)';
                 dotEls[heroCarouselIndex].style.width = '24px';
             }, 5000);
