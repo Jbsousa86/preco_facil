@@ -73,14 +73,14 @@ function renderResults(data) {
             <h3 style="margin:0 0 16px 0; color:#d97706; display:flex; align-items:center; gap:8px;">
                 <span style="font-size:1.5rem;">🏆</span> Melhores Preços Encontrados
             </h3>
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap:12px;">
                 ${top3.map(p => {
                     const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
                     const finalPrice = isPromo ? p.promo_price : p.price;
                     return `
                     <div onclick="window.location.href='store_profile.html?id=${p.store_id}'" style="background:#fff; padding:12px; border-radius:12px; cursor:pointer; border:1px solid #fef3c7; transition: transform 0.2s; display: flex; flex-direction: column; gap: 8px;">
                         <div style="width:100%; height:80px; background:#f1f5f9; border-radius:8px; overflow:hidden;">
-                            ${p.product_image ? `<img src="${getFullUrl(p.product_image)}" style="width:100%; height:100%; object-fit:cover;">` : '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#cbd5e1;">📦</div>'}
+                            ${p.image_url ? `<img src="${getFullUrl(p.image_url)}" style="width:100%; height:100%; object-fit:cover;">` : '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#cbd5e1;">📦</div>'}
                         </div>
                         <div>
                             <span style="font-size:0.65rem; font-weight:700; color:#d97706; text-transform:uppercase;">${p.store_name}</span>
@@ -147,23 +147,26 @@ function renderResults(data) {
                 <a href="store_profile.html?id=${storeId}" class="view-store-btn" style="${hasPromo ? 'background:#fbbf24; color:#fff;' : ''}">Ir para Loja</a>
             </div>
             
-            <div class="store-products-list">
+            <div class="store-products-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; margin-top: 12px;">
                 ${store.products.map(p => {
                     const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
                     const finalPrice = isPromo ? p.promo_price : p.price;
                     return `
-                    <div class="product-item" style="display: flex; gap: 12px; align-items: center;">
-                        <div style="width: 50px; height: 50px; background: #f1f5f9; border-radius: 8px; overflow: hidden; flex-shrink: 0;">
-                            ${p.product_image ? `<img src="${getFullUrl(p.product_image)}" style="width:100%; height:100%; object-fit:cover;">` : '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#94a3b8; font-size:0.8rem;">📦</div>'}
+                    <div class="product-item" style="background:#fff; border:1px solid #f1f5f9; border-radius:12px; overflow:hidden; display: flex; flex-direction: column;">
+                        <div style="width: 100%; height: 90px; background: #f1f5f9; position: relative;">
+                            ${p.image_url ? `<img src="${getFullUrl(p.image_url)}" style="width:100%; height:100%; object-fit:cover;">` : '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#94a3b8; font-size:1.5rem;">📦</div>'}
+                            ${isPromo ? `<div style="position:absolute; top:4px; right:4px; background:var(--primary); color:#fff; font-size:0.55rem; padding:2px 6px; border-radius:4px; font-weight:800;">OFERTA</div>` : ''}
                         </div>
-                        <div class="prod-info" style="flex-grow: 1;">
-                            <span style="font-size:0.6rem; color:var(--primary); font-weight:700; text-transform:uppercase;">${p.category || 'Geral'}</span>
-                            <h4 style="margin: 2px 0; font-size: 0.9rem;">${p.product_name}</h4>
-                            ${isPromo ? `<div class="promo-timer" data-expires="${p.promo_expires_at}" style="font-size: 0.65rem; color: #f59e0b; font-weight: 700;"></div>` : ''}
-                        </div>
-                        <div style="text-align:right;">
-                            ${isPromo ? `<div style="font-size: 0.65rem; text-decoration:line-through; color:#94a3b8;">R$ ${parseFloat(p.price).toFixed(2)}</div>` : ''}
-                            <div class="prod-price" style="font-size: 1rem;">R$ ${parseFloat(finalPrice).toFixed(2)}</div>
+                        <div class="prod-info" style="padding: 8px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <span style="font-size:0.55rem; color:#94a3b8; font-weight:700; text-transform:uppercase;">${p.category || 'Geral'}</span>
+                                <h4 style="margin: 2px 0; font-size: 0.8rem; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:2.4em;">${p.product_name}</h4>
+                                ${isPromo ? `<div class="promo-timer" data-expires="${p.promo_expires_at}" style="font-size: 0.6rem; color: #f59e0b; font-weight: 700;"></div>` : ''}
+                            </div>
+                            <div style="margin-top: 4px;">
+                                ${isPromo ? `<div style="font-size: 0.6rem; text-decoration:line-through; color:#94a3b8;">R$ ${parseFloat(p.price).toFixed(2)}</div>` : ''}
+                                <div class="prod-price" style="font-size: 0.95rem; font-weight:800; color:var(--success);">R$ ${parseFloat(finalPrice).toFixed(2)}</div>
+                            </div>
                         </div>
                     </div>
                     `;
