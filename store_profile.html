@@ -597,6 +597,16 @@
     </div>
 
     <script>
+        // FORÇAR ATUALIZAÇÃO: Unregister Service Workers antigos
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                    console.log('SW Unregistered for update');
+                } 
+            });
+        }
+
         const API_BASE_URL = window.location.hostname === 'localhost'
             ? 'http://localhost:3000'
             : 'https://preco-facil.onrender.com';
