@@ -789,6 +789,11 @@
             }
 
             updateCartSummary();
+            
+            // Se o modal estiver aberto, atualiza a lista lá também
+            if (document.getElementById('cart-modal').style.display === 'flex') {
+                renderCartOverlay();
+            }
         }
 
         function updateCartSummary() {
@@ -814,31 +819,46 @@
             
             const modalTotal = document.getElementById('modal-cart-total');
             if (modalTotal) modalTotal.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+
+            // Se o carrinho esvaziou e o modal estava aberto, fecha ele
+            if (count === 0 && document.getElementById('cart-modal').style.display === 'flex') {
+                closeCart();
+            }
         }
 
         function openCart() {
+            renderCartOverlay();
+            document.getElementById('cart-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function renderCartOverlay() {
             const list = document.getElementById('cart-items-list');
+            if (!list) return;
             list.innerHTML = '';
             
+            const cartKeys = Object.keys(cart);
+            if (cartKeys.length === 0) {
+                list.innerHTML = '<div style="text-align:center; padding:20px; color:#64748b;">Sua sacola está vazia</div>';
+                return;
+            }
+
             for (const id in cart) {
                 const item = cart[id];
                 list.insertAdjacentHTML('beforeend', `
                     <div class="cart-item">
                         <div class="cart-item-info">
-                            <h4>${item.name}</h4>
-                            <span>${item.qty}x R$ ${parseFloat(item.price).toFixed(2)}</span>
+                            <h4 style="margin:0; font-size:0.9rem;">${item.name}</h4>
+                            <span style="font-size:0.8rem; color:#64748b;">R$ ${parseFloat(item.price).toFixed(2)} un.</span>
                         </div>
-                        <div class="quantity-control" style="display:flex; margin-top:0;">
-                            <button class="qty-btn" onclick="updateCart('${item.id}', -1)">-</button>
-                            <span style="font-weight:700; margin: 0 10px;">${item.qty}</span>
-                            <button class="qty-btn" onclick="updateCart('${item.id}', 1)">+</button>
+                        <div class="quantity-control" style="display:flex; margin-top:0; background:#f8fafc; padding:2px; border-radius:8px;">
+                            <button class="qty-btn" style="width:28px; height:28px;" onclick="updateCart('${item.id}', -1, event)">-</button>
+                            <span style="font-weight:700; margin: 0 10px; min-width:20px; text-align:center;">${item.qty}</span>
+                            <button class="qty-btn" style="width:28px; height:28px;" onclick="updateCart('${item.id}', 1, event)">+</button>
                         </div>
                     </div>
                 `);
             }
-            
-            document.getElementById('cart-modal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
         }
 
         function closeCart() {
