@@ -291,19 +291,32 @@
                 color: #fff;
             }
             
-            .menu-toggle-btn {
-                background: rgba(255, 255, 255, 0.2);
+            /* Botão Sanduíche Flutuante (FAB) no Canto Inferior Direito */
+            .menu-toggle-fab {
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                width: 60px;
+                height: 60px;
+                background: var(--primary);
                 color: #fff;
                 border: none;
-                width: 42px;
-                height: 42px;
-                border-radius: 10px;
-                font-size: 1.3rem;
-                cursor: pointer;
+                border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                font-size: 1.5rem;
+                box-shadow: 0 4px 20px rgba(37, 99, 235, 0.5);
+                cursor: pointer;
+                z-index: 1050; /* Por cima de quase tudo */
+                transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             }
+
+            .menu-toggle-fab:active {
+                transform: scale(0.9);
+            }
+            
+            .menu-toggle-btn { display: none; } /* Remove o botão antigo do topo */
 
             .sidebar-overlay {
                 display: none;
@@ -422,10 +435,13 @@
     </aside>
 
     <div class="mobile-header-admin">
-        <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
-        <span style="font-weight: 800; font-size: 0.9rem;">ADMIN MASTER</span>
-        <div style="width: 40px;"></div>
+        <div style="width: 42px;"></div> <!-- Spacer -->
+        <span style="font-weight: 800; font-size: 0.95rem;">GESTÃO MASTER</span>
+        <div style="width: 42px;"></div> <!-- Spacer -->
     </div>
+
+    <!-- Botão de Menu Flutuante -->
+    <button class="menu-toggle-fab" onclick="toggleSidebar()">☰</button>
 
     <main>
         <header>
