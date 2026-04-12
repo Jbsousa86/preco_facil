@@ -738,13 +738,11 @@ app.delete('/api/admin/banners/:id', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 // INICIA O SERVIDOR
-if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
     initializeDatabase().then(() => {
         app.listen(PORT, '0.0.0.0',() => console.log(`Servidor rodando na porta ${PORT}`));
     }).catch(e => console.error("Falha startup:", e));
-} else {
-    // No Vercel, apenas rodamos o init sem bloquear e exportamos o app
-    initializeDatabase().catch(e => console.error("Init failed but continuing..."));
 }
 
+// Essencial para o Vercel encontrar o app
 module.exports = app;
