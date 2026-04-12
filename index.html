@@ -321,6 +321,46 @@
             gap: 12px;
         }
         .mobile-nav a { text-decoration: none; color: var(--gray-800); font-weight: 600; }
+
+        /* Bottom Nav - App Style */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            height: 65px;
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+            z-index: 1000;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #64748b;
+            font-size: 0.7rem;
+            font-weight: 600;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .bottom-nav-item i { font-size: 1.25rem; }
+        .bottom-nav-item.active { color: var(--primary); }
+
+        @media (max-width: 600px) {
+            .header-nav { display: none !important; }
+            .bottom-nav { display: grid; }
+            body { padding-bottom: 80px; }
+            .mobile-menu-btn { display: none; } /* Replaced by bottom nav */
+        }
     </style>
     <script>
         function toggleMobileMenu() {
@@ -329,14 +369,23 @@
         }
 
         function showView(mode) {
-            const ids = ['hero-carousel-section', 'all-merchants-section', 'offers-section', 'results', 'initial-state', 'merchant-portal-section'];
+            const ids = ['hero-carousel-section', 'all-merchants-section', 'offers-section', 'results', 'initial-state', 'merchant-portal-section', 'cheapest-prices-section'];
             const classes = ['.search-card', '.hero-section'];
             
             // Handle Active State
-            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-            if(mode === 'home') document.getElementById('nav-home').classList.add('active');
-            if(mode === 'stores') document.getElementById('nav-stores').classList.add('active');
-            if(mode === 'merchant') document.getElementById('nav-merchant').classList.add('active');
+            document.querySelectorAll('.nav-link, .bottom-nav-item').forEach(el => el.classList.remove('active'));
+            if(mode === 'home') {
+                document.getElementById('nav-home')?.classList.add('active');
+                document.getElementById('bnav-home')?.classList.add('active');
+            }
+            if(mode === 'stores') {
+                document.getElementById('nav-stores')?.classList.add('active');
+                document.getElementById('bnav-stores')?.classList.add('active');
+            }
+            if(mode === 'merchant') {
+                document.getElementById('nav-merchant')?.classList.add('active');
+                document.getElementById('bnav-merchant')?.classList.add('active');
+            }
 
             // Default: Hide almost everything
             ids.forEach(id => {
@@ -414,11 +463,20 @@
         <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
     </header>
 
-    <div id="mobile-nav" class="mobile-nav">
-        <a href="javascript:void(0)" onclick="showView('home'); toggleMobileMenu()">Início</a>
-        <a href="javascript:void(0)" onclick="showView('stores'); toggleMobileMenu()">Lojas</a>
-        <a href="javascript:void(0)" onclick="showView('merchant'); toggleMobileMenu()">Sou Lojista</a>
-    </div>
+    <nav class="bottom-nav">
+        <a href="javascript:void(0)" id="bnav-home" onclick="showView('home')" class="bottom-nav-item active">
+            <i>🏠</i>
+            <span>Início</span>
+        </a>
+        <a href="javascript:void(0)" id="bnav-stores" onclick="showView('stores')" class="bottom-nav-item">
+            <i>🏪</i>
+            <span>Lojas</span>
+        </a>
+        <a href="javascript:void(0)" id="bnav-merchant" onclick="showView('merchant')" class="bottom-nav-item">
+            <i>💼</i>
+            <span>Lojista</span>
+        </a>
+    </nav>
 
     <main>
         <section class="hero-section">
