@@ -346,46 +346,6 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        /* Floating Cart */
-        .cart-bar {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 64px;
-            height: 64px;
-            background: var(--primary);
-            color: #fff;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            z-index: 1000;
-            cursor: pointer;
-            animation: slideUp 0.3s ease-out;
-            transition: transform 0.2s;
-        }
-
-        .cart-bar:active { transform: scale(0.9); }
-
-        .cart-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ef4444;
-            color: #fff;
-            font-size: 0.75rem;
-            font-weight: 700;
-            min-width: 22px;
-            height: 22px;
-            padding: 0 4px;
-            border-radius: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #fff;
-        }
-
         @keyframes slideUp {
             from { transform: translate(-50%, 100%); opacity: 0; }
             to { transform: translate(-50%, 0); opacity: 1; }
@@ -592,12 +552,6 @@
             </div>
         </section>
     </main>
-
-    <!-- Floating Cart Button (Circle) -->
-    <div id="cart-bar" class="cart-bar" onclick="openCart()">
-        <span style="font-size: 1.8rem;">🛒</span>
-        <div id="cart-summary-qty" class="cart-badge">0</div>
-    </div>
 
     <!-- Cart Modal -->
     <div id="cart-modal" class="modal" onclick="if(event.target == this) closeCart()">
