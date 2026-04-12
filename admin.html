@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -324,7 +325,11 @@
             init();
         }
 
-        // Banners Management
+        // Banner Management
+        const supabaseUrl = 'https://licvfuzvvbmjdvcooogo.supabase.co';
+        const supabaseKey = 'sb_publishable_8hwXxxU7C4owwVmlc4FvPg_0pEXUFK-';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
         async function loadBannersAdmin() {
             const res = await fetchAdmin('api/banners');
             const banners = await res.json();
@@ -349,18 +354,40 @@
 
         async function addBanner(e) {
             e.preventDefault();
-            const payload = {
-                image_url: document.getElementById('b-image').value,
-                link_url: document.getElementById('b-link').value,
-                title: document.getElementById('b-title').value
-            };
-            await fetchAdmin('api/admin/banners', {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
-            document.getElementById('banner-modal').style.display='none';
-            document.getElementById('banner-form').reset();
-            loadBannersAdmin();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = "Processando...";
+
+            try {
+                let finalImageUrl = document.getElementById('b-image').value;
+                const fileInput = document.getElementById('b-file');
+                const sourceType = document.getElementById('banner-source-type').value;
+
+                if (sourceType === 'file' && fileInput.files[0]) {
+                    const fileName = `banner-${Date.now()}.jpg`;
+                    const { data, error } = await supabaseClient.storage.from('produtos').upload(fileName, fileInput.files[0]);
+                    if (error) throw error;
+                    finalImageUrl = supabaseClient.storage.from('produtos').getPublicUrl(fileName).data.publicUrl;
+                }
+
+                const payload = {
+                    image_url: finalImageUrl,
+                    link_url: document.getElementById('b-link').value,
+                    title: document.getElementById('b-title').value
+                };
+                await fetchAdmin('api/admin/banners', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                document.getElementById('banner-modal').style.display='none';
+                document.getElementById('banner-form').reset();
+                loadBannersAdmin();
+            } catch (err) {
+                alert('Erro ao salvar banner: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Salvar Banner";
+            }
         }
 
         async function init() {
@@ -601,8 +628,19 @@
             <h2 style="margin:0 0 20px 0;">🖼️ Novo Banner Global</h2>
             <form id="banner-form" onsubmit="addBanner(event)">
                 <div style="margin-bottom:12px;">
+                    <label style="display:block; font-size:0.8rem; font-weight:700;">Origem da Imagem</label>
+                    <select id="banner-source-type" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;" onchange="document.getElementById('b-url-group').style.display = this.value === 'url' ? 'block' : 'none'; document.getElementById('b-file-group').style.display = this.value === 'file' ? 'block' : 'none';">
+                        <option value="url">URL da Web</option>
+                        <option value="file">Arquivo Local</option>
+                    </select>
+                </div>
+                <div id="b-url-group" style="margin-bottom:12px;">
                     <label style="display:block; font-size:0.8rem; font-weight:700;">URL da Imagem</label>
-                    <input type="text" id="b-image" required placeholder="https://..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                    <input type="text" id="b-image" placeholder="https://..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                </div>
+                <div id="b-file-group" style="margin-bottom:12px; display:none;">
+                    <label style="display:block; font-size:0.8rem; font-weight:700;">Selecionar Arquivo</label>
+                    <input type="file" id="b-file" accept="image/*" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
                 </div>
                 <div style="margin-bottom:12px;">
                     <label style="display:block; font-size:0.8rem; font-weight:700;">Título (Opcional)</label>

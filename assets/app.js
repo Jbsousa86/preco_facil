@@ -262,14 +262,8 @@ async function loadHeroPromotions() {
         section.style.display = 'block';
         
         carousel.innerHTML = offers.map((o, i) => `
-            <div class="carousel-slide" style="position:absolute; inset:0; opacity:${i===0?1:0}; transition: opacity 0.8s ease; cursor:pointer;" onclick="if('${o.link_url}') window.open('${o.link_url}', '_blank')">
-                <img src="${getFullUrl(o.image_url)}" style="width:100%; height:100%; object-fit:cover; filter: brightness(0.7);">
-                <div style="position:absolute; inset:0; background:linear-gradient(transparent, rgba(0,0,0,0.8)); display:flex; flex-direction:column; justify-content:flex-end; padding:24px; color:#fff;">
-                    <div>
-                        <span style="background:var(--primary); padding:4px 12px; border-radius:8px; font-size:0.8rem; font-weight:700; margin-bottom:8px; display:inline-block;">DESTAQUE ✨</span>
-                        <h2 style="margin:0; font-size:1.5rem;">${o.title || 'Novidade no Ar'}</h2>
-                    </div>
-                </div>
+            <div class="carousel-slide" style="position:absolute; inset:0; opacity:${i===0?1:0}; transition: opacity 0.8s ease; cursor:pointer;" onclick="if('${o.link_url}' && '${o.link_url}' !== 'null') window.open('${o.link_url}', '_blank')">
+                <img src="${getFullUrl(o.image_url)}" style="width:100%; height:100%; object-fit:cover;">
             </div>
         `).join('');
         
