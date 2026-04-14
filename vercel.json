@@ -1,5 +1,3 @@
 {
-  "rewrites": [
-    { "source": "/api/:match*", "destination": "/api/server.js" }
-  ]
+  "cleanUrls": true
 }
