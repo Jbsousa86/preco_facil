@@ -754,12 +754,11 @@ app.delete('/api/admin/banners/:id', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 // INICIA O SERVIDOR
-// INICIA O SERVIDOR (Apenas se executado diretamente, não via Vercel/Require)
-if (require.main === module) {
-    initializeDatabase().then(() => {
+initializeDatabase().then(() => {
+    if (require.main === module) {
         app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Servidor rodando localmente em http://localhost:${PORT}`));
-    }).catch(e => console.error("Falha crítica no startup:", e));
-}
+    }
+}).catch(e => console.error("Erro no startup:", e));
 
 // Essencial para o Vercel encontrar o app
 module.exports = app;
