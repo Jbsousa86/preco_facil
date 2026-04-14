@@ -15,7 +15,8 @@
     <meta http-equiv="Expires" content="0">
     <style>
         :root {
-            --primary: #2563eb; /* Blue E-commerce standard */
+            --primary: #2563eb;
+            /* Blue E-commerce standard */
             --primary-dark: #1e40af;
             --accent: #f59e0b;
             --success: #10b981;
@@ -23,7 +24,7 @@
             --surface: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --card-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             --radius: 12px;
         }
 
@@ -54,7 +55,7 @@
             background-color: var(--bg-body);
             color: #1e293b;
             margin: 0;
-            padding-bottom: 80px; 
+            padding-bottom: 80px;
             overflow-x: hidden;
             width: 100%;
         }
@@ -65,7 +66,8 @@
         }
 
         .app-header {
-            background: #2563eb; /* Vibrant Blue Header */
+            background: #2563eb;
+            /* Vibrant Blue Header */
             padding: 12px 16px;
             display: flex;
             align-items: center;
@@ -73,7 +75,7 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             color: #fff;
         }
 
@@ -99,7 +101,7 @@
             height: 32px;
             border-radius: 6px;
             object-fit: cover;
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .header-name {
@@ -130,7 +132,7 @@
             padding: 2px 6px;
             border-radius: 10px;
             font-weight: 800;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             transition: transform 0.2s;
         }
 
@@ -170,7 +172,7 @@
             display: flex;
             align-items: center;
             padding: 8px 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
             border: 1px solid #e2e8f0;
         }
 
@@ -226,7 +228,7 @@
             gap: 12px;
             padding: 4px;
         }
-        
+
         @media (max-width: 360px) {
             #products-container.products-grid {
                 grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -236,7 +238,8 @@
 
         /* Product Card - Increased specificity */
         #products-container .product-card {
-            position: relative; /* FUNDAMENTAL para os botões ficarem no lugar certo */
+            position: relative;
+            /* FUNDAMENTAL para os botões ficarem no lugar certo */
             background: #fff;
             border-radius: 12px;
             overflow: hidden;
@@ -244,13 +247,14 @@
             flex-direction: column;
             border: 1px solid #e2e8f0;
             transition: all 0.2s;
-            box-shadow: none; /* Reset global shadows */
+            box-shadow: none;
+            /* Reset global shadows */
             margin-bottom: 0;
         }
-        
+
         #products-container .product-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         .product-image-container {
@@ -358,7 +362,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             transition: transform 0.2s;
             font-size: 1.2rem;
             z-index: 5;
@@ -383,7 +387,8 @@
         }
 
         .quantity-control {
-            display: none; /* Escondido no card, visível no modal */
+            display: none;
+            /* Escondido no card, visível no modal */
         }
 
         .qty-btn {
@@ -395,12 +400,19 @@
             color: var(--primary);
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         @keyframes slideUp {
-            from { transform: translate(-50%, 100%); opacity: 0; }
-            to { transform: translate(-50%, 0); opacity: 1; }
+            from {
+                transform: translate(-50%, 100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
         }
 
         .cart-info {
@@ -436,11 +448,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(4px);
             z-index: 2000;
             display: none;
-            align-items: center; 
+            align-items: center;
             justify-content: center;
             padding: 0;
         }
@@ -461,8 +473,15 @@
         }
 
         @keyframes slideUpModal {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .modal-header {
@@ -529,8 +548,15 @@
         }
 
         @keyframes slideUpFloat {
-            from { transform: translate(-50%, 100%); opacity: 0; }
-            to { transform: translate(-50%, 0); opacity: 1; }
+            from {
+                transform: translate(-50%, 100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
         }
 
         .cart-bar-content {
@@ -589,9 +615,17 @@
 
 
         @media (min-width: 600px) {
-            .modal { align-items: center; }
-            .modal-content { border-radius: 24px; }
-            .store-hero { height: 300px; }
+            .modal {
+                align-items: center;
+            }
+
+            .modal-content {
+                border-radius: 24px;
+            }
+
+            .store-hero {
+                height: 300px;
+            }
         }
     </style>
 </head>
@@ -609,7 +643,8 @@
         </button>
     </header>
 
-    <div id="loading-overlay" style="position:fixed; inset:0; background:#fff; z-index:9999; display:flex; align-items:center; justify-content:center;">
+    <div id="loading-overlay"
+        style="position:fixed; inset:0; background:#fff; z-index:9999; display:flex; align-items:center; justify-content:center;">
         <div class="loading-spinner"></div>
     </div>
 
@@ -620,18 +655,23 @@
     <main>
         <section class="store-details">
             <h1 id="store-name-title" style="margin:0 0 4px; font-size:1.5rem; font-weight:700;">Carregando...</h1>
-            <div id="store-address" class="store-meta" style="justify-content: flex-start; color: #64748b; font-size: 0.85rem; margin-bottom: 4px;"></div>
-            <div id="store-phone-meta" class="store-meta" style="justify-content: flex-start; color: #64748b; font-size: 0.85rem;"></div>
+            <div id="store-address" class="store-meta"
+                style="justify-content: flex-start; color: #64748b; font-size: 0.85rem; margin-bottom: 4px;"></div>
+            <div id="store-phone-meta" class="store-meta"
+                style="justify-content: flex-start; color: #64748b; font-size: 0.85rem;"></div>
             <div style="margin-top: 12px; display: flex; align-items: center; gap: 16px;">
                 <span class="status-badge">Aberto Agora</span>
-                <button onclick="shareStore()" style="background:none; border:none; color:var(--primary); font-weight:700; cursor:pointer; font-size:0.9rem;">📤 Compartilhar</button>
+                <button onclick="shareStore()"
+                    style="background:none; border:none; color:var(--primary); font-weight:700; cursor:pointer; font-size:0.9rem;">📤
+                    Compartilhar</button>
             </div>
         </section>
 
         <nav class="search-nav-container">
             <div class="search-bar-inner">
                 <span>🔍</span>
-                <input type="text" id="product-search" placeholder="O que você está procurando?" oninput="filterProducts()">
+                <input type="text" id="product-search" placeholder="O que você está procurando?"
+                    oninput="filterProducts()">
             </div>
             <div id="category-scroller" class="category-scroller">
                 <!-- Categories will be injected here -->
@@ -647,7 +687,9 @@
                 <p>Nenhum produto encontrado.</p>
             </div>
             <div style="text-align: center; margin-top: 32px;">
-                <button id="load-more-btn" onclick="loadMoreProducts()" style="display:none; background: #fff; border: 1px solid #e2e8f0; padding: 10px 24px; border-radius: 20px; color: var(--primary); font-weight: 600; cursor: pointer;">Carregar Mais</button>
+                <button id="load-more-btn" onclick="loadMoreProducts()"
+                    style="display:none; background: #fff; border: 1px solid #e2e8f0; padding: 10px 24px; border-radius: 20px; color: var(--primary); font-weight: 600; cursor: pointer;">Carregar
+                    Mais</button>
             </div>
         </section>
     </main>
@@ -683,7 +725,8 @@
                 <span>Finalizar no WhatsApp</span>
                 <span>💬</span>
             </button>
-            <button onclick="clearCart()" style="background:none; border:none; color:#ef4444; width:100%; margin-top:16px; font-weight:600; cursor:pointer; font-size:0.9rem;">
+            <button onclick="clearCart()"
+                style="background:none; border:none; color:#ef4444; width:100%; margin-top:16px; font-weight:600; cursor:pointer; font-size:0.9rem;">
                 Cancelar e Limpar Sacola
             </button>
         </div>
@@ -692,17 +735,17 @@
     <script>
         // DESINSTALAÇÃO AGRESSIVA DE QUALQUER CACHE ANTIGO
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(regs) {
-                for(let reg of regs) reg.unregister();
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+                for (let reg of regs) reg.unregister();
             });
         }
-        
+
         const isLocal = (
-            window.location.hostname === 'localhost' || 
-            window.location.hostname === '127.0.0.1' || 
-            window.location.hostname.startsWith('192.168.') || 
-            window.location.hostname.startsWith('10.') || 
-            window.location.hostname === "" || 
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname.startsWith('192.168.') ||
+            window.location.hostname.startsWith('10.') ||
+            window.location.hostname === "" ||
             window.location.protocol === 'file:'
         );
 
@@ -737,7 +780,7 @@
             if (navigator.share) {
                 navigator.share({
                     title: storeData ? storeData.name : 'Mercado Local',
-                    text: `Confira o cardápio de ${storeData ? storeData.name : 'esta loja'} no Mercado Local!`,
+                    text: `Confira o catálgo de ${storeData ? storeData.name : 'esta loja'} no Mercado Local!`,
                     url: window.location.href
                 }).catch(console.error);
             } else {
@@ -762,7 +805,7 @@
             const res = await fetch(`${API_BASE_URL}/api/store/${storeId}`);
             if (!res.ok) throw new Error('Store not found');
             storeData = await res.json();
-            
+
             document.getElementById('store-name-title').innerText = storeData.name;
             document.getElementById('header-store-name').innerText = storeData.name;
             document.title = `${storeData.name} - Mercado Local`;
@@ -792,12 +835,12 @@
         async function fetchProducts() {
             const res = await fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}&page=1&limit=1000`);
             allProducts = await res.json();
-            
+
             // Extract categories
             const cats = [...new Set(allProducts.map(p => p.category))].filter(Boolean).sort();
             categories = ['Todos', ...cats];
             renderCategories();
-            
+
             filterProducts();
         }
 
@@ -812,7 +855,7 @@
             activeCategory = cat;
             renderCategories();
             filterProducts();
-            
+
             // Scroll to top of products if on mobile
             if (window.innerWidth < 600) {
                 const nav = document.querySelector('.search-nav-container');
@@ -822,7 +865,7 @@
 
         function filterProducts() {
             const searchTerm = document.getElementById('product-search').value.toLowerCase();
-            
+
             filteredProducts = allProducts.filter(p => {
                 const matchesSearch = p.name.toLowerCase().includes(searchTerm);
                 const matchesCategory = activeCategory === 'Todos' || p.category === activeCategory;
@@ -835,7 +878,7 @@
         function renderProducts() {
             const container = document.getElementById('products-container');
             const emptyState = document.getElementById('empty-state');
-            
+
             if (filteredProducts.length === 0) {
                 container.innerHTML = '';
                 emptyState.style.display = 'block';
@@ -847,13 +890,13 @@
                 const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
                 const currentPrice = isPromo ? p.promo_price : p.price;
                 const qty = cart[p.id] ? cart[p.id].qty : 0;
-                
+
                 return `
                     <div class="product-card" data-id="${p.id}">
                         <div class="product-image-container">
-                            ${p.image_url ? 
-                                `<img src="${getFullUrl(p.image_url)}" class="product-image" alt="${p.name}" onerror="this.src='https://placehold.co/400x400/f8fafc/64748b?text=Produto';">` : 
-                                `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#cbd5e1; background:#f8fafc; font-size:2rem; gap:8px;">
+                            ${p.image_url ?
+                        `<img src="${getFullUrl(p.image_url)}" class="product-image" alt="${p.name}" onerror="this.src='https://placehold.co/400x400/f8fafc/64748b?text=Produto';">` :
+                        `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#cbd5e1; background:#f8fafc; font-size:2rem; gap:8px;">
                                     <span>📦</span>
                                     <span style="font-size:0.6rem; font-weight:700; color:#94a3b8; text-transform:uppercase;">Sem Foto</span>
                                  </div>`}
@@ -879,7 +922,7 @@
 
         function updateCart(prodId, delta, event) {
             if (event) event.stopPropagation();
-            
+
             const product = allProducts.find(p => String(p.id) === String(prodId));
             if (!product) return;
 
@@ -908,7 +951,7 @@
             }
 
             updateCartSummary();
-            
+
             // ATUALIZAÇÃO DIRETA NO MODAL (Mais rápido e seguro)
             const modalOpen = document.getElementById('cart-modal').style.display === 'flex';
             if (modalOpen) {
@@ -927,7 +970,7 @@
         function updateCartSummary() {
             let total = 0;
             let count = 0;
-            
+
             for (const id in cart) {
                 total += cart[id].price * cart[id].qty;
                 count += cart[id].qty;
@@ -939,7 +982,7 @@
                 const prevCount = parseInt(headBadge.innerText) || 0;
                 headBadge.innerText = count;
                 headBadge.style.display = count > 0 ? 'block' : 'none';
-                
+
                 if (count !== prevCount) {
                     headBadge.style.transform = 'scale(1.4)';
                     setTimeout(() => headBadge.style.transform = 'scale(1)', 200);
@@ -950,7 +993,7 @@
             const floatingBar = document.getElementById('floating-cart-bar');
             const floatingCount = document.getElementById('floating-cart-count');
             const floatingTotal = document.getElementById('floating-cart-total');
-            
+
             if (floatingBar) {
                 if (count > 0) {
                     floatingCount.innerText = count;
@@ -960,7 +1003,7 @@
                     floatingBar.style.display = 'none';
                 }
             }
-            
+
             const modalTotal = document.getElementById('modal-cart-total');
             if (modalTotal) modalTotal.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
 
@@ -980,7 +1023,7 @@
             const list = document.getElementById('cart-items-list');
             if (!list) return;
             list.innerHTML = '';
-            
+
             const cartKeys = Object.keys(cart);
             if (cartKeys.length === 0) {
                 list.innerHTML = '<div style="text-align:center; padding:20px; color:#64748b;">Sua sacola está vazia</div>';
@@ -1031,7 +1074,7 @@
             let message = `🛒 *Novo Pedido - Mercado Local*\n\n`;
             message += `🏪 *Loja:* ${storeData.name}\n`;
             message += `--------------------------\n`;
-            
+
             let total = 0;
             for (const id in cart) {
                 const item = cart[id];
@@ -1039,7 +1082,7 @@
                 total += lineTotal;
                 message += `${item.qty}x ${item.name} - R$ ${lineTotal.toFixed(2)}\n`;
             }
-            
+
             message += `--------------------------\n`;
             message += `*Total: R$ ${total.toFixed(2)}*\n\n`;
             message += `Olá! Gostaria de finalizar este pedido.`;
