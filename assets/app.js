@@ -9,7 +9,7 @@ const isLocal = (
     window.location.protocol === 'file:'
 );
 
-const API_BASE_URL = isLocal ? 'http://localhost:3000' : 'https://preco-facil.onrender.com';
+const API_BASE_URL = isLocal ? 'http://localhost:3000' : '';
 const form = document.getElementById('search-form');
 const resultsContainer = document.getElementById('results');
 let promoInterval; // Global interval for timers

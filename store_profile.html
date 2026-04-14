@@ -706,7 +706,7 @@
             window.location.protocol === 'file:'
         );
 
-        const API_BASE_URL = isLocal ? 'http://localhost:3000' : 'https://preco-facil.onrender.com';
+        const API_BASE_URL = isLocal ? 'http://localhost:3000' : '';
 
         function getFullUrl(path) {
             if (!path || path === 'null' || String(path).trim() === '') return '';
