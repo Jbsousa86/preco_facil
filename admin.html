@@ -916,6 +916,13 @@
             sessionStorage.removeItem('admin_key');
             location.reload();
         }
+
+        // DESINSTALAÇÃO AGRESSIVA DE QUALQUER CACHE ANTIGO
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+                for (let reg of regs) reg.unregister();
+            });
+        }
     </script>
     <!-- Banner Modal -->
     <div id="banner-modal"

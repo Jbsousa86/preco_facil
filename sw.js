@@ -1,5 +1,5 @@
 // sw.js - Service Worker for PWA offline support
-const CACHE_NAME = 'preco-facil-v114';
+const CACHE_NAME = 'preco-facil-v115';
 const FILES_TO_CACHE = [
     '/',
     '/index.html',
@@ -15,7 +15,9 @@ self.addEventListener('install', (evt) => {
     evt.waitUntil(
         caches.open(CACHE_NAME).then(async (cache) => {
             try {
-                await cache.addAll(FILES_TO_CACHE);
+                // Força o navegador a buscar do servidor, ignorando o cache de disco HTTP
+                const requests = FILES_TO_CACHE.map(url => new Request(url, { cache: 'reload' }));
+                await cache.addAll(requests);
             } catch (err) {
                 console.warn('Cache error:', err);
             }

@@ -896,6 +896,13 @@
         // Removed redundant footer script
 
         loadProducts();
+        
+        // DESINSTALAÇÃO AGRESSIVA DE QUALQUER CACHE ANTIGO
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+                for (let reg of regs) reg.unregister();
+            });
+        }
     </script>
 </body>
 
