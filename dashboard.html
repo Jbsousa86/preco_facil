@@ -801,12 +801,9 @@
         async function saveStoreIdentity() {
             const logoInput = document.getElementById('store-logo-input');
             const bannerInput = document.getElementById('store-banner-input');
+            const phoneInput = document.getElementById('store-phone-input');
             const btn = document.getElementById('id-save-btn');
             
-            if (!logoInput.files[0] && !bannerInput.files[0]) {
-                return alert('Selecione pelo menos um arquivo para alterar.');
-            }
-
             btn.disabled = true;
             btn.textContent = "Fazendo upload...";
 
@@ -832,7 +829,7 @@
                 const res = await fetch(`${API_BASE_URL}/api/merchant/update-identity`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ store_id: storeId, logo_url: logoUrl, banner_url: bannerUrl })
+                    body: JSON.stringify({ store_id: storeId, logo_url: logoUrl, banner_url: bannerUrl, phone: phoneInput.value.trim() })
                 });
 
                 if (res.ok) {

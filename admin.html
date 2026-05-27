@@ -814,6 +814,36 @@
             }
         });
 
+        function openEditModal(id) {
+            const store = allStores.find(s => s.id === id);
+            if (!store) return;
+            document.getElementById('edit-id').value = store.id;
+            document.getElementById('edit-name').value = store.name;
+            document.getElementById('edit-phone').value = store.phone || '';
+            document.getElementById('edit-pass').value = store.password || '';
+            document.getElementById('edit-street').value = store.street || '';
+            document.getElementById('edit-number').value = store.number || '';
+            document.getElementById('edit-neighborhood').value = store.neighborhood || '';
+            document.getElementById('edit-store-modal').style.display = 'flex';
+        }
+        function closeEditModal() { document.getElementById('edit-store-modal').style.display = 'none'; }
+
+        document.getElementById('edit-store-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            const body = {
+                name: document.getElementById('edit-name').value,
+                password: document.getElementById('edit-pass').value,
+                phone: document.getElementById('edit-phone').value,
+                street: document.getElementById('edit-street').value,
+                number: document.getElementById('edit-number').value,
+                neighborhood: document.getElementById('edit-neighborhood').value
+            };
+            const res = await fetchAdmin(`api/admin/stores/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+            if (res.ok) { closeEditModal(); loadStores(); alert('Loja atualizada com sucesso!'); }
+            else { const data = await res.json(); alert('Erro: ' + data.error); }
+        });
+
         async function toggleBlock(id, current) {
             if (!confirm('Deseja alterar o status desta loja?')) return;
             const res = await fetchAdmin(`api/admin/stores/${id}/block`, {
