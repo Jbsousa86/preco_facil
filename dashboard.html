@@ -538,6 +538,11 @@
                         <h3 class="card-title">🏪 Identidade da Loja</h3>
                         <p style="font-size: 0.75rem; color: #64748b; margin-bottom: 16px;">Personalize a logo e o banner do seu cardápio online.</p>
                         
+                        <div class="form-group" style="margin-bottom: 16px;">
+                            <label for="store-phone-input">Telefone / WhatsApp da Loja</label>
+                            <input type="text" id="store-phone-input" class="form-control" placeholder="Ex: 63992225774 (com DDD, apenas números)">
+                        </div>
+
                         <div class="form-group">
                             <label>Logo da Empresa</label>
                             <label class="custom-file-upload" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
@@ -902,10 +907,26 @@
 
         loadProducts();
         
-        // DESINSTALAÇÃO AGRESSIVA DE QUALQUER CACHE ANTIGO
+        // DESINSTALAÇÃO AGRESSIVA DE QUALQUER CACHE ANTIGO E LIMPEZA DE CACHE STORAGE
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function (regs) {
-                for (let reg of regs) reg.unregister();
+                let hasActive = regs.length > 0;
+                for (let reg of regs) {
+                    reg.unregister();
+                    console.log('SW Desinstalado para atualização');
+                }
+                if (hasActive) {
+                    if ('caches' in window) {
+                        caches.keys().then(function(names) {
+                            return Promise.all(names.map(name => caches.delete(name)));
+                        }).then(function() {
+                            console.log('Caches removidos, recarregando...');
+                            location.reload();
+                        });
+                    } else {
+                        location.reload();
+                    }
+                }
             });
         }
     </script>
