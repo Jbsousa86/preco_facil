@@ -682,6 +682,11 @@
                 const storeInfo = await storeRes.json();
                 document.getElementById('stat-whatsapp-clicks').textContent = storeInfo.whatsapp_clicks || 0;
 
+                const phoneInput = document.getElementById('store-phone-input');
+                if (phoneInput && storeInfo.phone) {
+                    phoneInput.value = storeInfo.phone;
+                }
+
                 const res = await fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}&limit=1000`);
                 merchantProducts = await res.json();
                 
