@@ -137,10 +137,11 @@
         }
 
         .store-hero {
-            height: 180px;
+            height: 200px;
             width: 100%;
-            overflow: hidden;
-            background: #e2e8f0;
+            overflow: visible; /* Permitir que a logo sobreposta flutue */
+            background: #cbd5e1;
+            position: relative;
         }
 
         .store-banner {
@@ -149,17 +150,44 @@
             object-fit: cover;
         }
 
+        .store-logo-wrapper {
+            position: absolute;
+            bottom: -40px;
+            left: 24px;
+            width: 90px;
+            height: 90px;
+            border-radius: 20px;
+            background: #fff;
+            padding: 4px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .store-avatar-main-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+            object-fit: cover;
+        }
+
         .store-details {
             background: #fff;
-            padding: 20px 16px;
-            margin-bottom: 8px;
+            padding: 56px 24px 20px 24px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            border-radius: 0 0 24px 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
         }
 
         /* Search & Categories */
         .search-nav-container {
             position: sticky;
             top: 0;
-            background: rgba(248, 250, 252, 0.9);
+            background: rgba(248, 250, 252, 0.95);
             backdrop-filter: blur(8px);
             z-index: 100;
             margin: 16px -16px 0;
@@ -168,12 +196,18 @@
 
         .search-bar-inner {
             background: #fff;
-            border-radius: 12px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
-            padding: 8px 16px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
+            padding: 10px 18px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            border: 1px solid #cbd5e1;
+            transition: border-color 0.2s;
+        }
+
+        .search-bar-inner:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
         .search-bar-inner input {
@@ -188,8 +222,8 @@
         .category-scroller {
             display: flex;
             overflow-x: auto;
-            gap: 12px;
-            padding: 12px 0 4px;
+            gap: 10px;
+            padding: 14px 0 4px;
             scrollbar-width: none;
         }
 
@@ -207,13 +241,20 @@
             font-weight: 600;
             color: #64748b;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .category-chip:hover {
+            border-color: #cbd5e1;
+            color: var(--text-main);
+            background: #f8fafc;
         }
 
         .category-chip.active {
             background: var(--primary);
             color: #fff;
             border-color: var(--primary);
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
         }
 
         /* Products Grid */
@@ -221,40 +262,39 @@
             padding: 16px 0;
         }
 
-        /* Products Grid - Increased specificity to override global styles */
         #products-container.products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 16px;
             padding: 4px;
         }
 
         @media (max-width: 480px) {
             #products-container.products-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
+                gap: 10px;
             }
         }
 
-        /* Product Card - Increased specificity */
+        /* Product Card - Marketplace Style */
         #products-container .product-card {
-            position: relative;
-            /* FUNDAMENTAL para os botões ficarem no lugar certo */
             background: #fff;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             border: 1px solid #e2e8f0;
-            transition: all 0.2s;
-            box-shadow: none;
-            /* Reset global shadows */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            cursor: pointer;
+            position: relative;
             margin-bottom: 0;
         }
 
         #products-container .product-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transform: translateY(-6px);
+            box-shadow: 0 12px 24px -8px rgba(37, 99, 235, 0.15);
+            border-color: #cbd5e1;
         }
 
         .product-image-container {
@@ -262,58 +302,64 @@
             aspect-ratio: 1;
             background: #f8fafc;
             position: relative;
-        }
-
-        .product-content {
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-
-        .product-name {
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            height: 2.8em;
             overflow: hidden;
-        }
-
-        .current-price {
-            font-size: 1rem;
-            font-weight: 800;
-            color: var(--text-main);
         }
 
         .product-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        #products-container .product-card:hover .product-image {
+            transform: scale(1.06);
         }
 
         .promo-pill {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            background: var(--primary);
+            top: 10px;
+            left: 10px;
+            background: #ef4444;
             color: #fff;
-            padding: 2px 8px;
+            padding: 4px 8px;
             border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2);
+            z-index: 2;
+        }
+
+        .product-rating-badge {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(4px);
+            color: #1e293b;
+            padding: 3px 6px;
+            border-radius: 6px;
             font-size: 0.7rem;
             font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            z-index: 2;
         }
 
         .product-content {
-            padding: 8px;
-            flex-grow: 1;
+            padding: 12px;
             display: flex;
             flex-direction: column;
+            flex-grow: 1;
         }
 
         .product-category {
-            font-size: 0.7rem;
-            color: #94a3b8;
+            font-size: 0.65rem;
+            color: var(--text-muted);
             text-transform: uppercase;
+            font-weight: 700;
             letter-spacing: 0.05em;
             margin-bottom: 4px;
         }
@@ -321,69 +367,190 @@
         .product-name {
             font-size: 0.85rem;
             font-weight: 600;
-            color: #0f172a;
-            margin: 0 0 4px;
+            color: var(--text-main);
+            margin: 0 0 8px;
+            line-height: 1.4;
+            height: 2.8em;
+            overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             line-clamp: 2;
             -webkit-box-orient: vertical;
-            overflow: hidden;
-            min-height: 2.4em;
         }
 
         .price-container {
             margin-top: auto;
             display: flex;
-            flex-direction: column;
+            align-items: baseline;
+            gap: 6px;
         }
 
         .old-price {
             font-size: 0.75rem;
-            color: #94a3b8;
+            color: var(--text-muted);
             text-decoration: line-through;
         }
 
         .current-price {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--success);
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-main);
         }
 
-        .add-btn {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            width: 36px;
-            height: 36px;
-            background: var(--primary);
-            color: #fff;
-            border-radius: 50%;
+        .product-tag-free {
+            font-size: 0.7rem;
+            color: #10b981;
+            font-weight: 700;
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        .add-btn-marketplace {
+            width: calc(100% - 24px);
+            margin: 0 auto 12px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: 1px solid #dbeafe;
+            padding: 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-            transition: transform 0.2s;
-            font-size: 1.2rem;
-            z-index: 5;
-            border: none;
+            gap: 8px;
+            position: relative;
+            box-shadow: none;
         }
 
-        .card-qty-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
+        .add-btn-marketplace:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+        }
+
+        .card-qty-badge-new {
             background: #ef4444;
             color: #fff;
             font-size: 0.7rem;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Product Details Modal Styling */
+        .product-details-modal-content {
+            max-width: 720px !important;
+            padding: 32px !important;
+            overflow: hidden !important;
+        }
+
+        .product-details-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 600px) {
+            .product-details-layout {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .product-details-modal-content {
+                max-width: 100% !important;
+                width: 100% !important;
+                border-radius: 24px 24px 0 0 !important;
+                position: fixed !important;
+                bottom: 0 !important;
+                max-height: 85vh !important;
+                animation: slideUpFloat 0.3s ease-out !important;
+            }
+        }
+
+        .product-details-image-side {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+
+        .product-details-image-side img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .details-promo-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: #ef4444;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+            display: none;
+        }
+
+        .product-details-info-side {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .details-category {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .details-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0 0 12px;
+            line-height: 1.3;
+        }
+
+        .details-price-box {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .details-old-price {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            text-decoration: line-through;
+            display: none;
+        }
+
+        .details-current-price {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--success);
         }
 
         .quantity-control {
@@ -650,20 +817,36 @@
 
     <section class="store-hero">
         <img id="store-banner" src="assets/default_banner.png" class="store-banner" alt="Banner da Loja">
+        <div class="store-logo-wrapper">
+            <img id="store-avatar-main" src="https://placehold.co/150" class="store-avatar-main-img" alt="Logo da Loja">
+        </div>
     </section>
 
     <main>
         <section class="store-details">
-            <h1 id="store-name-title" style="margin:0 0 4px; font-size:1.5rem; font-weight:700;">Carregando...</h1>
-            <div id="store-address" class="store-meta"
-                style="justify-content: flex-start; color: #64748b; font-size: 0.85rem; margin-bottom: 4px;"></div>
-            <div id="store-phone-meta" class="store-meta"
-                style="justify-content: flex-start; color: #64748b; font-size: 0.85rem;"></div>
-            <div style="margin-top: 12px; display: flex; align-items: center; gap: 16px;">
-                <span class="status-badge">Aberto Agora</span>
-                <button onclick="shareStore()"
-                    style="background:none; border:none; color:var(--primary); font-weight:700; cursor:pointer; font-size:0.9rem;">📤
-                    Compartilhar</button>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+                <div>
+                    <h1 id="store-name-title" style="margin:0 0 8px; font-size:1.75rem; font-weight:700; color: var(--text-main);">Carregando...</h1>
+                    <div id="store-address" class="store-meta"
+                        style="justify-content: flex-start; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;"></div>
+                    <div id="store-phone-meta" class="store-meta"
+                        style="justify-content: flex-start; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; gap: 6px;"></div>
+                </div>
+                <div class="store-badges-container" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+                    <div style="display: flex; align-items: center; gap: 6px; background: #fffbeb; color: #b45309; padding: 6px 12px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; border: 1px solid #fef3c7;">
+                        <span>⭐</span> <span id="store-rating-val">5.0</span> <span style="color:#d97706; font-weight:500; font-size:0.75rem;">(100+ avaliações)</span>
+                    </div>
+                    <div style="display: flex; gap: 6px;">
+                        <span style="background: #ecfdf5; color: #047857; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; border: 1px solid #d1fae5;">⚡ Entrega Rápida</span>
+                        <span style="background: #eff6ff; color: #1d4ed8; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; border: 1px solid #dbeafe;">🛡️ Compra Segura</span>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+                <span class="status-badge" style="background: var(--success); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-block;">🟢 Aberto agora</span>
+                <button onclick="shareStore()" class="share-btn" style="margin-top: 0; padding: 8px 16px;">
+                    <span>📤</span> Compartilhar Loja
+                </button>
             </div>
         </section>
 
@@ -729,6 +912,51 @@
                 style="background:none; border:none; color:#ef4444; width:100%; margin-top:16px; font-weight:600; cursor:pointer; font-size:0.9rem;">
                 Cancelar e Limpar Sacola
             </button>
+        </div>
+    </div>
+
+    <!-- Product Details Modal -->
+    <div id="product-details-modal" class="modal" onclick="if(event.target == this) closeProductDetails()">
+        <div class="modal-content product-details-modal-content">
+            <button class="modal-close" onclick="closeProductDetails()">×</button>
+            <div class="product-details-layout">
+                <div class="product-details-image-side">
+                    <img id="details-product-img" src="" alt="Produto">
+                    <div id="details-promo-badge" class="details-promo-badge"></div>
+                </div>
+                <div class="product-details-info-side">
+                    <span id="details-product-category" class="details-category">CATEGORIA</span>
+                    <h2 id="details-product-name" class="details-title">Nome do Produto</h2>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                        <span style="color: #eab308;">★★★★★</span>
+                        <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">(4.9 estrelas / 48 vendas)</span>
+                    </div>
+
+                    <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 24px;">
+                        Garantia de procedência e qualidade direto do produtor. Produto inspecionado e embalado sob rigorosos controles de higiene. Perfeito para o consumo de sua família!
+                    </p>
+
+                    <div class="details-price-box">
+                        <div id="details-old-price" class="details-old-price">R$ 0,00</div>
+                        <div id="details-current-price" class="details-current-price">R$ 0,00</div>
+                    </div>
+
+                    <div style="margin-bottom: 24px; padding-top: 16px; border-top: 1px solid #f1f5f9; display: flex; align-items: center; gap: 16px;">
+                        <span style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">Quantidade:</span>
+                        <div class="quantity-control" style="display:flex; background:#f1f5f9; padding:4px; border-radius:10px;">
+                            <button class="qty-btn" style="width:36px; height:36px; border-radius: 8px;" onclick="updateDetailsQty(-1)">-</button>
+                            <span id="details-qty-val" style="font-weight:700; margin: 0 16px; min-width:24px; text-align:center; font-size:1.1rem; align-self:center;">1</span>
+                            <button class="qty-btn" style="width:36px; height:36px; border-radius: 8px;" onclick="updateDetailsQty(1)">+</button>
+                        </div>
+                    </div>
+
+                    <button id="details-add-btn" class="checkout-btn" style="margin-top: 0; background: var(--primary);" onclick="addDetailsToCart()">
+                        <span>Adicionar R$ 0,00 à Sacola</span>
+                        <span>🛒</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -833,6 +1061,15 @@
                     headLogo.src = logoUrl;
                     headLogo.style.display = 'block';
                 }
+                const avatarMain = document.getElementById('store-avatar-main');
+                if (avatarMain) {
+                    avatarMain.src = logoUrl;
+                }
+            } else {
+                const avatarMain = document.getElementById('store-avatar-main');
+                if (avatarMain) {
+                    avatarMain.src = 'https://placehold.co/150x150?text=Loja';
+                }
             }
 
             if (storeData.banner_url) {
@@ -906,17 +1143,25 @@
                 const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
                 const currentPrice = isPromo ? p.promo_price : p.price;
                 const qty = cart[p.id] ? cart[p.id].qty : 0;
+                
+                // Cálculo de desconto dinâmico
+                const discountPct = isPromo ? Math.round((1 - (p.promo_price / p.price)) * 100) : 0;
+                
+                // Mock de avaliações consistente por ID
+                const ratingMock = (4.4 + (p.id % 7) * 0.1).toFixed(1);
 
                 return `
-                    <div class="product-card" data-id="${p.id}">
+                    <div class="product-card" data-id="${p.id}" onclick="openProductDetails(${p.id})">
                         <div class="product-image-container">
                             ${p.image_url ?
-                        `<img src="${getFullUrl(p.image_url)}" class="product-image" alt="${p.name}" onerror="this.src='https://placehold.co/400x400/f8fafc/64748b?text=Produto';">` :
-                        `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#cbd5e1; background:#f8fafc; font-size:2rem; gap:8px;">
+                                `<img src="${getFullUrl(p.image_url)}" class="product-image" alt="${p.name}" onerror="this.src='https://placehold.co/400x400/f8fafc/64748b?text=Produto';">` :
+                                `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#cbd5e1; background:#f8fafc; font-size:2rem; gap:8px;">
                                     <span>📦</span>
                                     <span style="font-size:0.6rem; font-weight:700; color:#94a3b8; text-transform:uppercase;">Sem Foto</span>
-                                 </div>`}
-                            ${isPromo ? `<div class="promo-pill">Oferta</div>` : ''}
+                                 </div>`
+                            }
+                            ${isPromo ? `<div class="promo-pill">-${discountPct}% OFF</div>` : ''}
+                            <div class="product-rating-badge">⭐ ${ratingMock}</div>
                         </div>
                         <div class="product-content">
                             <span class="product-category">${p.category || 'Geral'}</span>
@@ -925,15 +1170,101 @@
                                 ${isPromo ? `<span class="old-price">R$ ${parseFloat(p.price).toFixed(2)}</span>` : ''}
                                 <span class="current-price">R$ ${parseFloat(currentPrice).toFixed(2)}</span>
                             </div>
-                            
-                            <button class="add-btn" onclick="updateCart('${p.id}', 1, event)">
-                                <span>+</span>
-                                <div id="qty-badge-${p.id}" class="card-qty-badge" style="display:${qty > 0 ? 'flex' : 'none'}">${qty}</div>
-                            </button>
+                            <span class="product-tag-free">Frete Grátis</span>
                         </div>
+                        <button class="add-btn-marketplace" onclick="updateCart('${p.id}', 1, event)">
+                            <span>+ Adicionar</span>
+                            <div id="qty-badge-${p.id}" class="card-qty-badge-new" style="display:${qty > 0 ? 'flex' : 'none'}">${qty}</div>
+                        </button>
                     </div>
                 `;
             }).join('');
+        }
+
+        // --- Logica de Detalhes do Produto ---
+        let selectedProduct = null;
+        let selectedProductQty = 1;
+
+        function openProductDetails(id) {
+            const product = allProducts.find(p => String(p.id) === String(id));
+            if (!product) return;
+
+            selectedProduct = product;
+            const inCart = cart[id];
+            selectedProductQty = inCart ? inCart.qty : 1;
+
+            const isPromo = product.promo_price && new Date(product.promo_expires_at) > new Date();
+            const currentPrice = isPromo ? product.promo_price : product.price;
+
+            document.getElementById('details-product-img').src = product.image_url ? getFullUrl(product.image_url) : 'https://placehold.co/400x400/f8fafc/64748b?text=Produto';
+            document.getElementById('details-product-category').innerText = product.category || 'Geral';
+            document.getElementById('details-product-name').innerText = product.name;
+
+            const oldPriceEl = document.getElementById('details-old-price');
+            const promoBadge = document.getElementById('details-promo-badge');
+
+            if (isPromo) {
+                const discountPct = Math.round((1 - (product.promo_price / product.price)) * 100);
+                oldPriceEl.innerText = `R$ ${parseFloat(product.price).toFixed(2)}`;
+                oldPriceEl.style.display = 'inline';
+                promoBadge.innerText = `-${discountPct}% OFF`;
+                promoBadge.style.display = 'block';
+            } else {
+                oldPriceEl.style.display = 'none';
+                promoBadge.style.display = 'none';
+            }
+
+            document.getElementById('details-current-price').innerText = `R$ ${parseFloat(currentPrice).toFixed(2)}`;
+            document.getElementById('details-qty-val').innerText = selectedProductQty;
+
+            updateDetailsModalBtnPrice();
+
+            document.getElementById('product-details-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeProductDetails() {
+            document.getElementById('product-details-modal').style.display = 'none';
+            if (document.getElementById('cart-modal').style.display !== 'flex') {
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function updateDetailsQty(delta) {
+            selectedProductQty += delta;
+            if (selectedProductQty < 1) selectedProductQty = 1;
+            document.getElementById('details-qty-val').innerText = selectedProductQty;
+            updateDetailsModalBtnPrice();
+        }
+
+        function updateDetailsModalBtnPrice() {
+            if (!selectedProduct) return;
+            const isPromo = selectedProduct.promo_price && new Date(selectedProduct.promo_expires_at) > new Date();
+            const currentPrice = isPromo ? selectedProduct.promo_price : selectedProduct.price;
+            const total = currentPrice * selectedProductQty;
+            document.getElementById('details-add-btn').querySelector('span').innerText = `Adicionar R$ ${total.toFixed(2).replace('.', ',')} à Sacola`;
+        }
+
+        function addDetailsToCart() {
+            if (!selectedProduct) return;
+            
+            const prodId = selectedProduct.id;
+            const isPromo = selectedProduct.promo_price && new Date(selectedProduct.promo_expires_at) > new Date();
+            const price = isPromo ? selectedProduct.promo_price : selectedProduct.price;
+
+            if (!cart[prodId]) {
+                cart[prodId] = {
+                    id: selectedProduct.id,
+                    name: selectedProduct.name,
+                    price: price,
+                    qty: 0
+                };
+            }
+            cart[prodId].qty = selectedProductQty;
+
+            updateCartSummary();
+            renderProducts();
+            closeProductDetails();
         }
 
         function updateCart(prodId, delta, event) {
