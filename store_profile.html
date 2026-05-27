@@ -471,7 +471,13 @@
                 position: fixed !important;
                 bottom: 0 !important;
                 max-height: 85vh !important;
+                padding: 24px 20px !important;
+                overflow-y: auto !important; /* Permitir rolagem vertical no mobile */
                 animation: slideUpFloat 0.3s ease-out !important;
+            }
+            .product-details-image-side {
+                aspect-ratio: 16/9 !important; /* Altura menor no celular */
+                height: 180px !important;
             }
         }
 
