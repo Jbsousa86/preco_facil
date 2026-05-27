@@ -271,6 +271,13 @@
             gap: 12px;
         }
 
+        @media (max-width: 480px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+        }
+
         .product-item {
             background: #fff;
             border-radius: var(--radius-md);

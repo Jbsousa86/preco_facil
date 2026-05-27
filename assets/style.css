@@ -350,7 +350,8 @@ main {
 
 @media (max-width: 600px) {
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
   }
   .product-card img { height: 110px; }
 }
