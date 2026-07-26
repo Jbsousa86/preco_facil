@@ -817,19 +817,20 @@
                 container.innerHTML = merchantProducts.map((p, index) => {
                     const hasPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
                     
-                    let promoBadge = '';
+                    let promoBanner = '';
                     if (hasPromo) {
                         const expiresAt = new Date(p.promo_expires_at);
                         const hoursLeft = Math.max(0, Math.floor((expiresAt - new Date()) / (1000 * 60 * 60)));
                         const minsLeft = Math.max(0, Math.floor(((expiresAt - new Date()) % (1000 * 60 * 60)) / (1000 * 60)));
-                        promoBadge = `<div style="background: #fee2e2; color: #ef4444; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 8px; font-weight: 700;">🔥 Expira em ${hoursLeft}h ${minsLeft}m</div>`;
+                        promoBanner = `<div style="position: absolute; top: 0; left: 0; right: 0; background: #ef4444; color: #fff; font-size: 0.75rem; font-weight: 800; text-align: center; padding: 6px; z-index: 2; box-shadow: 0 2px 4px rgba(239,68,68,0.3);">🔥 Expira em ${hoursLeft}h ${minsLeft}m</div>`;
                     } else if (p.promo_price) {
-                        promoBadge = `<div style="background: #f1f5f9; color: #64748b; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 8px; font-weight: 700;">⏱️ Oferta Expirada</div>`;
+                        promoBanner = `<div style="position: absolute; top: 0; left: 0; right: 0; background: #64748b; color: #fff; font-size: 0.75rem; font-weight: 800; text-align: center; padding: 6px; z-index: 2;">⏱️ Oferta Expirada</div>`;
                     }
 
                     return `
-                    <div class="product-item">
-                        <div class="product-img-wrapper">
+                    <div class="product-item" style="position: relative; padding-top: ${p.promo_price ? '28px' : '0'};">
+                        ${promoBanner}
+                        <div class="product-img-wrapper" style="border-radius: ${p.promo_price ? '0' : '8px 8px 0 0'};">
                             ${p.image_url ? `<img src="${getFullUrl(p.image_url)}" class="product-img" alt="${p.name}">` : '📦'}
                         </div>
                         <div class="product-body">
@@ -838,7 +839,6 @@
                             <div class="product-price">
                                 ${hasPromo ? `<span style="font-size:0.75rem; text-decoration:line-through; color:var(--gray-600);">R$ ${parseFloat(p.price).toFixed(2).replace('.', ',')}</span><br>R$ ${parseFloat(p.promo_price).toFixed(2).replace('.', ',')}` : `R$ ${parseFloat(p.price).toFixed(2).replace('.', ',')}`}
                             </div>
-                            ${promoBadge}
                         </div>
                         <div class="product-actions">
                             <button class="btn-sm btn-edit" onclick="triggerEdit(${index})">✏️ Editar</button>
