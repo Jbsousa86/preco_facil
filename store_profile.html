@@ -946,8 +946,13 @@
                     </p>
 
                     <div class="details-price-box">
-                        <div id="details-old-price" class="details-old-price">R$ 0,00</div>
-                        <div id="details-current-price" class="details-current-price">R$ 0,00</div>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <div style="display: flex; align-items: baseline; gap: 10px;">
+                                <div id="details-old-price" class="details-old-price">R$ 0,00</div>
+                                <div id="details-current-price" class="details-current-price">R$ 0,00</div>
+                            </div>
+                            <div id="details-promo-timer-container"></div>
+                        </div>
                     </div>
 
                     <div style="margin-bottom: 24px; padding-top: 16px; border-top: 1px solid #f1f5f9; display: flex; align-items: center; gap: 16px;">
@@ -1175,10 +1180,11 @@
                             <span class="product-category">${p.category || 'Geral'}</span>
                             <h3 class="product-name">${p.name}</h3>
                             <div class="price-container">
-                                ${isPromo ? `<span class="old-price">R$ ${parseFloat(p.price).toFixed(2)}</span>` : ''}
-                                <span class="current-price">R$ ${parseFloat(currentPrice).toFixed(2)}</span>
+                                ${isPromo ? `<span class="old-price">R$ ${parseFloat(p.price).toFixed(2).replace('.', ',')}</span>` : ''}
+                                <span class="current-price">R$ ${parseFloat(currentPrice).toFixed(2).replace('.', ',')}</span>
                             </div>
                             <span class="product-tag-free">Frete Grátis</span>
+                            ${isPromo ? `<div class="promo-timer" data-expires="${p.promo_expires_at}" style="font-size: 0.65rem; color: #ef4444; font-weight: 700; margin-top: 6px; background: #fee2e2; padding: 4px; border-radius: 4px; display: inline-block; text-align: center;"></div>` : ''}
                         </div>
                         <button class="add-btn-marketplace" onclick="updateCart('${p.id}', 1, event)">
                             <span>+ Adicionar</span>
@@ -1187,6 +1193,8 @@
                     </div>
                 `;
             }).join('');
+            
+            if (typeof startPromoTimers === 'function') startPromoTimers();
         }
 
         // --- Logica de Detalhes do Produto ---
@@ -1213,22 +1221,32 @@
 
             if (isPromo) {
                 const discountPct = Math.round((1 - (product.promo_price / product.price)) * 100);
-                oldPriceEl.innerText = `R$ ${parseFloat(product.price).toFixed(2)}`;
+                oldPriceEl.innerText = `R$ ${parseFloat(product.price).toFixed(2).replace('.', ',')}`;
                 oldPriceEl.style.display = 'inline';
                 promoBadge.innerText = `-${discountPct}% OFF`;
                 promoBadge.style.display = 'block';
+                
+                const timerContainer = document.getElementById('details-promo-timer-container');
+                if (timerContainer) {
+                    timerContainer.innerHTML = `<div class="promo-timer" data-expires="${product.promo_expires_at}" style="font-size: 0.8rem; color: #ef4444; font-weight: 700; background: #fee2e2; padding: 4px 8px; border-radius: 6px; display: inline-block;"></div>`;
+                }
             } else {
                 oldPriceEl.style.display = 'none';
                 promoBadge.style.display = 'none';
+                
+                const timerContainer = document.getElementById('details-promo-timer-container');
+                if (timerContainer) timerContainer.innerHTML = '';
             }
 
-            document.getElementById('details-current-price').innerText = `R$ ${parseFloat(currentPrice).toFixed(2)}`;
+            document.getElementById('details-current-price').innerText = `R$ ${parseFloat(currentPrice).toFixed(2).replace('.', ',')}`;
             document.getElementById('details-qty-val').innerText = selectedProductQty;
 
             updateDetailsModalBtnPrice();
 
             document.getElementById('product-details-modal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            
+            if (typeof startPromoTimers === 'function') startPromoTimers();
         }
 
         function closeProductDetails() {
