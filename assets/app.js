@@ -141,6 +141,7 @@ function renderResults(data) {
 }
 
 function startPromoTimers() {
+    if (promoInterval) clearInterval(promoInterval);
     const update = () => {
         document.querySelectorAll('.promo-timer').forEach(el => {
             const end = new Date(el.dataset.expires).getTime();
