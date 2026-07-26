@@ -688,11 +688,6 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- Footer Address/Link -->
-                            <div style="background: #fbbf24; padding: 20px 40px; text-align: center; z-index: 2;">
-                                <span style="font-size: 1.5rem; font-weight: 800; color: #1e293b;">Catálogo completo e pedidos online em: <span style="color: #0f172a; text-decoration: underline;">preco-facil.onrender.com</span></span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1123,7 +1118,7 @@
                             await navigator.share({
                                 files: [file],
                                 title: 'Ofertas Imperdíveis - ' + storeName,
-                                text: 'Confira as promoções exclusivas da nossa loja! Aproveite antes que acabe. Faça seu pedido!'
+                                text: `🔥 Confira as ofertas imperdíveis de ${storeName}!\n\n🛒 Faça seu pedido direto pelo nosso catálogo online e veja mais:\n🔗 https://preco-facil.onrender.com\n\nAproveite antes que acabe!`
                             });
                         } catch (err) {
                             console.log('Compartilhamento cancelado ou falhou', err);
