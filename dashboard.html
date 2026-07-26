@@ -1073,6 +1073,9 @@
             btn.innerHTML = '⏳ Gerando Cartaz...';
             btn.disabled = true;
 
+            const scaleWrapper = document.getElementById('poster-scale-wrapper');
+            if (scaleWrapper) scaleWrapper.style.transform = 'none';
+
             try {
                 const element = document.getElementById('poster-container');
                 const canvas = await html2canvas(element, { 
@@ -1082,6 +1085,8 @@
                     backgroundColor: '#ffffff'
                 });
                 
+                if (scaleWrapper) scaleWrapper.style.transform = 'scale(0.3)';
+
                 const link = document.createElement('a');
                 link.download = `cartaz-ofertas-${storeName.replace(/\s+/g, '-').toLowerCase()}.png`;
                 link.href = canvas.toDataURL('image/png');
@@ -1089,6 +1094,7 @@
             } catch(e) {
                 console.error(e);
                 alert('Erro ao gerar a imagem do cartaz. Tente novamente.');
+                if (scaleWrapper) scaleWrapper.style.transform = 'scale(0.3)';
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -1101,6 +1107,9 @@
             btn.innerHTML = '⏳ Preparando...';
             btn.disabled = true;
 
+            const scaleWrapper = document.getElementById('poster-scale-wrapper');
+            if (scaleWrapper) scaleWrapper.style.transform = 'none';
+
             try {
                 const element = document.getElementById('poster-container');
                 const canvas = await html2canvas(element, { 
@@ -1110,6 +1119,8 @@
                     backgroundColor: '#ffffff'
                 });
                 
+                if (scaleWrapper) scaleWrapper.style.transform = 'scale(0.3)';
+
                 canvas.toBlob(async (blob) => {
                     const file = new File([blob], `ofertas-${storeName.replace(/\s+/g, '-').toLowerCase()}.png`, { type: 'image/png' });
                     
@@ -1133,6 +1144,7 @@
             } catch(e) {
                 console.error(e);
                 alert('Erro ao gerar o cartaz para compartilhamento.');
+                if (scaleWrapper) scaleWrapper.style.transform = 'scale(0.3)';
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
