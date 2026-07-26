@@ -88,7 +88,7 @@ function renderResults(data) {
                     const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
                     const finalPrice = isPromo ? p.promo_price : p.price;
                     return `
-                    <div onclick="window.location.href='store_profile.html?id=${p.store_id}'" style="background:#fff; padding:10px; border-radius:12px; cursor:pointer; border:1px solid #f1f5f9; transition: transform 0.2s; display: flex; flex-direction: column; gap: 6px;">
+                    <div onclick="window.location.href='store_profile.html?id=${p.store_id}'" style="background:#fff; padding:10px; border-radius:12px; cursor:pointer; border:1px solid #f1f5f9; transition: transform 0.2s; display: flex; flex-direction: column; gap: 6px; position: relative;">
                         <div style="width:100%; height:90px; background:#f1f5f9; border-radius:8px; overflow:hidden; position:relative;">
                             ${p.image_url ? `<img src="${getFullUrl(p.image_url)}" style="width:100%; height:100%; object-fit:cover;">` : '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#cbd5e1;">📦</div>'}
                             ${isPromo ? `<div style="position:absolute; top:4px; right:4px; background:var(--primary); color:#fff; font-size:0.55rem; padding:2px 6px; border-radius:4px; font-weight:800;">OFERTA</div>` : ''}
@@ -96,7 +96,8 @@ function renderResults(data) {
                         <div>
                             <span style="font-size:0.6rem; font-weight:700; color:#94a3b8; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block;">${p.store_name}</span>
                             <h4 style="margin:2px 0; font-size:0.8rem; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:2.4em;">${p.product_name}</h4>
-                            <div style="font-size:1rem; font-weight:800; color:var(--success);">R$ ${parseFloat(finalPrice).toFixed(2)}</div>
+                            <div style="font-size:1rem; font-weight:800; color:var(--success);">R$ ${parseFloat(finalPrice).toFixed(2).replace('.', ',')}</div>
+                            ${isPromo ? `<div class="promo-timer" data-expires="${p.promo_expires_at}" style="font-size: 0.65rem; color: #ef4444; font-weight: 700; margin-top: 4px; background: #fee2e2; padding: 2px 4px; border-radius: 4px; display: inline-block;"></div>` : ''}
                         </div>
                     </div>
                     `;
@@ -118,13 +119,15 @@ function renderResults(data) {
                 const finalPrice = isPromo ? p.promo_price : p.price;
                 return `
                 <div onclick="window.location.href='store_profile.html?id=${p.store_id}'" style="background:#fff; padding:10px; border-radius:12px; cursor:pointer; border:1px solid #f1f5f9; display: flex; flex-direction: column; gap: 6px;">
-                    <div style="width:100%; height:80px; background:#f1f5f9; border-radius:8px; overflow:hidden;">
+                    <div style="width:100%; height:80px; background:#f1f5f9; border-radius:8px; overflow:hidden; position:relative;">
                         ${p.image_url ? `<img src="${getFullUrl(p.image_url)}" style="width:100%; height:100%; object-fit:cover;">` : '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#cbd5e1;">📦</div>'}
+                        ${isPromo ? `<div style="position:absolute; top:4px; right:4px; background:var(--primary); color:#fff; font-size:0.55rem; padding:2px 6px; border-radius:4px; font-weight:800;">OFERTA</div>` : ''}
                     </div>
                     <div>
                         <span style="font-size:0.6rem; font-weight:700; color:#94a3b8; text-transform:uppercase;">${p.store_name}</span>
                         <h4 style="margin:2px 0; font-size:0.8rem; display:-webkit-box; -webkit-line-clamp:1; line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">${p.product_name}</h4>
-                        <div style="font-size:0.95rem; font-weight:800; color:var(--success);">R$ ${parseFloat(finalPrice).toFixed(2)}</div>
+                        <div style="font-size:0.95rem; font-weight:800; color:var(--success);">R$ ${parseFloat(finalPrice).toFixed(2).replace('.', ',')}</div>
+                        ${isPromo ? `<div class="promo-timer" data-expires="${p.promo_expires_at}" style="font-size: 0.65rem; color: #ef4444; font-weight: 700; margin-top: 4px; background: #fee2e2; padding: 2px 4px; border-radius: 4px; display: inline-block;"></div>` : ''}
                     </div>
                 </div>
                 `;
@@ -199,17 +202,19 @@ async function loadTrendingOffers() {
                 container.innerHTML = offers.map(offer => {
                     const fullImageUrl = getFullUrl(offer.image_url);
                     return `
-                    <div class="result-card" onclick="window.location.href='store_profile.html?id=${offer.store_id}'" style="flex: 0 0 240px; background:#fff; border-radius:12px; padding:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1); border:1px solid #e2e8f0; cursor:pointer;">
+                    <div class="result-card" onclick="window.location.href='store_profile.html?id=${offer.store_id}'" style="flex: 0 0 240px; background:#fff; border-radius:12px; padding:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1); border:1px solid #e2e8f0; cursor:pointer; display: flex; flex-direction: column;">
                         ${fullImageUrl ? `<img src="${fullImageUrl}" style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bottom:8px;">` : `<div style="height:100px; background:#f1f5f9; border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:8px;">📦</div>`}
                         <h4 style="margin:0 0 4px; font-size:0.9rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${offer.product_name}</h4>
                         <div style="font-size:0.75rem; color:#64748b; margin-bottom:8px;">🏪 ${offer.store_name}</div>
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="color:#10b981; font-weight:700;">R$ ${parseFloat(offer.promo_price).toFixed(2)}</span>
+                            <span style="color:#10b981; font-weight:700;">R$ ${parseFloat(offer.promo_price).toFixed(2).replace('.', ',')}</span>
                             <span style="font-size:0.65rem; color:#f59e0b; font-weight:700;">OFERTA 🔥</span>
                         </div>
+                        <div class="promo-timer" data-expires="${offer.promo_expires_at}" style="font-size: 0.7rem; color: #ef4444; font-weight: 700; margin-top: 8px; background: #fee2e2; padding: 4px; border-radius: 4px; text-align: center;"></div>
                     </div>
                     `;
                 }).join('');
+                startPromoTimers();
             }
         }
     } catch (e) { console.error(e); }
@@ -241,14 +246,16 @@ async function loadCheapest() {
                     const finalPrice = isPromo ? p.promo_price : p.price;
                     return `
                     <div onclick="window.location.href='store_profile.html?id=${p.store_id}'" style="background:#fff; padding:8px; border-radius:12px; border:1px solid #e2e8f0; cursor:pointer; text-align:center; display: flex; flex-direction: column; gap: 4px; position:relative;">
-                        <div style="position:absolute; top:4px; right:4px; background:var(--primary); color:#fff; font-size:0.55rem; padding:2px 6px; border-radius:4px; font-weight:800; z-index:1;">OFERTA 🔥</div>
+                        ${isPromo ? `<div style="position:absolute; top:4px; right:4px; background:var(--primary); color:#fff; font-size:0.55rem; padding:2px 6px; border-radius:4px; font-weight:800; z-index:1;">OFERTA 🔥</div>` : ''}
                         <div style="width: 100%; height: 90px; background: #f1f5f9; border-radius: 8px; overflow: hidden; margin-bottom: 4px;">
                             ${p.image_url ? `<img src="${getFullUrl(p.image_url)}" style="width:100%; height:100%; object-fit:cover;">` : '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#94a3b8; font-size:1.5rem;">📦</div>'}
                         </div>
-                        <div style="font-size: 1rem; font-weight: 800; color: var(--success);">R$ ${parseFloat(finalPrice).toFixed(2)}</div>
+                        <div style="font-size: 1rem; font-weight: 800; color: var(--success);">R$ ${parseFloat(finalPrice).toFixed(2).replace('.', ',')}</div>
                         <span style="font-size:0.6rem; color:#94a3b8; font-weight:700; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.store_name}</span>
+                        ${isPromo ? `<div class="promo-timer" data-expires="${p.promo_expires_at}" style="font-size: 0.6rem; color: #ef4444; font-weight: 700; background: #fee2e2; padding: 2px; border-radius: 4px; display: inline-block;"></div>` : ''}
                     </div>
                 `;}).join('');
+                startPromoTimers();
             }
         }
     } catch (e) { console.error(e); }
