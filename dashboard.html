@@ -632,10 +632,13 @@
                 </div>
             </div>
             
-            <div style="display: flex; gap: 16px;">
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
                 <button onclick="document.getElementById('poster-modal').style.display='none'" style="padding: 14px 24px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; background: #fff; color: #1e293b; font-size:1.1rem;">❌ Fechar</button>
-                <button id="download-poster-btn" onclick="downloadPoster()" style="padding: 14px 24px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; background: var(--primary); color: #fff; display: flex; align-items: center; gap: 8px; font-size:1.1rem;">
-                    ⬇️ Baixar Imagem do Cartaz
+                <button id="download-poster-btn" onclick="downloadPoster()" style="padding: 14px 24px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; background: #e2e8f0; color: #1e293b; display: flex; align-items: center; gap: 8px; font-size:1.1rem;">
+                    ⬇️ Baixar Imagem
+                </button>
+                <button id="share-poster-btn" onclick="sharePoster()" style="padding: 14px 24px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; background: #25D366; color: #fff; display: flex; align-items: center; gap: 8px; font-size:1.1rem; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
+                    📲 Enviar Direto (WhatsApp/Insta)
                 </button>
             </div>
         </div>
@@ -1016,6 +1019,49 @@
                 console.error(e);
                 alert('Erro ao gerar a imagem do cartaz. Tente novamente.');
             } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function sharePoster() {
+            const btn = document.getElementById('share-poster-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Preparando...';
+            btn.disabled = true;
+
+            try {
+                const element = document.getElementById('poster-container');
+                const canvas = await html2canvas(element, { 
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff'
+                });
+                
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], `ofertas-${storeName.replace(/\s+/g, '-').toLowerCase()}.png`, { type: 'image/png' });
+                    
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                files: [file],
+                                title: 'Ofertas Imperdíveis - ' + storeName,
+                                text: 'Confira as promoções exclusivas da nossa loja! Aproveite antes que acabe. Faça seu pedido!'
+                            });
+                        } catch (err) {
+                            console.log('Compartilhamento cancelado ou falhou', err);
+                        }
+                    } else {
+                        alert('Seu dispositivo ou navegador (comum em PCs) não suporta envio direto de imagens. Use o botão "Baixar Imagem" e envie manualmente pelo WhatsApp Web.');
+                    }
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 'image/png');
+                
+            } catch(e) {
+                console.error(e);
+                alert('Erro ao gerar o cartaz para compartilhamento.');
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
