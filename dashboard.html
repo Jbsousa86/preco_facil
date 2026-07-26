@@ -952,7 +952,7 @@
         // Removed redundant footer script
         
         function openPosterModal() {
-            const promos = merchantProducts.filter(p => p.promo_price && parseFloat(p.promo_price) > 0);
+            const promos = merchantProducts.filter(p => p.promo_price && parseFloat(p.promo_price) > 0 && (!p.promo_expires_at || new Date(p.promo_expires_at) > new Date()));
             
             if (promos.length === 0) {
                 alert('Você não tem nenhum produto com preço de oferta ativo. Edite um produto, adicione um "Preço Oferta" para gerar o cartaz!');
