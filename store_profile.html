@@ -810,10 +810,15 @@
             <img id="header-logo" src="" class="header-logo" alt="Logo" style="display:none;">
             <span id="header-store-name" class="header-name">Carregando...</span>
         </div>
-        <button class="cart-icon-btn" onclick="openCart()">
-            🛒
-            <span id="header-cart-badge" class="cart-badge-new" style="display:none;">0</span>
-        </button>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button onclick="shareStore()" style="background: none; border: none; color: rgba(255, 255, 255, 0.8); font-size: 1.2rem; cursor: pointer; padding: 4px; display: flex; align-items: center;" title="Compartilhar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+            </button>
+            <button class="cart-icon-btn" onclick="openCart()">
+                🛒
+                <span id="header-cart-badge" class="cart-badge-new" style="display:none;">0</span>
+            </button>
+        </div>
     </header>
 
     <div id="loading-overlay"
@@ -830,6 +835,9 @@
 
     <main>
         <section class="store-details">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary); margin: 0; letter-spacing: -0.5px;">Compare e economize</h2>
+            </div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
                 <div>
                     <h1 id="store-name-title" style="margin:0 0 8px; font-size:1.75rem; font-weight:700; color: var(--text-main);">Carregando...</h1>
@@ -848,11 +856,8 @@
                     </div>
                 </div>
             </div>
-            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-start; align-items: center;">
                 <span class="status-badge" style="background: var(--success); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-block;">🟢 Aberto agora</span>
-                <button onclick="shareStore()" class="share-btn" style="margin-top: 0; padding: 8px 16px;">
-                    <span>📤</span> Compartilhar Loja
-                </button>
             </div>
         </section>
 
