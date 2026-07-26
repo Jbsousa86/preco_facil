@@ -1009,7 +1009,7 @@
                 });
                 
                 const link = document.createElement('a');
-                link.download = \`cartaz-ofertas-\${storeName.replace(/\\s+/g, '-').toLowerCase()}.png\`;
+                link.download = `cartaz-ofertas-${storeName.replace(/\s+/g, '-').toLowerCase()}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             } catch(e) {
