@@ -474,16 +474,18 @@
             <img src="assets/logo.png" alt="Logo" class="logo-img">
             <h1 class="header-title">Mercado Local</h1>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
             <button id="install-btn" class="install-btn">📲 Instalar</button>
             <nav class="header-nav">
                 <a href="javascript:void(0)" id="nav-home" onclick="showView('home')" class="nav-link active">Início</a>
                 <a href="javascript:void(0)" id="nav-stores" onclick="showView('stores')" class="nav-link">Lojas</a>
                 <a href="javascript:void(0)" id="nav-merchant" onclick="showView('merchant')" class="nav-link merchant-link">Sou Lojista</a>
-                <button onclick="sharePlatform()" class="nav-link" style="border: 1px solid var(--primary); color: var(--primary); cursor: pointer; background: transparent;">📤 Divulgar</button>
             </nav>
+            <button onclick="sharePlatform()" style="background: none; border: none; color: var(--primary); cursor: pointer; padding: 4px; display: flex; align-items: center;" title="Compartilhar Plataforma">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+            </button>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
         </div>
-        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
     </header>
 
     <nav class="bottom-nav">
@@ -506,20 +508,17 @@
     </nav>
 
     <main>
-        <section class="hero-section">
-            <h2>Compare e economize.</h2>
-            <p>Encontre os melhores preços perto de você.</p>
-            <button onclick="sharePlatform()" style="margin-top: 16px; background: #fff; border: 1px solid var(--primary); color: var(--primary); padding: 10px 24px; border-radius: 20px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                <span>🚀</span> Compartilhar Plataforma
-            </button>
-        </section>
-
-        <!-- Hero Promotion Carousel -->
-        <section id="hero-carousel-section" style="display: none; margin-bottom: 32px;">
+        <!-- Hero Promotion Carousel moved above hero-section -->
+        <section id="hero-carousel-section" style="display: none; margin-bottom: 24px;">
             <div id="hero-carousel" style="width: 100%; height: 250px; border-radius: var(--radius-lg); overflow: hidden; position: relative; box-shadow: var(--shadow);">
                 <!-- Promotion slides will be injected here -->
             </div>
             <div id="hero-dots" style="display: flex; justify-content: center; gap: 8px; margin-top: 10px;"></div>
+        </section>
+
+        <section class="hero-section">
+            <h2>Compare e economize.</h2>
+            <p>Encontre os melhores preços perto de você.</p>
         </section>
 
         <!-- Merchant Info Section (Hidden by default) -->
