@@ -1165,7 +1165,7 @@
 
                 return `
                     <div class="product-card" data-id="${p.id}" onclick="openProductDetails(${p.id})">
-                        <div class="product-image-container">
+                        <div class="product-image-container" style="position: relative;">
                             ${p.image_url ?
                                 `<img src="${getFullUrl(p.image_url)}" class="product-image" alt="${p.name}" onerror="this.src='https://placehold.co/400x400/f8fafc/64748b?text=Produto';">` :
                                 `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#cbd5e1; background:#f8fafc; font-size:2rem; gap:8px;">
@@ -1174,6 +1174,7 @@
                                  </div>`
                             }
                             ${isPromo ? `<div class="promo-pill">-${discountPct}% OFF</div>` : ''}
+                            ${isPromo ? `<div class="promo-timer" data-expires="${p.promo_expires_at}" style="position: absolute; bottom: 8px; left: 8px; right: 8px; font-size: 0.65rem; color: #fff; font-weight: 800; background: rgba(220, 38, 38, 0.9); padding: 4px; border-radius: 6px; text-align: center; backdrop-filter: blur(4px); box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>` : ''}
                             <div class="product-rating-badge">⭐ ${ratingMock}</div>
                         </div>
                         <div class="product-content">
@@ -1184,7 +1185,6 @@
                                 <span class="current-price">R$ ${parseFloat(currentPrice).toFixed(2).replace('.', ',')}</span>
                             </div>
                             <span class="product-tag-free">Frete Grátis</span>
-                            ${isPromo ? `<div class="promo-timer" data-expires="${p.promo_expires_at}" style="font-size: 0.65rem; color: #ef4444; font-weight: 700; margin-top: 6px; background: #fee2e2; padding: 4px; border-radius: 4px; display: inline-block; text-align: center;"></div>` : ''}
                         </div>
                         <button class="add-btn-marketplace" onclick="updateCart('${p.id}', 1, event)">
                             <span>+ Adicionar</span>
@@ -1228,7 +1228,7 @@
                 
                 const timerContainer = document.getElementById('details-promo-timer-container');
                 if (timerContainer) {
-                    timerContainer.innerHTML = `<div class="promo-timer" data-expires="${product.promo_expires_at}" style="font-size: 0.8rem; color: #ef4444; font-weight: 700; background: #fee2e2; padding: 4px 8px; border-radius: 6px; display: inline-block;"></div>`;
+                    timerContainer.innerHTML = `<div class="promo-timer" data-expires="${product.promo_expires_at}" style="font-size: 0.8rem; color: #fff; font-weight: 800; background: #dc2626; padding: 4px 12px; border-radius: 6px; display: inline-block; box-shadow: 0 2px 4px rgba(220,38,38,0.3);"></div>`;
                 }
             } else {
                 oldPriceEl.style.display = 'none';
