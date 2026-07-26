@@ -602,99 +602,98 @@
         <div id="poster-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000; align-items:center; justify-content:center; padding:20px; flex-direction:column;">
             <h3 style="color:#fff; margin-bottom: 16px;">📸 Pré-visualização do seu Cartaz</h3>
             
-            <div style="background:#fff; border-radius:16px; margin-bottom:16px; max-width:95vw; max-height:70vh; overflow:auto; box-shadow:0 20px 40px rgba(0,0,0,0.5);">
-                <!-- The actual poster that will be converted to image (1080x1920) -->
-                <div id="poster-container" style="width: 1080px; height: 1920px; background: linear-gradient(180deg, #023e8a, #0077b6); position: relative; overflow: hidden; font-family: 'Outfit', sans-serif; display: flex; flex-direction: column;">
-                    <!-- Background Decorators -->
-                    <div style="position:absolute; top:-100px; right:-100px; width:600px; height:600px; background:#00b4d8; border-radius:50%; opacity:0.2; filter:blur(50px);"></div>
-                    <div style="position:absolute; bottom:200px; left:-200px; width:800px; height:800px; background:#0096c7; border-radius:50%; opacity:0.3; filter:blur(80px);"></div>
+            <div style="background:#1e293b; border-radius:32px; padding: 12px; margin-bottom:16px; box-shadow:0 20px 40px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;">
+                <div style="width: 324px; height: 576px; background:#fff; border-radius: 20px; overflow: hidden; position: relative;">
+                    <div style="transform-origin: top left; transform: scale(0.3); width: 1080px; height: 1920px;">
+                        <!-- The actual poster that will be converted to image (1080x1920) -->
+                        <div id="poster-container" style="width: 1080px; height: 1920px; background: linear-gradient(180deg, #023e8a, #0077b6); position: relative; overflow: hidden; font-family: 'Outfit', sans-serif; display: flex; flex-direction: column;">
+                            <!-- Background Decorators -->
+                            <div style="position:absolute; top:-100px; right:-100px; width:600px; height:600px; background:#00b4d8; border-radius:50%; opacity:0.2; filter:blur(50px);"></div>
+                            <div style="position:absolute; bottom:200px; left:-200px; width:800px; height:800px; background:#0096c7; border-radius:50%; opacity:0.3; filter:blur(80px);"></div>
+        
+                            <!-- Top Row: Logo and Validity -->
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 40px; z-index: 2;">
+                                <div style="background: #fff; padding: 15px 30px; border-radius: 16px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+                                    <img id="poster-logo" src="" crossorigin="anonymous" style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; display:none;">
+                                    <div>
+                                        <h1 id="poster-store-name" style="font-size: 2.2rem; font-weight: 800; color: #1e293b; margin: 0; line-height: 1.1;">Nome da Loja</h1>
+                                        <span style="font-size: 1.2rem; font-weight: 600; color: #ef4444;">SUPERMERCADO</span>
+                                    </div>
+                                </div>
+                                <div style="background: #fff; padding: 15px 25px; border-radius: 16px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+                                    <span style="font-size: 2.5rem;">📅</span>
+                                    <div>
+                                        <div style="font-size: 1.1rem; font-weight: 700; color: #1e293b;">OFERTAS VÁLIDAS</div>
+                                        <div style="font-size: 1.1rem; font-weight: 500; color: #64748b;">ENQUANTO DURAREM OS ESTOQUES.</div>
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <!-- Header Text -->
+                            <div style="text-align: center; margin-top: 10px; z-index: 2; padding: 0 40px;">
+                                <h2 style="font-size: 5rem; font-weight: 900; color: #fbbf24; margin: 0; text-shadow: 4px 4px 0px #b45309, 8px 8px 15px rgba(0,0,0,0.5); line-height: 1;">OFERTAS</h2>
+                                <h2 style="font-size: 6.5rem; font-weight: 900; color: #fff; margin: -10px 0 0 0; text-shadow: 5px 5px 0px #020617, 10px 10px 20px rgba(0,0,0,0.5); line-height: 1; letter-spacing: -2px;">IMPERDÍVEIS</h2>
+                                <h2 style="font-size: 4.5rem; font-weight: 900; color: #fbbf24; margin: -5px 0 0 0; text-shadow: 4px 4px 0px #b45309, 8px 8px 15px rgba(0,0,0,0.5); line-height: 1;">DA SEMANA!</h2>
+                                <div style="background: #ef4444; display: inline-block; padding: 10px 40px; border-radius: 50px; margin-top: 20px; box-shadow: 0 10px 20px rgba(239,68,68,0.4); transform: rotate(-2deg); border: 4px solid #fff;">
+                                    <span style="font-size: 2rem; font-weight: 800; color: #fff; text-transform: uppercase;">Economia de verdade perto de você! 👍</span>
+                                </div>
+                            </div>
+        
+                            <!-- Grid of products (Moved up and expanded) -->
+                            <div id="poster-products-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(min-content, max-content); gap: 24px; padding: 40px; z-index: 2; flex-grow: 1;">
+                                <!-- Products injected here -->
+                            </div>
+                            
+                            <!-- Features Banner (Moved Down) -->
+                            <div style="margin: 0 40px 30px 40px; display: flex; justify-content: space-between; background: #fff; border-radius: 20px; padding: 15px 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 2;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="background: #ef4444; width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.5rem; font-weight: 900;">%</div>
+                                    <div style="font-weight: 800; color: #1e293b; font-size: 1.1rem; line-height: 1.1;">PREÇOS<br>BAIXOS</div>
+                                </div>
+                                <div style="width: 2px; background: #e2e8f0;"></div>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="background: #22c55e; width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.5rem;">✅</div>
+                                    <div style="font-weight: 800; color: #1e293b; font-size: 1.1rem; line-height: 1.1;">QUALIDADE<br>QUE VOCÊ CONFIA</div>
+                                </div>
+                                <div style="width: 2px; background: #e2e8f0;"></div>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="background: #f59e0b; width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.5rem;">🛒</div>
+                                    <div style="font-weight: 800; color: #1e293b; font-size: 1.1rem; line-height: 1.1;">TUDO PARA<br>SUA CASA</div>
+                                </div>
+                            </div>
 
-                    <!-- Top Row: Logo and Validity -->
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 40px; z-index: 2;">
-                        <div style="background: #fff; padding: 15px 30px; border-radius: 16px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
-                            <img id="poster-logo" src="" crossorigin="anonymous" style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; display:none;">
-                            <div>
-                                <h1 id="poster-store-name" style="font-size: 2.2rem; font-weight: 800; color: #1e293b; margin: 0; line-height: 1.1;">Nome da Loja</h1>
-                                <span style="font-size: 1.2rem; font-weight: 600; color: #ef4444;">SUPERMERCADO</span>
+                            <!-- Bottom Contact Info -->
+                            <div style="background: #0f172a; margin-top: auto; padding: 30px 40px; display: flex; justify-content: space-between; align-items: center; z-index: 2; border-top: 5px solid #22c55e;">
+                                <div style="display: flex; align-items: center; gap: 20px;">
+                                    <div style="background: #22c55e; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; color: white;">📞</div>
+                                    <div>
+                                        <div style="color: #fff; font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">PEÇA JÁ PELO</div>
+                                        <div style="color: #22c55e; font-size: 2.2rem; font-weight: 900; line-height: 1;">WHATSAPP!</div>
+                                        <div id="poster-phone" style="color: #fbbf24; font-size: 1.8rem; font-weight: 800;"></div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="font-size: 3.5rem;">🛵</div>
+                                    <div>
+                                        <div style="color: #22c55e; font-size: 1.2rem; font-weight: 800; text-transform: uppercase;">ENTREGAMOS</div>
+                                        <div style="color: #fff; font-size: 1.1rem; font-weight: 600;">NA SUA CASA!</div>
+                                    </div>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.1); padding: 15px 25px; border-radius: 15px;">
+                                    <div style="color: #22c55e; font-size: 1rem; font-weight: 800; text-align: center; margin-bottom: 5px; text-transform: uppercase;">Formas de Pagamento</div>
+                                    <div style="display: flex; gap: 15px; color: #fff; font-size: 1.5rem;">
+                                        <div style="display: flex; flex-direction: column; align-items: center;"><span style="font-size:1.5rem;">💠</span><span style="font-size:0.7rem; font-weight:700;">PIX</span></div>
+                                        <div style="display: flex; flex-direction: column; align-items: center;"><span style="font-size:1.5rem;">💳</span><span style="font-size:0.7rem; font-weight:700;">CARTÃO</span></div>
+                                        <div style="display: flex; flex-direction: column; align-items: center;"><span style="font-size:1.5rem;">💵</span><span style="font-size:0.7rem; font-weight:700;">DINHEIRO</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Footer Address/Link -->
+                            <div style="background: #fbbf24; padding: 20px 40px; text-align: center; z-index: 2;">
+                                <span style="font-size: 1.5rem; font-weight: 800; color: #1e293b;">Catálogo completo e pedidos online em: <span style="color: #0f172a; text-decoration: underline;">preco-facil.onrender.com</span></span>
                             </div>
                         </div>
-                        <div style="background: #fff; padding: 15px 25px; border-radius: 16px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
-                            <span style="font-size: 2.5rem;">📅</span>
-                            <div>
-                                <div style="font-size: 1.1rem; font-weight: 700; color: #1e293b;">OFERTAS VÁLIDAS</div>
-                                <div style="font-size: 1.1rem; font-weight: 500; color: #64748b;">ENQUANTO DURAREM OS ESTOQUES.</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Header Text -->
-                    <div style="text-align: center; margin-top: 10px; z-index: 2; padding: 0 40px;">
-                        <h2 style="font-size: 5rem; font-weight: 900; color: #fbbf24; margin: 0; text-shadow: 4px 4px 0px #b45309, 8px 8px 15px rgba(0,0,0,0.5); line-height: 1;">OFERTAS</h2>
-                        <h2 style="font-size: 6.5rem; font-weight: 900; color: #fff; margin: -10px 0 0 0; text-shadow: 5px 5px 0px #020617, 10px 10px 20px rgba(0,0,0,0.5); line-height: 1; letter-spacing: -2px;">IMPERDÍVEIS</h2>
-                        <h2 style="font-size: 4.5rem; font-weight: 900; color: #fbbf24; margin: -5px 0 0 0; text-shadow: 4px 4px 0px #b45309, 8px 8px 15px rgba(0,0,0,0.5); line-height: 1;">DA SEMANA!</h2>
-                        <div style="background: #ef4444; display: inline-block; padding: 10px 40px; border-radius: 50px; margin-top: 20px; box-shadow: 0 10px 20px rgba(239,68,68,0.4); transform: rotate(-2deg); border: 4px solid #fff;">
-                            <span style="font-size: 2rem; font-weight: 800; color: #fff; text-transform: uppercase;">Economia de verdade perto de você! 👍</span>
-                        </div>
-                    </div>
-
-                    <!-- Highlighted Product (First product) -->
-                    <div id="poster-highlighted-product" style="margin: 40px 40px 20px 40px; background: rgba(255,255,255,0.1); border-radius: 30px; border: 2px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px); padding: 30px; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 2;">
-                        <!-- Injected via JS -->
-                    </div>
-
-                    <!-- Features Banner -->
-                    <div style="margin: 0 40px 30px 40px; display: flex; justify-content: space-between; background: #fff; border-radius: 20px; padding: 15px 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 2;">
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <div style="background: #ef4444; width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.5rem; font-weight: 900;">%</div>
-                            <div style="font-weight: 800; color: #1e293b; font-size: 1.1rem; line-height: 1.1;">PREÇOS<br>BAIXOS</div>
-                        </div>
-                        <div style="width: 2px; background: #e2e8f0;"></div>
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <div style="background: #22c55e; width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.5rem;">✅</div>
-                            <div style="font-weight: 800; color: #1e293b; font-size: 1.1rem; line-height: 1.1;">QUALIDADE<br>QUE VOCÊ CONFIA</div>
-                        </div>
-                        <div style="width: 2px; background: #e2e8f0;"></div>
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <div style="background: #f59e0b; width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.5rem;">🛒</div>
-                            <div style="font-weight: 800; color: #1e293b; font-size: 1.1rem; line-height: 1.1;">TUDO PARA<br>SUA CASA</div>
-                        </div>
-                    </div>
-
-                    <!-- Grid of other products -->
-                    <div id="poster-products-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; padding: 0 40px 30px 40px; z-index: 2; flex-grow: 1;">
-                        <!-- Products injected here -->
-                    </div>
-
-                    <!-- Bottom Contact Info -->
-                    <div style="background: #0f172a; margin-top: auto; padding: 30px 40px; display: flex; justify-content: space-between; align-items: center; z-index: 2; border-top: 5px solid #22c55e;">
-                        <div style="display: flex; align-items: center; gap: 20px;">
-                            <div style="background: #22c55e; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; color: white;">📞</div>
-                            <div>
-                                <div style="color: #fff; font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">PEÇA JÁ PELO</div>
-                                <div style="color: #22c55e; font-size: 2.2rem; font-weight: 900; line-height: 1;">WHATSAPP!</div>
-                                <div id="poster-phone" style="color: #fbbf24; font-size: 1.8rem; font-weight: 800;"></div>
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <div style="font-size: 3.5rem;">🛵</div>
-                            <div>
-                                <div style="color: #22c55e; font-size: 1.2rem; font-weight: 800; text-transform: uppercase;">ENTREGAMOS</div>
-                                <div style="color: #fff; font-size: 1.1rem; font-weight: 600;">NA SUA CASA!</div>
-                            </div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.1); padding: 15px 25px; border-radius: 15px;">
-                            <div style="color: #22c55e; font-size: 1rem; font-weight: 800; text-align: center; margin-bottom: 5px; text-transform: uppercase;">Formas de Pagamento</div>
-                            <div style="display: flex; gap: 15px; color: #fff; font-size: 1.5rem;">
-                                <div style="display: flex; flex-direction: column; align-items: center;"><span style="font-size:1.5rem;">💠</span><span style="font-size:0.7rem; font-weight:700;">PIX</span></div>
-                                <div style="display: flex; flex-direction: column; align-items: center;"><span style="font-size:1.5rem;">💳</span><span style="font-size:0.7rem; font-weight:700;">CARTÃO</span></div>
-                                <div style="display: flex; flex-direction: column; align-items: center;"><span style="font-size:1.5rem;">💵</span><span style="font-size:0.7rem; font-weight:700;">DINHEIRO</span></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Footer Address/Link -->
-                    <div style="background: #fbbf24; padding: 20px 40px; text-align: center; z-index: 2;">
-                        <span style="font-size: 1.5rem; font-weight: 800; color: #1e293b;">Catálogo completo e pedidos online em: <span style="color: #0f172a; text-decoration: underline;">preco-facil.onrender.com</span></span>
                     </div>
                 </div>
             </div>
@@ -1044,35 +1043,8 @@
             }
             document.getElementById('poster-phone').innerText = formattedPhone || '(Sem número)';
 
-            // The highlighted product is the first promo product
-            const highlightedProduct = promos[0];
-            const diff = parseFloat(highlightedProduct.price) - parseFloat(highlightedProduct.promo_price);
-            
-            const highlightedHtml = `
-                <div style="position:absolute; top:-25px; right: 30px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 15px 30px; border-radius: 40px; font-weight: 900; font-size: 1.6rem; box-shadow: 0 10px 20px rgba(220,38,38,0.4); transform: rotate(4deg); z-index: 10; border: 3px solid #fff;">
-                    🔥 OFERTA DA SEMANA
-                </div>
-                <div style="width: 420px; height: 350px; background: #fff; border-radius: 20px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 15px 30px rgba(0,0,0,0.2);">
-                    ${highlightedProduct.image_url ? `<img src="${getFullUrl(highlightedProduct.image_url)}" crossorigin="anonymous" style="width:100%; height:100%; object-fit:cover;">` : `<span style="font-size:10rem;">📦</span>`}
-                </div>
-                <div style="flex: 1; margin-left: 30px; display: flex; flex-direction: column; justify-content: center;">
-                    <div style="font-size: 3rem; font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); text-transform: uppercase;">${highlightedProduct.name}</div>
-                    
-                    <div style="background: #fbbf24; border-radius: 20px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 4px solid #fff; position: relative;">
-                        <div style="font-size: 1.3rem; font-weight: 800; color: #b45309; text-decoration: line-through;">DE: R$ ${parseFloat(highlightedProduct.price).toFixed(2).replace('.', ',')}</div>
-                        <div style="font-size: 1.3rem; font-weight: 800; color: #1e293b; margin-top: 2px;">POR APENAS</div>
-                        <div style="font-size: 5rem; font-weight: 900; color: #ef4444; line-height: 1; display: flex; align-items: flex-start; margin-top: 5px; text-shadow: 2px 2px 0px #fff;">
-                            <span style="font-size: 2rem; margin-top: 10px; margin-right: 5px; color: #1e293b;">R$</span>${parseFloat(highlightedProduct.promo_price).toFixed(2).replace('.', ',')}
-                        </div>
-                    </div>
-                    
-                    ${diff > 0 ? `<div style="background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 30px; font-size: 1.3rem; font-weight: 800; margin-top: 15px; text-align: center; border: 2px solid #334155; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">VOCÊ ECONOMIZA R$ ${diff.toFixed(2).replace('.', ',')}!</div>` : ''}
-                </div>
-            `;
-            document.getElementById('poster-highlighted-product').innerHTML = highlightedHtml;
-
-            // Pick next up to 6 products for the 3x2 grid
-            const gridProducts = promos.slice(1, 7);
+            // Pick up to 9 products for the 3x3 grid (since there's no highlighted product anymore)
+            const gridProducts = promos.slice(0, 9);
             
             const grid = document.getElementById('poster-products-grid');
             if (gridProducts.length > 0) {
