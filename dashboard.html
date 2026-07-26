@@ -489,7 +489,7 @@
                                     <input type="number" id="prod-price" class="form-control" step="0.01" placeholder="0,00" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="prod-promo">Preço Oferta (Opcional)</label>
+                                    <label for="prod-promo">Preço Oferta (Dura 24h)</label>
                                     <input type="number" id="prod-promo" class="form-control" step="0.01" placeholder="0,00">
                                 </div>
                             </div>
@@ -816,6 +816,17 @@
                 emptyState.style.display = 'none';
                 container.innerHTML = merchantProducts.map((p, index) => {
                     const hasPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
+                    
+                    let promoBadge = '';
+                    if (hasPromo) {
+                        const expiresAt = new Date(p.promo_expires_at);
+                        const hoursLeft = Math.max(0, Math.floor((expiresAt - new Date()) / (1000 * 60 * 60)));
+                        const minsLeft = Math.max(0, Math.floor(((expiresAt - new Date()) % (1000 * 60 * 60)) / (1000 * 60)));
+                        promoBadge = `<div style="background: #fee2e2; color: #ef4444; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 8px; font-weight: 700;">🔥 Expira em ${hoursLeft}h ${minsLeft}m</div>`;
+                    } else if (p.promo_price) {
+                        promoBadge = `<div style="background: #f1f5f9; color: #64748b; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 8px; font-weight: 700;">⏱️ Oferta Expirada</div>`;
+                    }
+
                     return `
                     <div class="product-item">
                         <div class="product-img-wrapper">
@@ -825,8 +836,9 @@
                             <span class="product-cat">${p.category || 'Geral'}</span>
                             <h4 class="product-name">${p.name}</h4>
                             <div class="product-price">
-                                ${hasPromo ? `<span style="font-size:0.75rem, text-decoration:line-through; color:var(--gray-600);">R$ ${parseFloat(p.price).toFixed(2)}</span><br>R$ ${parseFloat(p.promo_price).toFixed(2)}` : `R$ ${parseFloat(p.price).toFixed(2)}`}
+                                ${hasPromo ? `<span style="font-size:0.75rem; text-decoration:line-through; color:var(--gray-600);">R$ ${parseFloat(p.price).toFixed(2).replace('.', ',')}</span><br>R$ ${parseFloat(p.promo_price).toFixed(2).replace('.', ',')}` : `R$ ${parseFloat(p.price).toFixed(2).replace('.', ',')}`}
                             </div>
+                            ${promoBadge}
                         </div>
                         <div class="product-actions">
                             <button class="btn-sm btn-edit" onclick="triggerEdit(${index})">✏️ Editar</button>
