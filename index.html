@@ -16,9 +16,11 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- SEO & Social Sharing (OpenGraph) -->
-    <meta name="description" content="Encontre os melhores preços de supermercados e lojas perto de você. Compare e economize no Mercado Local!" />
+    <meta name="description"
+        content="Encontre os melhores preços de supermercados e lojas perto de você. Compare e economize no Mercado Local!" />
     <meta property="og:title" content="Mercado Local - Comparador de Preços" />
-    <meta property="og:description" content="Compare preços de diversos estabelecimentos em um só lugar. Economize tempo e dinheiro!" />
+    <meta property="og:description"
+        content="Compare preços de diversos estabelecimentos em um só lugar. Economize tempo e dinheiro!" />
     <meta property="og:image" content="assets/logo.png" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -37,7 +39,8 @@
             background-color: var(--bg-body);
             color: #1e293b;
             margin: 0;
-            overflow-x: hidden; /* Fix screen dancing */
+            overflow-x: hidden;
+            /* Fix screen dancing */
             width: 100%;
         }
 
@@ -49,7 +52,7 @@
         header {
             background: #fff;
             padding: 1rem 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
@@ -82,19 +85,22 @@
             font-weight: 600;
             cursor: pointer;
             font-size: 0.85rem;
-            display: none; /* Injected by script */
+            display: none;
+            /* Injected by script */
         }
 
         main {
             max-width: 800px;
             margin: 0 auto;
-            padding: 16px 12px; /* Reduced padding */
+            padding: 16px 12px;
+            /* Reduced padding */
             box-sizing: border-box;
         }
 
         .hero-section {
             text-align: center;
-            margin-bottom: 20px; /* Reduced margin */
+            margin-bottom: 20px;
+            /* Reduced margin */
         }
 
         .hero-section h2 {
@@ -217,7 +223,9 @@
             text-decoration: none;
         }
 
-        .store-name:hover { color: var(--primary); }
+        .store-name:hover {
+            color: var(--primary);
+        }
 
         .view-store-btn {
             background: var(--primary-light);
@@ -237,7 +245,9 @@
             border-bottom: 1px solid #f8fafc;
         }
 
-        .product-item:last-child { border: none; }
+        .product-item:last-child {
+            border: none;
+        }
 
         .prod-info h4 {
             margin: 0;
@@ -261,8 +271,15 @@
             margin-top: 48px;
         }
 
-        .merchant-card h3 { margin: 0 0 8px; font-size: 1.5rem; }
-        .merchant-card p { opacity: 0.9; margin-bottom: 20px; }
+        .merchant-card h3 {
+            margin: 0 0 8px;
+            font-size: 1.5rem;
+        }
+
+        .merchant-card p {
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
 
         .btn-white {
             background: #fff;
@@ -274,40 +291,68 @@
             display: inline-block;
         }
 
-        .mobile-menu-btn { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--gray-800); }
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-800);
+        }
 
         @media (max-width: 600px) {
-            .search-bar { flex-direction: column; }
-            .search-btn { padding: 14px; }
-            header { padding: 1rem; }
-            .header-title { font-size: 1.25rem; }
-            .header-nav { display: none; }
-            .mobile-menu-btn { display: block; }
+            .search-bar {
+                flex-direction: column;
+            }
+
+            .search-btn {
+                padding: 14px;
+            }
+
+            header {
+                padding: 1rem;
+            }
+
+            .header-title {
+                font-size: 1.25rem;
+            }
+
+            .header-nav {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
         }
 
         /* Portal Navigation Styles - Modernized */
-        .header-nav { display: flex; align-items: center; gap: 12px; }
-        
-        .nav-link { 
-            text-decoration: none; 
-            color: #64748b; 
-            font-weight: 600; 
-            font-size: 0.85rem; 
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.85rem;
             padding: 8px 16px;
             border-radius: 12px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid transparent;
         }
 
-        .nav-link:hover { 
-            color: var(--primary); 
+        .nav-link:hover {
+            color: var(--primary);
             background: var(--primary-light);
             transform: translateY(-1px);
         }
 
-        .nav-link.active { 
-            color: var(--primary); 
-            background: var(--primary-light); 
+        .nav-link.active {
+            color: var(--primary);
+            background: var(--primary-light);
             border: 1px solid var(--primary-light);
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
         }
@@ -331,16 +376,21 @@
             transform: scale(1.05);
             filter: brightness(1.1);
         }
-        
-        .mobile-nav { 
-            display: none; 
-            flex-direction: column; 
-            background: #fff; 
-            padding: 16px; 
+
+        .mobile-nav {
+            display: none;
+            flex-direction: column;
+            background: #fff;
+            padding: 16px;
             border-bottom: 1px solid #e2e8f0;
             gap: 12px;
         }
-        .mobile-nav a { text-decoration: none; color: var(--gray-800); font-weight: 600; }
+
+        .mobile-nav a {
+            text-decoration: none;
+            color: var(--gray-800);
+            font-weight: 600;
+        }
 
         /* Bottom Nav - App Style */
         .bottom-nav {
@@ -354,7 +404,7 @@
             grid-template-columns: repeat(3, 1fr);
             height: 65px;
             border-top: 1px solid #e2e8f0;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
             z-index: 1000;
             padding-bottom: env(safe-area-inset-bottom);
         }
@@ -372,14 +422,33 @@
             transition: all 0.2s;
         }
 
-        .bottom-nav-item i { font-size: 1.25rem; }
-        .bottom-nav-item.active { color: var(--primary); }
+        .bottom-nav-item i {
+            font-size: 1.25rem;
+        }
+
+        .bottom-nav-item.active {
+            color: var(--primary);
+        }
 
         @media (max-width: 600px) {
-            .header-nav { display: none !important; }
-            .bottom-nav { display: grid; grid-template-columns: repeat(4, 1fr); }
-            body { padding-bottom: 80px; }
-            .mobile-menu-btn { display: none; } /* Replaced by bottom nav */
+            .header-nav {
+                display: none !important;
+            }
+
+            .bottom-nav {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            body {
+                padding-bottom: 80px;
+            }
+
+            .mobile-menu-btn {
+                display: none;
+            }
+
+            /* Replaced by bottom nav */
         }
     </style>
     <script>
@@ -391,18 +460,18 @@
         function showView(mode) {
             const ids = ['hero-carousel-section', 'all-merchants-section', 'offers-section', 'results', 'initial-state', 'merchant-portal-section', 'cheapest-prices-section'];
             const classes = ['.search-card', '.hero-section'];
-            
+
             // Handle Active State
             document.querySelectorAll('.nav-link, .bottom-nav-item').forEach(el => el.classList.remove('active'));
-            if(mode === 'home') {
+            if (mode === 'home') {
                 document.getElementById('nav-home')?.classList.add('active');
                 document.getElementById('bnav-home')?.classList.add('active');
             }
-            if(mode === 'stores') {
+            if (mode === 'stores') {
                 document.getElementById('nav-stores')?.classList.add('active');
                 document.getElementById('bnav-stores')?.classList.add('active');
             }
-            if(mode === 'merchant') {
+            if (mode === 'merchant') {
                 document.getElementById('nav-merchant')?.classList.add('active');
                 document.getElementById('bnav-merchant')?.classList.add('active');
             }
@@ -410,42 +479,42 @@
             // Default: Hide almost everything
             ids.forEach(id => {
                 const el = document.getElementById(id);
-                if(el) el.style.display = 'none';
+                if (el) el.style.display = 'none';
             });
             classes.forEach(cls => {
                 const el = document.querySelector(cls);
-                if(el) el.style.display = 'none';
+                if (el) el.style.display = 'none';
             });
 
             if (mode === 'home') {
                 // Restore Home View (Logic-based restore)
                 ids.forEach(id => {
                     const el = document.getElementById(id);
-                    if(id === 'hero-carousel-section' || id === 'offers-section') {
+                    if (id === 'hero-carousel-section' || id === 'offers-section') {
                         // For the reload to work without infinite loop, we only do it if we are switching back to home from elsewhere
                         if (window.lastMode && window.lastMode !== 'home') {
-                            window.location.reload(); 
+                            window.location.reload();
                         }
-                    } else if(el && id !== 'merchant-portal-section' && id !== 'results') {
+                    } else if (el && id !== 'merchant-portal-section' && id !== 'results') {
                         el.style.display = '';
                     }
                 });
                 classes.forEach(cls => {
                     const el = document.querySelector(cls);
-                    if(el) el.style.display = '';
+                    if (el) el.style.display = '';
                 });
             } else if (mode === 'stores') {
                 const el = document.getElementById('all-merchants-section');
-                if(el) {
+                if (el) {
                     el.style.display = 'block';
                     el.scrollIntoView({ behavior: 'smooth' });
                 }
             } else if (mode === 'merchant') {
                 const el = document.getElementById('merchant-portal-section');
-                if(el) {
+                if (el) {
                     el.style.display = 'block';
                     el.scrollIntoView({ behavior: 'smooth' });
-                    
+
                     if (!document.getElementById('back-to-consumer')) {
                         const backBtn = document.createElement('button');
                         backBtn.id = 'back-to-consumer';
@@ -479,10 +548,18 @@
             <nav class="header-nav">
                 <a href="javascript:void(0)" id="nav-home" onclick="showView('home')" class="nav-link active">Início</a>
                 <a href="javascript:void(0)" id="nav-stores" onclick="showView('stores')" class="nav-link">Lojas</a>
-                <a href="javascript:void(0)" id="nav-merchant" onclick="showView('merchant')" class="nav-link merchant-link">Sou Lojista</a>
+                <a href="javascript:void(0)" id="nav-merchant" onclick="showView('merchant')"
+                    class="nav-link merchant-link">Sou Lojista</a>
             </nav>
-            <button onclick="sharePlatform()" style="background: none; border: none; color: var(--primary); cursor: pointer; padding: 4px; display: flex; align-items: center;" title="Compartilhar Plataforma">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+            <button onclick="sharePlatform()"
+                style="background: none; border: none; color: var(--primary); cursor: pointer; padding: 4px; display: flex; align-items: center;"
+                title="Compartilhar Plataforma">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                    <polyline points="16 6 12 2 8 6"></polyline>
+                    <line x1="12" y1="2" x2="12" y2="15"></line>
+                </svg>
             </button>
             <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
         </div>
@@ -510,7 +587,8 @@
     <main>
         <!-- Hero Promotion Carousel moved above hero-section -->
         <section id="hero-carousel-section" style="display: none; margin-bottom: 24px;">
-            <div id="hero-carousel" style="width: 100%; height: 250px; border-radius: var(--radius-lg); overflow: hidden; position: relative; box-shadow: var(--shadow);">
+            <div id="hero-carousel"
+                style="width: 100%; height: 250px; border-radius: var(--radius-lg); overflow: hidden; position: relative; box-shadow: var(--shadow);">
                 <!-- Promotion slides will be injected here -->
             </div>
             <div id="hero-dots" style="display: flex; justify-content: center; gap: 8px; margin-top: 10px;"></div>
@@ -522,31 +600,36 @@
         </section>
 
         <!-- Merchant Info Section (Hidden by default) -->
-        <section id="merchant-portal-section" style="display: none; margin-bottom: 48px; background: linear-gradient(135deg, #4f46e5, #9333ea); padding: 32px; border-radius: var(--radius-lg); color: #fff; text-align: center;">
+        <section id="merchant-portal-section"
+            style="display: none; margin-bottom: 48px; background: linear-gradient(135deg, #4f46e5, #9333ea); padding: 32px; border-radius: var(--radius-lg); color: #fff; text-align: center;">
             <h3>Sua loja no centro das atenções</h3>
             <p style="margin-bottom: 24px;">Cadastre-se hoje e comece a vender no Mercado Local.</p>
             <div style="display: flex; gap: 12px; justify-content: center;">
                 <a href="login.html" class="btn-white">Entrar no Painel</a>
-                <a href="https://wa.me/5563992225774" target="_blank" class="btn-white" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #fff;">Falar com Consultor</a>
+                <a href="https://wa.me/5563992225774" target="_blank" class="btn-white"
+                    style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #fff;">Falar com
+                    Consultor</a>
             </div>
         </section>
 
         <!-- All Merchants Section -->
         <section id="all-merchants-section" style="margin-bottom: 32px;">
             <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-                <span>🏪</span> Lojistas Parceiros
+                <span>🏪</span> Parceiros
             </h3>
-            <div id="all-stores-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 16px;">
+            <div id="all-stores-container"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 16px;">
                 <!-- All stores will be injected here via app.js -->
             </div>
         </section>
 
         <section class="search-card">
             <form id="search-form" class="search-bar">
-                <input type="text" id="product" class="search-input" placeholder="O que você busca hoje? (ex: Arroz, Café)" required autofocus>
+                <input type="text" id="product" class="search-input"
+                    placeholder="O que você busca hoje? (ex: Arroz, Café)" required autofocus>
                 <button type="submit" class="search-btn">Buscar Preços</button>
             </form>
-            
+
             <div id="trending-container" class="trending-tags-box" style="display: none;">
                 <span class="trending-label">🔥 Buscas:</span>
                 <div id="trending-tags" style="display: contents;"></div>
@@ -557,14 +640,16 @@
             <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
                 <span>✨</span> As Melhores Ofertas
             </h3>
-            <div id="cheapest-prices-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+            <div id="cheapest-prices-container"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
                 <!-- Cheap prices injected here -->
             </div>
         </section>
 
         <div id="offers-section" style="display: none; margin-bottom: 32px;">
             <h3 style="margin-bottom: 16px;">✨ Ofertas Imperdíveis</h3>
-            <div id="offers-container" style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none;">
+            <div id="offers-container"
+                style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none;">
                 <!-- Offers injected here -->
             </div>
         </div>
@@ -572,7 +657,6 @@
         <section id="results" class="results-container">
             <!-- Results injected here -->
             <div id="initial-state" style="text-align: center; padding: 48px 0; color: #94a3b8;">
-                <div style="font-size: 3.5rem; margin-bottom: 16px;">🏢</div>
                 <p>Economize tempo e dinheiro comparando os preços dos mercados da sua região.</p>
             </div>
         </section>
@@ -583,17 +667,17 @@
     <script>
         // FORÇAR ATUALIZAÇÃO DO CACHE / LIMPEZA DE SW E CACHE STORAGE
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(regs) {
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
                 let hasActive = regs.length > 0;
-                for(let reg of regs) {
+                for (let reg of regs) {
                     reg.unregister();
                     console.log('SW Desinstalado para atualização');
                 }
                 if (hasActive) {
                     if ('caches' in window) {
-                        caches.keys().then(function(names) {
+                        caches.keys().then(function (names) {
                             return Promise.all(names.map(name => caches.delete(name)));
-                        }).then(function() {
+                        }).then(function () {
                             console.log('Caches removidos, recarregando...');
                             location.reload();
                         });
@@ -603,7 +687,7 @@
                 }
             });
         }
-        
+
         // Adjust empty state visibility
         document.getElementById('search-form').addEventListener('submit', () => {
             document.getElementById('initial-state').style.display = 'none';
