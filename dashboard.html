@@ -1053,8 +1053,8 @@
             btn.textContent = "Fazendo upload...";
 
             try {
-                let logoUrl = (window.globalStoreInfo && window.globalStoreInfo.logo_url) ? window.globalStoreInfo.logo_url : localStorage.getItem('store_logo');
-                let bannerUrl = (window.globalStoreInfo && window.globalStoreInfo.banner_url) ? window.globalStoreInfo.banner_url : localStorage.getItem('store_banner');
+                let logoUrl = window.globalStoreInfo ? window.globalStoreInfo.logo_url : null;
+                let bannerUrl = window.globalStoreInfo ? window.globalStoreInfo.banner_url : null;
                 if (logoUrl === 'null') logoUrl = null;
                 if (bannerUrl === 'null') bannerUrl = null;
 
