@@ -569,7 +569,7 @@
                         
                         <div class="form-group" style="margin-bottom: 16px;">
                             <label for="store-poster-msg-input">Mensagem do Cartaz (Faixa Vermelha)</label>
-                            <input type="text" id="store-poster-msg-input" class="form-control" placeholder="Ex: APROVEITE ANTES QUE ACABE!">
+                            <input type="text" id="store-poster-msg-input" class="form-control" placeholder="Ex: ECONOMIA DE VERDADE PERTO DE VOCÊ">
                         </div>
 
 
@@ -655,7 +655,7 @@
                                 <h2 style="font-size: 7rem; font-weight: 900; color: #fff; margin: -10px 0 0 0; text-shadow: 5px 5px 0px #1e3a8a, 10px 10px 20px rgba(0,0,0,0.5); line-height: 1; letter-spacing: -2px;">IMPERDÍVEIS</h2>
                                 <h2 style="font-size: 5rem; font-weight: 900; color: #fbbf24; margin: -5px 0 0 0; text-shadow: 4px 4px 0px #b45309, 8px 8px 15px rgba(0,0,0,0.5); line-height: 1;">DA SEMANA!</h2>
                                 <div style="background: #e11d48; display: inline-block; padding: 12px 50px; border-radius: 50px; margin-top: 25px; box-shadow: 0 10px 20px rgba(225, 29, 72, 0.4); transform: rotate(-2deg); border: 4px solid #fff;">
-                                    <span id="poster-ribbon-msg" style="font-size: 2.2rem; font-weight: 900; color: #fff; text-transform: uppercase;">APROVEITE ANTES QUE ACABE! 🏃‍♂️💨</span>
+                                    <span id="poster-ribbon-msg" style="font-size: 2.2rem; font-weight: 900; color: #fff; text-transform: uppercase;">ECONOMIA DE VERDADE PERTO DE VOCÊ</span>
                                 </div>
                             </div>
         
@@ -814,6 +814,11 @@
                 const storeRes = await fetch(`${API_BASE_URL}/api/store/${storeId}`);
                 const storeInfo = await storeRes.json();
                 window.globalStoreInfo = storeInfo;
+                if (storeInfo.logo_url) localStorage.setItem('store_logo', storeInfo.logo_url);
+                else localStorage.removeItem('store_logo');
+                if (storeInfo.banner_url) localStorage.setItem('store_banner', storeInfo.banner_url);
+                else localStorage.removeItem('store_banner');
+                
                 document.getElementById('stat-whatsapp-clicks').textContent = storeInfo.whatsapp_clicks || 0;
 
                 const phoneInput = document.getElementById('store-phone-input');
@@ -1048,8 +1053,8 @@
             btn.textContent = "Fazendo upload...";
 
             try {
-                let logoUrl = localStorage.getItem('store_logo');
-                let bannerUrl = localStorage.getItem('store_banner');
+                let logoUrl = (window.globalStoreInfo && window.globalStoreInfo.logo_url) ? window.globalStoreInfo.logo_url : localStorage.getItem('store_logo');
+                let bannerUrl = (window.globalStoreInfo && window.globalStoreInfo.banner_url) ? window.globalStoreInfo.banner_url : localStorage.getItem('store_banner');
                 if (logoUrl === 'null') logoUrl = null;
                 if (bannerUrl === 'null') bannerUrl = null;
 
@@ -1096,6 +1101,8 @@
                         window.globalStoreInfo.number = numberInput;
                         window.globalStoreInfo.neighborhood = neighborhoodInput;
                         window.globalStoreInfo.poster_message = posterMsgInput;
+                        window.globalStoreInfo.logo_url = logoUrl;
+                        window.globalStoreInfo.banner_url = bannerUrl;
                     }
                     alert('Identidade atualizada com sucesso!');
                     updateAvatar();
@@ -1197,7 +1204,7 @@
                 logoEl.style.display = 'none';
             }
             
-            const ribbonMsg = (window.globalStoreInfo && window.globalStoreInfo.poster_message) ? window.globalStoreInfo.poster_message : "APROVEITE ANTES QUE ACABE! 🏃‍♂️💨";
+            const ribbonMsg = (window.globalStoreInfo && window.globalStoreInfo.poster_message) ? window.globalStoreInfo.poster_message : "ECONOMIA DE VERDADE PERTO DE VOCÊ";
             document.getElementById('poster-ribbon-msg').innerText = ribbonMsg;
 
             const phone = document.getElementById('store-phone-input').value || '';
