@@ -1194,7 +1194,14 @@
                 `;
             }).join('');
             
-            if (typeof startPromoTimers === 'function') startPromoTimers();
+            const attemptTimer = (retries = 5) => {
+                if (typeof startPromoTimers === 'function') {
+                    startPromoTimers();
+                } else if (retries > 0) {
+                    setTimeout(() => attemptTimer(retries - 1), 500);
+                }
+            };
+            attemptTimer();
         }
 
         // --- Logica de Detalhes do Produto ---

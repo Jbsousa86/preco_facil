@@ -640,7 +640,7 @@
                             </div>
         
                             <!-- Grid of products (Moved up and expanded) -->
-                            <div id="poster-products-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(min-content, max-content); gap: 24px; padding: 40px; z-index: 2; flex-grow: 1;">
+                            <div id="poster-products-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(min-content, max-content); gap: 24px; padding: 40px; z-index: 2; flex-grow: 1;">
                                 <!-- Products injected here -->
                             </div>
                             
@@ -1050,8 +1050,8 @@
             }
             document.getElementById('poster-phone').innerText = formattedPhone || '(Sem número)';
 
-            // Pick up to 9 products for the 3x3 grid (since there's no highlighted product anymore)
-            const gridProducts = promos.slice(0, 9);
+            // Pick up to 6 products for the 2x3 grid (prevent overlapping layout)
+            const gridProducts = promos.slice(0, 6);
             
             const grid = document.getElementById('poster-products-grid');
             if (gridProducts.length > 0) {
