@@ -643,7 +643,7 @@
                                 <div style="background: #fff; padding: 15px 40px; border-radius: 50px; display: flex; align-items: center; gap: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-width: 90%;">
                                     <img id="poster-logo" src="" crossorigin="anonymous" style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; display:none;">
                                     <div style="overflow: hidden; text-align: left;">
-                                        <h1 id="poster-store-name" style="font-size: 2.5rem; font-weight: 900; color: #1e3a8a; margin: 0; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Nome da Loja</h1>
+                                        <h1 id="poster-store-name" style="font-size: 2.5rem; font-weight: 900; color: #1e3a8a; margin: 0; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></h1>
                                         <span id="poster-store-address" style="font-size: 1.2rem; font-weight: 600; color: #475569; display: none; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">📍 Endereço</span>
                                     </div>
                                 </div>
@@ -1050,6 +1050,8 @@
             try {
                 let logoUrl = localStorage.getItem('store_logo');
                 let bannerUrl = localStorage.getItem('store_banner');
+                if (logoUrl === 'null') logoUrl = null;
+                if (bannerUrl === 'null') bannerUrl = null;
 
                 if (logoInput.files[0]) {
                     const fileName = `logo-${storeId}-${Date.now()}.jpg`;
@@ -1172,7 +1174,9 @@
                 return;
             }
 
-            document.getElementById('poster-store-name').innerText = storeName || 'Supermercado';
+            const storeNameEl = document.getElementById('poster-store-name');
+            const actualStoreName = (window.globalStoreInfo && window.globalStoreInfo.name) ? window.globalStoreInfo.name : storeName;
+            storeNameEl.innerText = actualStoreName || 'Nome da Loja';
             
             const addrEl = document.getElementById('poster-store-address');
             if (window.globalStoreInfo && window.globalStoreInfo.street) {

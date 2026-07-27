@@ -1075,7 +1075,7 @@
             document.getElementById('header-store-name').innerText = storeData.name;
             document.title = `${storeData.name} - Mercado Local`;
 
-            if (storeData.logo_url) {
+            if (storeData.logo_url && storeData.logo_url !== 'null') {
                 const logoUrl = getFullUrl(storeData.logo_url);
                 const headLogo = document.getElementById('header-logo');
                 if (headLogo) {
@@ -1093,7 +1093,7 @@
                 }
             }
 
-            if (storeData.banner_url) {
+            if (storeData.banner_url && storeData.banner_url !== 'null') {
                 document.getElementById('store-banner').src = getFullUrl(storeData.banner_url);
             }
 
