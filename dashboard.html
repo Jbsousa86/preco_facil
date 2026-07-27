@@ -566,6 +566,12 @@
                                 <input type="text" id="store-neighborhood-input" class="form-control" placeholder="Ex: Centro">
                             </div>
                         </div>
+                        
+                        <div class="form-group" style="margin-bottom: 16px;">
+                            <label for="store-poster-msg-input">Mensagem do Cartaz (Faixa Vermelha)</label>
+                            <input type="text" id="store-poster-msg-input" class="form-control" placeholder="Ex: APROVEITE ANTES QUE ACABE!">
+                        </div>
+
 
                         <div class="form-group">
                             <label>Logo da Empresa</label>
@@ -649,7 +655,7 @@
                                 <h2 style="font-size: 7rem; font-weight: 900; color: #fff; margin: -10px 0 0 0; text-shadow: 5px 5px 0px #1e3a8a, 10px 10px 20px rgba(0,0,0,0.5); line-height: 1; letter-spacing: -2px;">IMPERDÍVEIS</h2>
                                 <h2 style="font-size: 5rem; font-weight: 900; color: #fbbf24; margin: -5px 0 0 0; text-shadow: 4px 4px 0px #b45309, 8px 8px 15px rgba(0,0,0,0.5); line-height: 1;">DA SEMANA!</h2>
                                 <div style="background: #e11d48; display: inline-block; padding: 12px 50px; border-radius: 50px; margin-top: 25px; box-shadow: 0 10px 20px rgba(225, 29, 72, 0.4); transform: rotate(-2deg); border: 4px solid #fff;">
-                                    <span style="font-size: 2.2rem; font-weight: 900; color: #fff; text-transform: uppercase;">APROVEITE ANTES QUE ACABE! 🏃‍♂️💨</span>
+                                    <span id="poster-ribbon-msg" style="font-size: 2.2rem; font-weight: 900; color: #fff; text-transform: uppercase;">APROVEITE ANTES QUE ACABE! 🏃‍♂️💨</span>
                                 </div>
                             </div>
         
@@ -818,6 +824,7 @@
                 if (storeInfo.street) document.getElementById('store-street-input').value = storeInfo.street;
                 if (storeInfo.number) document.getElementById('store-number-input').value = storeInfo.number;
                 if (storeInfo.neighborhood) document.getElementById('store-neighborhood-input').value = storeInfo.neighborhood;
+                if (storeInfo.poster_message) document.getElementById('store-poster-msg-input').value = storeInfo.poster_message;
 
                 const res = await fetch(`${API_BASE_URL}/api/merchant/products?store_id=${storeId}&limit=1000`);
                 merchantProducts = await res.json();
@@ -1061,6 +1068,7 @@
                 const streetInput = document.getElementById('store-street-input').value.trim();
                 const numberInput = document.getElementById('store-number-input').value.trim();
                 const neighborhoodInput = document.getElementById('store-neighborhood-input').value.trim();
+                const posterMsgInput = document.getElementById('store-poster-msg-input').value.trim();
 
                 // Update on backend
                 const res = await fetch(`${API_BASE_URL}/api/merchant/update-identity`, {
@@ -1073,7 +1081,8 @@
                         phone: phoneInput.value.trim(),
                         street: streetInput,
                         number: numberInput,
-                        neighborhood: neighborhoodInput
+                        neighborhood: neighborhoodInput,
+                        poster_message: posterMsgInput
                     })
                 });
 
@@ -1177,6 +1186,9 @@
             } else {
                 logoEl.style.display = 'none';
             }
+            
+            const ribbonMsg = (window.globalStoreInfo && window.globalStoreInfo.poster_message) ? window.globalStoreInfo.poster_message : "APROVEITE ANTES QUE ACABE! 🏃‍♂️💨";
+            document.getElementById('poster-ribbon-msg').innerText = ribbonMsg;
 
             const phone = document.getElementById('store-phone-input').value || '';
             let formattedPhone = phone;
@@ -1269,7 +1281,7 @@
                             await navigator.share({
                                 files: [file],
                                 title: 'Ofertas Imperdíveis - ' + storeName,
-                                text: `🔥 Confira as ofertas imperdíveis de ${storeName}!\n\n🛒 Faça seu pedido direto pelo nosso catálogo online e veja mais:\n🔗 ${window.location.origin}\n\nAproveite antes que acabe!`
+                                text: `🔥 Confira as ofertas imperdíveis de ${storeName}!\n\n🛒 Faça seu pedido direto pelo nosso catálogo online e veja mais:\n🔗 ${window.location.origin}`
                             });
                         } catch (err) {
                             console.log('Compartilhamento cancelado ou falhou', err);
