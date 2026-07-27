@@ -6,7 +6,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const { Pool } = require('pg');
 const fetch = require('node-fetch');
-const multer = require('multer');
+
 const fs = require('fs');
 const crypto = require('crypto');
 
@@ -33,22 +33,7 @@ app.get('/dashboard.html', (req, res) => {
 });
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
-// Configuração do Multer para Uploads
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const dir = './uploads';
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-        cb(null, dir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-    }
-});
-const upload = multer({
-  limits: { fileSize: 600 * 1024 } // 600KB
-});
+
 
 
 // PostgreSQL connection pool Configuration

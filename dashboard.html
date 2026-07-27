@@ -716,7 +716,7 @@
             window.location.protocol === 'file:'
         );
 
-        const API_BASE_URL = isLocal ? 'http://localhost:3000' : 'https://preco-facil.onrender.com';
+        const API_BASE_URL = isLocal ? 'http://localhost:3000' : '';
             
         const supabaseUrl = 'https://licvfuzvvbmjdvcooogo.supabase.co';
         const supabaseKey = 'sb_publishable_8hwXxxU7C4owwVmlc4FvPg_0pEXUFK-';
@@ -1139,7 +1139,7 @@
                             await navigator.share({
                                 files: [file],
                                 title: 'Ofertas Imperdíveis - ' + storeName,
-                                text: `🔥 Confira as ofertas imperdíveis de ${storeName}!\n\n🛒 Faça seu pedido direto pelo nosso catálogo online e veja mais:\n🔗 https://preco-facil.onrender.com\n\nAproveite antes que acabe!`
+                                text: `🔥 Confira as ofertas imperdíveis de ${storeName}!\n\n🛒 Faça seu pedido direto pelo nosso catálogo online e veja mais:\n🔗 ${window.location.origin}\n\nAproveite antes que acabe!`
                             });
                         } catch (err) {
                             console.log('Compartilhamento cancelado ou falhou', err);
