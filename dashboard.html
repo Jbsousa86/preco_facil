@@ -877,31 +877,54 @@
                 });
 
                 const highlightedHtml = renderedProducts.filter(p => p.is_highlighted).map(p => p.html).join('');
-                const normalHtml = renderedProducts.filter(p => !p.is_highlighted).map(p => p.html).join('');
+                const allHtml = renderedProducts.map(p => p.html).join('');
                 const highlightedCount = renderedProducts.filter(p => p.is_highlighted).length;
 
                 container.innerHTML = `
                     <div style="width: 100%;">
-                        <h3 style="margin: 0 0 15px 0; font-size: 1.1rem; color: #b45309; background: #fffbeb; padding: 10px 15px; border-radius: 8px; border: 1px solid #fde68a; display: flex; justify-content: space-between; align-items: center;">
-                            <span>⭐ No Cartaz Promocional</span>
-                            <span style="font-size: 0.9rem; background: #f59e0b; color: #fff; padding: 2px 8px; border-radius: 10px;">${highlightedCount}/6</span>
-                        </h3>
-                        <div class="products-grid" style="margin-bottom: 30px;">
-                            ${highlightedHtml || '<p style="color: #64748b; font-size: 0.9rem; grid-column: 1/-1;">Nenhum produto destacado para o cartaz.</p>'}
+                        <div class="catalog-tabs" style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+                            <button onclick="switchTab('all')" id="tab-all" style="padding: 8px 16px; border: none; background: transparent; font-weight: 700; color: var(--primary); border-bottom: 2px solid var(--primary); cursor: pointer; transition: all 0.2s;">📦 Todos os Produtos (${merchantProducts.length})</button>
+                            <button onclick="switchTab('poster')" id="tab-poster" style="padding: 8px 16px; border: none; background: transparent; font-weight: 700; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s;">⭐ No Cartaz (${highlightedCount}/6)</button>
+                        </div>
+                        
+                        <div id="tab-content-all">
+                            <div class="products-grid">
+                                ${allHtml}
+                            </div>
                         </div>
 
-                        <h3 style="margin: 0 0 15px 0; font-size: 1.1rem; color: #1e293b; background: #f8fafc; padding: 10px 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                            📦 Outros Produtos Cadastrados
-                        </h3>
-                        <div class="products-grid">
-                            ${normalHtml || '<p style="color: #64748b; font-size: 0.9rem; grid-column: 1/-1;">Todos os seus produtos estão destacados.</p>'}
+                        <div id="tab-content-poster" style="display: none;">
+                            <div class="products-grid">
+                                ${highlightedHtml || '<p style="color: #64748b; font-size: 0.9rem; grid-column: 1/-1;">Nenhum produto destacado para o cartaz.</p>'}
+                            </div>
                         </div>
                     </div>
                 `;
+                if (window.currentCatalogTab) { switchTab(window.currentCatalogTab); }
             } catch (err) {
                 console.error(err);
             } finally {
                 spinner.style.display = 'none';
+            }
+        }
+
+        window.currentCatalogTab = 'all';
+        function switchTab(tab) {
+            window.currentCatalogTab = tab;
+            if (tab === 'all') {
+                document.getElementById('tab-content-all').style.display = 'block';
+                document.getElementById('tab-content-poster').style.display = 'none';
+                document.getElementById('tab-all').style.color = 'var(--primary)';
+                document.getElementById('tab-all').style.borderBottomColor = 'var(--primary)';
+                document.getElementById('tab-poster').style.color = '#64748b';
+                document.getElementById('tab-poster').style.borderBottomColor = 'transparent';
+            } else {
+                document.getElementById('tab-content-all').style.display = 'none';
+                document.getElementById('tab-content-poster').style.display = 'block';
+                document.getElementById('tab-poster').style.color = '#b45309';
+                document.getElementById('tab-poster').style.borderBottomColor = '#b45309';
+                document.getElementById('tab-all').style.color = '#64748b';
+                document.getElementById('tab-all').style.borderBottomColor = 'transparent';
             }
         }
 
