@@ -608,8 +608,8 @@
             <h3 style="color:#fff; margin-bottom: 16px;">📸 Pré-visualização do seu Cartaz</h3>
             
             <div style="background:#fff; border-radius:16px; margin-bottom:16px; max-width:95vw; max-height:70vh; overflow:auto; box-shadow:0 20px 40px rgba(0,0,0,0.5);">
-                <!-- The actual poster that will be converted to image (1080x1350 - Portrait) -->
-                <div id="poster-container" style="width: 1080px; height: 1350px; background: linear-gradient(180deg, #023e8a, #0077b6); position: relative; overflow: hidden; font-family: 'Outfit', sans-serif; display: flex; flex-direction: column;">
+                <!-- The actual poster that will be converted to image (1080x1920) -->
+                <div id="poster-container" style="width: 1080px; height: 1920px; background: linear-gradient(180deg, #023e8a, #0077b6); position: relative; overflow: hidden; font-family: 'Outfit', sans-serif; display: flex; flex-direction: column;">
                             <!-- Background Decorators -->
                             <div style="position:absolute; top:-100px; right:-100px; width:600px; height:600px; background:#00b4d8; border-radius:50%; opacity:0.2; filter:blur(50px);"></div>
                             <div style="position:absolute; bottom:200px; left:-200px; width:800px; height:800px; background:#0096c7; border-radius:50%; opacity:0.3; filter:blur(80px);"></div>
@@ -1059,8 +1059,8 @@
             }
             document.getElementById('poster-phone').innerText = formattedPhone || '(Sem número)';
 
-            // Pick up to 6 products for the 3x2 grid to fit the shorter portrait aspect ratio
-            const gridProducts = promos.slice(0, 6);
+            // Pick up to 9 products for the 3x3 grid
+            const gridProducts = promos.slice(0, 9);
             
             const grid = document.getElementById('poster-products-grid');
             if (gridProducts.length > 0) {
