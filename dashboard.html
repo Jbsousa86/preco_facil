@@ -1089,6 +1089,12 @@
                 if (res.ok) {
                     localStorage.setItem('store_logo', logoUrl);
                     localStorage.setItem('store_banner', bannerUrl);
+                    if (window.globalStoreInfo) {
+                        window.globalStoreInfo.street = streetInput;
+                        window.globalStoreInfo.number = numberInput;
+                        window.globalStoreInfo.neighborhood = neighborhoodInput;
+                        window.globalStoreInfo.poster_message = posterMsgInput;
+                    }
                     alert('Identidade atualizada com sucesso!');
                     updateAvatar();
                 } else {
