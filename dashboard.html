@@ -1345,21 +1345,10 @@
         
         // DESINSTALAÇÃO AGRESSIVA DE QUALQUER CACHE ANTIGO E LIMPEZA DE CACHE STORAGE
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function (regs) {
-                let hasActive = regs.length > 0;
-                for (let reg of regs) {
-                    reg.unregister();
-                    console.log('SW Desinstalado para atualização');
-                }
-                if (hasActive) {
-                    if ('caches' in window) {
-                        caches.keys().then(function(names) {
-                            return Promise.all(names.map(name => caches.delete(name)));
-                        }).then(function() {
-                            console.log('Caches removidos, recarregando...');
-                            location.reload();
-                        });
-                    } else {
+            navigator.serviceWorker.register('./sw.js')
+            .then((reg) => console.log('Service Worker Registrado!', reg))
+            .catch((err) => console.log('Erro ao registrar Service Worker:', err));
+        } else {
                         location.reload();
                     }
                 }
