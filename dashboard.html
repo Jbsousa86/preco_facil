@@ -500,10 +500,7 @@
                                 <small style="color: var(--gray-500); font-size: 0.8rem;">Se vazio, a oferta durará 24 horas a partir de agora.</small>
                             </div>
                             
-                            <div class="form-group" style="display: flex; align-items: center; gap: 8px; background: #fffbeb; padding: 10px; border-radius: 8px; border: 1px solid #fde68a;">
-                                <input type="checkbox" id="prod-highlight" style="width: 18px; height: 18px; accent-color: #fbbf24; cursor: pointer;">
-                                <label for="prod-highlight" style="margin: 0; font-size: 0.9rem; font-weight: 700; color: #b45309; cursor: pointer;">⭐ Destacar (Aparece no Cartaz e no Topo da Loja)</label>
-                            </div>
+
 
                             <div class="form-group">
                                 <label for="prod-category">Categoria</label>
@@ -945,8 +942,7 @@
                         promo_price: promoInput.value || null,
                         promo_expires_at: document.getElementById('prod-promo-expires').value || null,
                         image_url: finalImageUrl,
-                        store_id: storeId,
-                        is_highlighted: document.getElementById('prod-highlight').checked
+                        store_id: storeId
                     })
                 });
 
@@ -1029,8 +1025,6 @@
                 document.getElementById('prod-promo-expires').value = '';
             }
             
-            document.getElementById('prod-highlight').checked = p.is_highlighted === true || p.is_highlighted === "true";
-            
             // Set existing image url
             let existing = document.getElementById('existing-image-url');
             if (!existing) {
@@ -1053,7 +1047,6 @@
 
         function resetForm() {
             document.getElementById('add-product-form').reset();
-            document.getElementById('prod-highlight').checked = false;
             document.getElementById('save-btn').textContent = "Salvar Produto";
             document.getElementById('cancel-edit-btn').style.display = 'none';
             document.getElementById('file-name-display').textContent = "📁 Clique para selecionar";
