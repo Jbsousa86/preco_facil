@@ -356,7 +356,7 @@
         }
 
         .product-content {
-            padding: 8px;
+            padding: 8px 8px 4px 8px;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
@@ -408,7 +408,8 @@
             font-size: 0.7rem;
             color: #10b981;
             font-weight: 700;
-            margin-top: 4px;
+            margin-top: 2px;
+            margin-bottom: 4px;
             display: inline-block;
         }
 
@@ -876,17 +877,6 @@
             </div>
         </nav>
 
-        <section id="exclusive-offers-section" style="display:none; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                <h2 style="font-size: 1.15rem; font-weight: 800; color: #b45309; margin: 0; display: flex; align-items: center; gap: 8px;">
-                    ⭐ Ofertas Exclusivas
-                </h2>
-            </div>
-            <div id="exclusive-products-container" class="products-grid">
-                <!-- Highlighted products injected here -->
-            </div>
-        </section>
-
         <section class="products-section">
             <div id="products-container" class="products-grid">
                 <!-- Products will be injected here -->
@@ -1122,7 +1112,14 @@
 
             // Extract categories
             const cats = [...new Set(allProducts.map(p => p.category))].filter(Boolean).sort();
-            categories = ['Todos', ...cats];
+            const hasHighlighted = allProducts.some(p => p.is_highlighted === true || p.is_highlighted === "true");
+            
+            categories = ['Todos'];
+            if (hasHighlighted) {
+                categories.push('⭐ Ofertas Exclusivas');
+            }
+            categories = categories.concat(cats);
+            
             renderCategories();
 
             filterProducts();
@@ -1152,24 +1149,18 @@
 
             filteredProducts = allProducts.filter(p => {
                 const matchesSearch = p.name.toLowerCase().includes(searchTerm);
-                const matchesCategory = activeCategory === 'Todos' || p.category === activeCategory;
+                let matchesCategory = false;
+                
+                if (activeCategory === 'Todos') {
+                    matchesCategory = true;
+                } else if (activeCategory === '⭐ Ofertas Exclusivas') {
+                    matchesCategory = (p.is_highlighted === true || p.is_highlighted === "true");
+                } else {
+                    matchesCategory = (p.category === activeCategory);
+                }
+                
                 return matchesSearch && matchesCategory;
             });
-
-            // Render Exclusive Block (Only if no search and active category is 'Todos')
-            const exclusiveSection = document.getElementById('exclusive-offers-section');
-            if (searchTerm === '' && activeCategory === 'Todos') {
-                const highlighted = allProducts.filter(p => p.is_highlighted === true || p.is_highlighted === "true");
-                if (highlighted.length > 0) {
-                    exclusiveSection.style.display = 'block';
-                    const exclusiveContainer = document.getElementById('exclusive-products-container');
-                    exclusiveContainer.innerHTML = highlighted.map(p => generateProductCardHTML(p)).join('');
-                } else {
-                    exclusiveSection.style.display = 'none';
-                }
-            } else {
-                exclusiveSection.style.display = 'none';
-            }
 
             renderProducts();
         }
