@@ -1214,8 +1214,8 @@
             }
             document.getElementById('poster-phone').innerText = formattedPhone || '(Sem número)';
 
-            // Pick up to 9 products for the 3x3 grid
-            const gridProducts = promos.slice(0, 9);
+            // Pick up to 6 products for the 3x2 grid to prevent layout overflow
+            const gridProducts = promos.slice(0, 6);
             
             const grid = document.getElementById('poster-products-grid');
             if (gridProducts.length > 0) {
