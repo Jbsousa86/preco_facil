@@ -1174,7 +1174,6 @@
                                  </div>`
                             }
                             ${isPromo ? `<div class="promo-pill">-${discountPct}% OFF</div>` : ''}
-                            ${isPromo ? `<div class="promo-timer" data-expires="${p.promo_expires_at}" style="position: absolute; bottom: 8px; left: 8px; right: 8px; font-size: 0.65rem; color: #fff; font-weight: 800; background: rgba(220, 38, 38, 0.9); padding: 4px; border-radius: 6px; text-align: center; backdrop-filter: blur(4px); box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>` : ''}
                             <div class="product-rating-badge">⭐ ${ratingMock}</div>
                         </div>
                         <div class="product-content">
@@ -1193,15 +1192,6 @@
                     </div>
                 `;
             }).join('');
-            
-            const attemptTimer = (retries = 5) => {
-                if (typeof startPromoTimers === 'function') {
-                    startPromoTimers();
-                } else if (retries > 0) {
-                    setTimeout(() => attemptTimer(retries - 1), 500);
-                }
-            };
-            attemptTimer();
         }
 
         // --- Logica de Detalhes do Produto ---
@@ -1234,9 +1224,7 @@
                 promoBadge.style.display = 'block';
                 
                 const timerContainer = document.getElementById('details-promo-timer-container');
-                if (timerContainer) {
-                    timerContainer.innerHTML = `<div class="promo-timer" data-expires="${product.promo_expires_at}" style="font-size: 0.8rem; color: #fff; font-weight: 800; background: #dc2626; padding: 4px 12px; border-radius: 6px; display: inline-block; box-shadow: 0 2px 4px rgba(220,38,38,0.3);"></div>`;
-                }
+                if (timerContainer) timerContainer.innerHTML = '';
             } else {
                 oldPriceEl.style.display = 'none';
                 promoBadge.style.display = 'none';
