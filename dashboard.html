@@ -1254,12 +1254,14 @@
             btn.disabled = true;
 
             try {
-                const element = document.getElementById('poster-container');
-                const wrapper = element.parentElement;
-                const oldMaxHeight = wrapper.style.maxHeight;
-                const oldOverflow = wrapper.style.overflow;
-                wrapper.style.maxHeight = 'none';
-                wrapper.style.overflow = 'visible';
+                const originalElement = document.getElementById('poster-container');
+                // Clone the element and append to body to bypass any parent modal clipping bugs
+                const element = originalElement.cloneNode(true);
+                document.body.appendChild(element);
+                element.style.position = 'absolute';
+                element.style.top = '0';
+                element.style.left = '0';
+                element.style.zIndex = '-9999';
                 
                 const canvas = await html2canvas(element, { 
                     scale: 1,
@@ -1270,8 +1272,7 @@
                     windowHeight: 1920
                 });
                 
-                wrapper.style.maxHeight = oldMaxHeight;
-                wrapper.style.overflow = oldOverflow;
+                document.body.removeChild(element);
                 
                 const link = document.createElement('a');
                 link.download = `cartaz-ofertas-${storeName.replace(/\s+/g, '-').toLowerCase()}.png`;
@@ -1293,12 +1294,13 @@
             btn.disabled = true;
 
             try {
-                const element = document.getElementById('poster-container');
-                const wrapper = element.parentElement;
-                const oldMaxHeight = wrapper.style.maxHeight;
-                const oldOverflow = wrapper.style.overflow;
-                wrapper.style.maxHeight = 'none';
-                wrapper.style.overflow = 'visible';
+                const originalElement = document.getElementById('poster-container');
+                const element = originalElement.cloneNode(true);
+                document.body.appendChild(element);
+                element.style.position = 'absolute';
+                element.style.top = '0';
+                element.style.left = '0';
+                element.style.zIndex = '-9999';
                 
                 const canvas = await html2canvas(element, { 
                     scale: 1,
@@ -1309,8 +1311,7 @@
                     windowHeight: 1920
                 });
                 
-                wrapper.style.maxHeight = oldMaxHeight;
-                wrapper.style.overflow = oldOverflow;
+                document.body.removeChild(element);
                 
                 canvas.toBlob(async (blob) => {
                     const file = new File([blob], `ofertas-${storeName.replace(/\s+/g, '-').toLowerCase()}.png`, { type: 'image/png' });
