@@ -453,14 +453,22 @@ app.patch('/api/merchant/product/highlight', async (req, res) => {
 });
 
 app.post('/api/merchant/update-identity', async (req, res) => {
-    const { store_id, logo_url, banner_url, phone } = req.body;
+    const { store_id, logo_url, banner_url, phone, street, number, neighborhood } = req.body;
     try {
         const client = await pool.connect();
-        if (phone !== undefined) {
-            await client.query('UPDATE stores SET logo_url = $1, banner_url = $2, phone = $3 WHERE id = $4', [logo_url, banner_url, phone, store_id]);
-        } else {
-            await client.query('UPDATE stores SET logo_url = $1, banner_url = $2 WHERE id = $3', [logo_url, banner_url, store_id]);
-        }
+        let query = 'UPDATE stores SET logo_url = $1, banner_url = $2';
+        let values = [logo_url, banner_url];
+        let idx = 3;
+        
+        if (phone !== undefined) { query += `, phone = $${idx++}`; values.push(phone); }
+        if (street !== undefined) { query += `, street = $${idx++}`; values.push(street); }
+        if (number !== undefined) { query += `, number = $${idx++}`; values.push(number); }
+        if (neighborhood !== undefined) { query += `, neighborhood = $${idx++}`; values.push(neighborhood); }
+        
+        query += ` WHERE id = $${idx}`;
+        values.push(store_id);
+
+        await client.query(query, values);
         client.release();
         res.json({ success: true });
     } catch (e) {
