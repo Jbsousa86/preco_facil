@@ -222,7 +222,7 @@ app.get('/api/store/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const client = await pool.connect();
-        const result = await client.query('SELECT id, name, logo_url, banner_url, street, number, neighborhood, phone, whatsapp_clicks FROM stores WHERE id = $1', [id]);
+        const result = await client.query('SELECT id, name, logo_url, banner_url, street, number, neighborhood, poster_message, phone, whatsapp_clicks FROM stores WHERE id = $1', [id]);
         client.release();
         if (result.rows.length > 0) {
             res.json(result.rows[0]);

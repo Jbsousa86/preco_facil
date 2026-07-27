@@ -197,7 +197,8 @@
                 if (res.ok) {
                     localStorage.setItem('store_id', data.id);
                     localStorage.setItem('store_name', data.name);
-                    localStorage.setItem('store_logo', data.logo_url);
+                    localStorage.setItem('store_logo', data.logo_url || '');
+                    localStorage.removeItem('store_banner');
                     window.location.href = 'dashboard.html';
                 } else {
                     errorEl.textContent = data.error || 'Credenciais inválidas';
