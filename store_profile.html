@@ -850,6 +850,9 @@
                         style="justify-content: flex-start; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;"></div>
                     <div id="store-phone-meta" class="store-meta"
                         style="justify-content: flex-start; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; gap: 6px;"></div>
+                    <a id="store-whatsapp-btn" href="#" target="_blank" style="display: none; background: #25D366; color: white; padding: 6px 14px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 0.85rem; margin-top: 10px; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(37, 211, 102, 0.2); width: fit-content;">
+                        💬 Conversar no WhatsApp
+                    </a>
                 </div>
                 <div class="store-badges-container" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
                     <div style="display: flex; align-items: center; gap: 6px; background: #fffbeb; color: #b45309; padding: 6px 12px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; border: 1px solid #fef3c7;">
@@ -1103,6 +1106,9 @@
 
             if (storeData.phone) {
                 document.getElementById('store-phone-meta').innerHTML = `📞 ${storeData.phone}`;
+                const waBtn = document.getElementById('store-whatsapp-btn');
+                waBtn.href = `https://wa.me/55${storeData.phone.replace(/\\D/g, \'\')}?text=Ol%C3%A1%2C%20vim%20pela%20plataforma%20Mercado%20Local.`;
+                waBtn.style.display = 'inline-flex';
             }
         }
 
