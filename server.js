@@ -358,16 +358,17 @@ app.post('/api/products', async (req, res) => {
         const promoExpires = finalPromoPrice !== null ? new Date(Date.now() + 24 * 60 * 60 * 1000) : null;
         
         const upsertPriceQuery = `
-            INSERT INTO prices (store_id, product_id, price, image_url, promo_price, promo_expires_at)
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO prices (store_id, product_id, price, image_url, promo_price, promo_expires_at, is_highlighted)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             ON CONFLICT (store_id, product_id)
             DO UPDATE SET
                 price = EXCLUDED.price,
                 image_url = EXCLUDED.image_url,
+                is_highlighted = EXCLUDED.is_highlighted,
                 promo_price = EXCLUDED.promo_price,
                 promo_expires_at = EXCLUDED.promo_expires_at;
         `;
-        await client.query(upsertPriceQuery, [store_id, productId, finalPrice, image_url, finalPromoPrice, promoExpires]);
+        await client.query(upsertPriceQuery, [store_id, productId, finalPrice, image_url, finalPromoPrice, promoExpires, req.body.is_highlighted || false]);
 
         await client.query('COMMIT');
         res.status(201).json({ success: true, message: 'Produto salvo com sucesso!' });
@@ -404,7 +405,8 @@ app.get('/api/merchant/products', async (req, res) => {
                 pr.price, 
                 pr.promo_price,
                 pr.promo_expires_at,
-                pr.image_url
+                pr.image_url,
+                pr.is_highlighted
              FROM products p
              JOIN prices pr ON p.id = pr.product_id
              WHERE pr.store_id = $1
@@ -766,3 +768,4 @@ initializeDatabase().then(() => {
 
 // Essencial para o Vercel encontrar o app
 module.exports = app;
+

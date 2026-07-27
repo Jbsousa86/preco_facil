@@ -869,6 +869,17 @@
             </div>
         </nav>
 
+        <section id="exclusive-offers-section" style="display:none; padding: 0 16px; margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                <h2 style="font-size: 1.25rem; font-weight: 800; color: #b45309; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    ⭐ Ofertas Exclusivas
+                </h2>
+            </div>
+            <div id="exclusive-products-container" class="products-grid">
+                <!-- Highlighted products injected here -->
+            </div>
+        </section>
+
         <section class="products-section">
             <div id="products-container" class="products-grid">
                 <!-- Products will be injected here -->
@@ -1138,6 +1149,21 @@
                 return matchesSearch && matchesCategory;
             });
 
+            // Render Exclusive Block (Only if no search and active category is 'Todos')
+            const exclusiveSection = document.getElementById('exclusive-offers-section');
+            if (searchTerm === '' && activeCategory === 'Todos') {
+                const highlighted = allProducts.filter(p => p.is_highlighted === true || p.is_highlighted === "true");
+                if (highlighted.length > 0) {
+                    exclusiveSection.style.display = 'block';
+                    const exclusiveContainer = document.getElementById('exclusive-products-container');
+                    exclusiveContainer.innerHTML = highlighted.map(p => generateProductCardHTML(p)).join('');
+                } else {
+                    exclusiveSection.style.display = 'none';
+                }
+            } else {
+                exclusiveSection.style.display = 'none';
+            }
+
             renderProducts();
         }
 
@@ -1152,7 +1178,10 @@
             }
 
             emptyState.style.display = 'none';
-            container.innerHTML = filteredProducts.map(p => {
+            container.innerHTML = filteredProducts.map(p => generateProductCardHTML(p)).join('');
+        }
+
+        function generateProductCardHTML(p) {
                 const isPromo = p.promo_price && new Date(p.promo_expires_at) > new Date();
                 const currentPrice = isPromo ? p.promo_price : p.price;
                 const qty = cart[p.id] ? cart[p.id].qty : 0;
@@ -1191,7 +1220,7 @@
                         </button>
                     </div>
                 `;
-            }).join('');
+                `;
         }
 
         // --- Logica de Detalhes do Produto ---
