@@ -489,9 +489,15 @@
                                     <input type="number" id="prod-price" class="form-control" step="0.01" placeholder="0,00" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="prod-promo">Preço Oferta (Dura 24h)</label>
+                                    <label for="prod-promo">Preço Oferta (R$)</label>
                                     <input type="number" id="prod-promo" class="form-control" step="0.01" placeholder="0,00">
                                 </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="prod-promo-expires">Validade da Oferta</label>
+                                <input type="datetime-local" id="prod-promo-expires" class="form-control">
+                                <small style="color: var(--gray-500); font-size: 0.8rem;">Se vazio, a oferta durará 24 horas a partir de agora.</small>
                             </div>
                             
                             <div class="form-group" style="display: flex; align-items: center; gap: 8px; background: #fffbeb; padding: 10px; border-radius: 8px; border: 1px solid #fde68a;">
@@ -620,6 +626,7 @@
                                     <img id="poster-logo" src="" crossorigin="anonymous" style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; display:none;">
                                     <div>
                                         <h1 id="poster-store-name" style="font-size: 2.2rem; font-weight: 800; color: #1e293b; margin: 0; line-height: 1.1;">Nome da Loja</h1>
+                                        <span id="poster-store-address" style="font-size: 1.1rem; font-weight: 600; color: #64748b; display: none; margin-top: 4px;"></span>
                                     </div>
                                 </div>
                                 <div style="background: #fff; padding: 15px 25px; border-radius: 16px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
@@ -792,6 +799,7 @@
                 // Fetch stats about hits and stores
                 const storeRes = await fetch(`${API_BASE_URL}/api/store/${storeId}`);
                 const storeInfo = await storeRes.json();
+                window.globalStoreInfo = storeInfo;
                 document.getElementById('stat-whatsapp-clicks').textContent = storeInfo.whatsapp_clicks || 0;
 
                 const phoneInput = document.getElementById('store-phone-input');
@@ -912,6 +920,7 @@
                         price: priceInput.value,
                         category: categoryInput.value,
                         promo_price: promoInput.value || null,
+                        promo_expires_at: document.getElementById('prod-promo-expires').value || null,
                         image_url: finalImageUrl,
                         store_id: storeId,
                         is_highlighted: document.getElementById('prod-highlight').checked
@@ -988,6 +997,15 @@
             document.getElementById('prod-price').value = p.price;
             document.getElementById('prod-category').value = p.category;
             document.getElementById('prod-promo').value = p.promo_price || '';
+            
+            if (p.promo_expires_at) {
+                const date = new Date(p.promo_expires_at);
+                const localStr = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                document.getElementById('prod-promo-expires').value = localStr;
+            } else {
+                document.getElementById('prod-promo-expires').value = '';
+            }
+            
             document.getElementById('prod-highlight').checked = p.is_highlighted === true || p.is_highlighted === "true";
             
             // Set existing image url
@@ -1041,6 +1059,16 @@
             }
 
             document.getElementById('poster-store-name').innerText = storeName || 'Supermercado';
+            
+            const addrEl = document.getElementById('poster-store-address');
+            if (window.globalStoreInfo && window.globalStoreInfo.street) {
+                const num = window.globalStoreInfo.number ? `, ${window.globalStoreInfo.number}` : '';
+                const neigh = window.globalStoreInfo.neighborhood ? ` - ${window.globalStoreInfo.neighborhood}` : '';
+                addrEl.innerText = `📍 ${window.globalStoreInfo.street}${num}${neigh}`;
+                addrEl.style.display = 'block';
+            } else {
+                addrEl.style.display = 'none';
+            }
             
             const logo = localStorage.getItem('store_logo');
             const logoEl = document.getElementById('poster-logo');

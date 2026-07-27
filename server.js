@@ -296,7 +296,7 @@ app.post('/api/login', async (req, res) => {
 // Endpoint: GET /api/merchant/products?store_id=...
 // ROTA PARA SALVAR PRODUTO (Recebe JSON do Supabase)
 app.post('/api/products', async (req, res) => {
-    let { name, price, category, image_url, store_id, promo_price } = req.body;
+    let { name, price, category, image_url, store_id, promo_price, promo_expires_at } = req.body;
 
     if (!name || !price || !category || !store_id) {
         return res.status(400).json({ error: 'Todos os campos obrigatórios devem ser preenchidos: nome, preço, categoria e ID da loja.' });
@@ -340,7 +340,10 @@ app.post('/api/products', async (req, res) => {
         const productId = productResult.rows[0].id;
 
         // Etapa 2: Insere ou atualiza o preço na tabela `prices`.
-        const promoExpires = finalPromoPrice !== null ? new Date(Date.now() + 24 * 60 * 60 * 1000) : null;
+        let promoExpires = null;
+        if (finalPromoPrice !== null) {
+            promoExpires = promo_expires_at ? new Date(promo_expires_at) : new Date(Date.now() + 24 * 60 * 60 * 1000);
+        }
         
         const upsertPriceQuery = `
             INSERT INTO prices (store_id, product_id, price, image_url, promo_price, promo_expires_at, is_highlighted)
