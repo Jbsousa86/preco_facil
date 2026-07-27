@@ -439,6 +439,19 @@ app.post('/api/delete-product', async (req, res) => {
     }
 });
 
+app.patch('/api/merchant/product/highlight', async (req, res) => {
+    const { store_id, product_id, is_highlighted } = req.body;
+    try {
+        const client = await pool.connect();
+        await client.query('UPDATE prices SET is_highlighted = $1 WHERE store_id = $2 AND product_id = $3', [is_highlighted, store_id, product_id]);
+        client.release();
+        res.json({ success: true });
+    } catch (e) {
+        console.error("Erro ao destacar produto:", e);
+        res.status(500).json({ error: 'Erro no servidor ao tentar destacar o produto.' });
+    }
+});
+
 app.post('/api/merchant/update-identity', async (req, res) => {
     const { store_id, logo_url, banner_url, phone } = req.body;
     try {

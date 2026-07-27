@@ -848,8 +848,11 @@
                                 ${hasPromo ? `<span style="font-size:0.75rem; text-decoration:line-through; color:var(--gray-600);">R$ ${parseFloat(p.price).toFixed(2).replace('.', ',')}</span><br>R$ ${parseFloat(p.promo_price).toFixed(2).replace('.', ',')}` : `R$ ${parseFloat(p.price).toFixed(2).replace('.', ',')}`}
                             </div>
                         </div>
-                        <div class="product-actions">
-                            <button class="btn-sm btn-edit" onclick="triggerEdit(${index})">✏️ Editar</button>
+                        <div class="product-actions" style="flex-wrap: wrap; gap: 8px;">
+                            <button class="btn-sm" onclick="toggleHighlight(${p.id}, ${p.is_highlighted})" style="width: 100%; margin-bottom: 8px; font-weight: 700; background: ${p.is_highlighted ? '#fef3c7' : '#f8fafc'}; color: ${p.is_highlighted ? '#b45309' : '#64748b'}; border: 1px solid ${p.is_highlighted ? '#fbbf24' : '#cbd5e1'};">
+                                ⭐ ${p.is_highlighted ? 'Destacado (Remover)' : 'Adicionar ao Cartaz'}
+                            </button>
+                            <button class="btn-sm btn-edit" onclick="triggerEdit(${index})" style="flex: 1;">✏️ Editar</button>
                             <button class="btn-sm btn-delete" onclick="triggerDelete(${p.id})">🗑️</button>
                         </div>
                     </div>
@@ -878,6 +881,26 @@
                 }
             } catch (err) {
                 console.error(err);
+            }
+        }
+
+        async function toggleHighlight(productId, currentState) {
+            try {
+                const newState = !currentState;
+                const res = await fetch(`${API_BASE_URL}/api/merchant/product/highlight`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ product_id: productId, store_id: storeId, is_highlighted: newState }),
+                });
+
+                if (res.ok) {
+                    loadProducts();
+                } else {
+                    alert('Erro ao alterar destaque.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erro na conexão.');
             }
         }
 
