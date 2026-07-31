@@ -168,6 +168,7 @@ async function initializeDatabase() {
                 store_id INTEGER REFERENCES stores(id) ON DELETE CASCADE,
                 customer_name TEXT,
                 customer_phone TEXT,
+                address TEXT,
                 access_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `).catch(e => console.error('Erro ao criar tabela leads:', e.message));
@@ -176,6 +177,7 @@ async function initializeDatabase() {
         await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;').catch(e => {});
         await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS banner_url TEXT;').catch(e => {});
         await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS whatsapp_clicks INTEGER DEFAULT 0; ALTER TABLE stores ADD COLUMN IF NOT EXISTS external_url TEXT;').catch(e => {});
+        await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS address TEXT;').catch(e => {});
         
         console.log("Tabelas base (stores, products, history, stats) criadas.");
 
@@ -589,6 +591,40 @@ app.post('/api/track_visit', async (req, res) => {
         res.status(200).json({ success: true });
     } catch (e) {
         console.error('Erro ao rastrear visita:', e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// Endpoint: GET /api/leads/:phone - Busca o lead pelo telefone
+app.get('/api/leads/:phone', async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT customer_name, address FROM leads WHERE customer_phone = $1 ORDER BY access_time DESC LIMIT 1', [req.params.phone]);
+        client.release();
+        if (result.rows.length > 0) {
+            res.json(result.rows[0]);
+        } else {
+            res.status(404).json({ error: 'Lead não encontrado' });
+        }
+    } catch (e) {
+        console.error('Erro ao buscar lead:', e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// Endpoint: POST /api/leads - Salva lead de redirecionamento
+app.post('/api/leads', async (req, res) => {
+    const { store_id, customer_name, customer_phone, address, access_time } = req.body;
+    try {
+        const client = await pool.connect();
+        await client.query(
+            'INSERT INTO leads (store_id, customer_name, customer_phone, address, access_time) VALUES ($1, $2, $3, $4, $5)',
+            [store_id, customer_name, customer_phone, address || '', access_time || new Date()]
+        );
+        client.release();
+        res.status(200).json({ success: true });
+    } catch (e) {
+        console.error('Erro ao salvar lead:', e);
         res.status(500).json({ error: e.message });
     }
 });
