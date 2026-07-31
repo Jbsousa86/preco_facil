@@ -202,10 +202,34 @@
         <div class="store-info">
             <img id="store-logo" src="" class="store-logo" alt="Logo">
             <h1 id="store-name" class="store-name">Carregando...</h1>
-            <p id="store-desc" class="store-desc">Redirecionando você para a melhor experiência.</p>
+            
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 24px; text-align: left;">
+                <h3 style="margin: 0 0 8px; font-size: 1.1rem; color: var(--text-dark);">Sobre o Estabelecimento</h3>
+                <p id="store-desc" style="margin: 0 0 12px; color: var(--text-light); font-size: 0.95rem; line-height: 1.4;">Carregando detalhes...</p>
+                
+                <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
+                    <span>📍</span>
+                    <span id="store-address" style="color: var(--text-light); font-size: 0.9rem; line-height: 1.4;">Endereço não informado</span>
+                </div>
+                
+                <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
+                    <span>🕒</span>
+                    <span id="store-hours" style="color: var(--text-light); font-size: 0.9rem; line-height: 1.4;">Horário não informado</span>
+                </div>
+
+                <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 12px;">
+                    <span>📞</span>
+                    <span id="store-phone" style="color: var(--text-light); font-size: 0.9rem; line-height: 1.4;">Telefone não informado</span>
+                </div>
+                
+                <div style="display: flex; align-items: flex-start; gap: 8px; background: #fee2e2; padding: 12px; border-radius: 8px;">
+                    <span>⚠️</span>
+                    <span style="color: #991b1b; font-size: 0.85rem; font-weight: 600; line-height: 1.3;">Aviso: O atendimento e o envio dos pedidos são feitos exclusivamente através do sistema próprio desta loja.</span>
+                </div>
+            </div>
             
             <button class="cta-btn" onclick="handleCTAClick()">
-                <span>Ver Cardápio e Pedir</span>
+                <span>Acessar o Catálogo</span>
                 <span style="font-size: 1.5rem;">🍽️</span>
             </button>
         </div>
@@ -321,6 +345,24 @@
                 }
 
                 document.getElementById('store-name').innerText = currentStore.name;
+                
+                const addressStr = [currentStore.street, currentStore.number, currentStore.neighborhood].filter(Boolean).join(', ');
+                document.getElementById('store-address').innerText = addressStr || 'Endereço não informado';
+                document.getElementById('store-desc').innerText = currentStore.poster_message || 'Seja bem-vindo(a) à nossa vitrine parceira! Preparamos as melhores opções para você.';
+                
+                const hoursEl = document.getElementById('store-hours');
+                if (currentStore.opening_hours && currentStore.opening_hours.trim() !== '') {
+                    hoursEl.innerText = currentStore.opening_hours;
+                } else {
+                    hoursEl.innerText = 'Não informado';
+                }
+                
+                const phoneEl = document.getElementById('store-phone');
+                if (currentStore.phone && currentStore.phone.trim() !== '') {
+                    phoneEl.innerText = currentStore.phone;
+                } else {
+                    phoneEl.innerText = 'Não informado';
+                }
                 
                 if (currentStore.logo_url) {
                     document.getElementById('store-logo').src = getFullUrl(currentStore.logo_url);
