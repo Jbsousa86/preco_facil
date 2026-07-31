@@ -161,10 +161,21 @@ async function initializeDatabase() {
             );
         `).catch(e => console.error('Erro ao criar tabela global_banners:', e.message));
 
+        
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS leads (
+                id SERIAL PRIMARY KEY,
+                store_id INTEGER REFERENCES stores(id) ON DELETE CASCADE,
+                customer_name TEXT,
+                customer_phone TEXT,
+                access_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `).catch(e => console.error('Erro ao criar tabela leads:', e.message));
+
         // --- 2.5 MIGRAÇÕES DE COLUNAS (DESTAQUES E MÉTRICAS) ---
         await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;').catch(e => {});
         await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS banner_url TEXT;').catch(e => {});
-        await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS whatsapp_clicks INTEGER DEFAULT 0;').catch(e => {});
+        await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS whatsapp_clicks INTEGER DEFAULT 0; ALTER TABLE stores ADD COLUMN IF NOT EXISTS external_url TEXT;').catch(e => {});
         
         console.log("Tabelas base (stores, products, history, stats) criadas.");
 
@@ -222,7 +233,7 @@ app.get('/api/store/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const client = await pool.connect();
-        const result = await client.query('SELECT id, name, logo_url, banner_url, street, number, neighborhood, poster_message, phone, whatsapp_clicks FROM stores WHERE id = $1', [id]);
+        const result = await client.query('SELECT id, name, logo_url, banner_url, street, number, neighborhood, poster_message, phone, whatsapp_clicks, external_url FROM stores WHERE id = \$1', [id]);
         client.release();
         if (result.rows.length > 0) {
             res.json(result.rows[0]);
@@ -254,7 +265,7 @@ app.get('/api/stores', async (req, res) => {
     try {
         const client = await pool.connect();
         const result = await client.query(`
-            SELECT s.id, s.name, s.logo_url, s.banner_url, s.is_blocked, s.is_featured, s.whatsapp_clicks,
+            SELECT s.id, s.name, s.logo_url, s.banner_url, s.is_blocked, s.is_featured, s.whatsapp_clicks, s.external_url,
             EXISTS (
                 SELECT 1 FROM prices p 
                 WHERE p.store_id = s.id 
@@ -637,7 +648,7 @@ app.get('/api/admin/stores', async (req, res) => {
 
 // POST /api/admin/stores - Adicionar loja
 app.post('/api/admin/stores', async (req, res) => {
-    const { name, password, street, number, neighborhood, phone } = req.body;
+    const { name, password, street, number, neighborhood, phone, external_url } = req.body;
     if (!name || !password) {
         return res.status(400).json({ error: 'Nome e senha são obrigatórios' });
     }
@@ -652,8 +663,8 @@ app.post('/api/admin/stores', async (req, res) => {
         }
 
         const result = await client.query(
-            'INSERT INTO stores (name, password, rating, lat, lon, street, number, neighborhood, phone) VALUES ($1, $2, 5.0, 0.0, 0.0, $3, $4, $5, $6) RETURNING *',
-            [name, password, street, number, neighborhood, phone]
+            'INSERT INTO stores (name, password, rating, lat, lon, street, number, neighborhood, phone, external_url) VALUES (\$1, \$2, 5.0, 0.0, 0.0, \$3, \$4, \$5, \$6, \$7) RETURNING *',
+            [name, password, street, number, neighborhood, phone, external_url]
         );
         client.release();
         res.json(result.rows[0]);
@@ -666,10 +677,10 @@ app.post('/api/admin/stores', async (req, res) => {
 // PUT /api/admin/stores/:id - Editar loja
 app.put('/api/admin/stores/:id', async (req, res) => {
     const { id } = req.params;
-    const { name, password, street, number, neighborhood, phone } = req.body;
+    const { name, password, street, number, neighborhood, phone, external_url } = req.body;
     try {
         const client = await pool.connect();
-        await client.query('UPDATE stores SET name = $1, password = $2, street = $3, number = $4, neighborhood = $5, phone = $6 WHERE id = $7', [name, password, street, number, neighborhood, phone, id]);
+        await client.query('UPDATE stores SET name = $1, password = $2, street = $3, number = $4, neighborhood = \$5, phone = \$6, external_url = \$7 WHERE id = \$8', [name, password, street, number, neighborhood, phone, external_url, id]);
         client.release();
         res.json({ success: true });
     } catch (e) {

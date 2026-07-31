@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirecionando - Mercado Local</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --bg-main: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #fff;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+
+        .hero-banner {
+            width: 100%;
+            height: 200px;
+            background: #e2e8f0;
+            object-fit: cover;
+        }
+
+        .store-info {
+            padding: 24px;
+            text-align: center;
+            margin-top: -60px;
+        }
+
+        .store-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            background: #fff;
+            object-fit: cover;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 0 auto 16px;
+        }
+
+        .store-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 0 0 8px;
+        }
+
+        .store-desc {
+            color: var(--text-light);
+            font-size: 1rem;
+            margin-bottom: 24px;
+        }
+
+        .cta-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            transition: transform 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 0 auto;
+        }
+
+        .cta-btn:active {
+            transform: scale(0.95);
+        }
+
+        .cta-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: #fff;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 24px;
+            padding: 32px;
+            box-sizing: border-box;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0 0 8px;
+            color: var(--text-dark);
+        }
+
+        .modal-desc {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <button class="back-btn" onclick="window.history.back()">←</button>
+        <span style="font-weight: 700; font-size: 1.2rem;">Parceiro Oficial</span>
+    </header>
+
+    <div id="content" style="display: none;">
+        <img id="store-banner" src="" class="hero-banner" alt="Banner da Loja" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNlMmU4ZjAiLz48L3N2Zz4='">
+        
+        <div class="store-info">
+            <img id="store-logo" src="" class="store-logo" alt="Logo">
+            <h1 id="store-name" class="store-name">Carregando...</h1>
+            <p id="store-desc" class="store-desc">Redirecionando você para a melhor experiência.</p>
+            
+            <button class="cta-btn" onclick="handleCTAClick()">
+                <span>Ver Cardápio e Pedir</span>
+                <span style="font-size: 1.5rem;">🍽️</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Lead Capture Modal -->
+    <div id="lead-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div style="font-size: 3rem; margin-bottom: 16px;">👋</div>
+            <h2 class="modal-title">Falta pouco!</h2>
+            <p class="modal-desc">Identifique-se rapidamente para acessar o cardápio e receber novidades exclusivas.</p>
+            
+            <form id="lead-form" onsubmit="saveLead(event)">
+                <div class="input-group">
+                    <label>Seu Nome</label>
+                    <input type="text" id="lead-name" placeholder="Ex: João Silva" required>
+                </div>
+                <div class="input-group">
+                    <label>Seu WhatsApp</label>
+                    <input type="tel" id="lead-phone" placeholder="(00) 00000-0000" required>
+                </div>
+                <button type="submit" class="submit-btn" id="submit-btn">Acessar Cardápio</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const isLocal = (
+            window.location.hostname === 'localhost' || 
+            window.location.hostname === '127.0.0.1' || 
+            window.location.hostname.startsWith('192.168.') || 
+            window.location.hostname.startsWith('10.') || 
+            window.location.hostname === "" || 
+            window.location.protocol === 'file:'
+        );
+
+        const API_URL = isLocal ? 'http://localhost:3000' : '';
+        const params = new URLSearchParams(window.location.search);
+        const storeId = params.get('id');
+        let currentStore = null;
+
+        // Usaremos nossa própria API para gravar os leads!
+
+        function getFullUrl(path) {
+            if (!path || path === 'null' || String(path).trim() === '') return '';
+            const cleanPath = String(path).trim();
+            if (cleanPath.startsWith('http') || cleanPath.startsWith('//')) return cleanPath;
+            const finalPath = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
+            return `${API_URL}${finalPath}`;
+        }
+
+        async function init() {
+            if (!storeId) {
+                alert('ID da loja não fornecido.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/api/store/${storeId}`);
+                if (!res.ok) throw new Error('Loja não encontrada');
+                currentStore = await res.json();
+
+                if (!currentStore.external_url) {
+                    // If no external url, redirect back to standard profile
+                    window.location.href = `store_profile.html?id=${storeId}`;
+                    return;
+                }
+
+                document.getElementById('store-name').innerText = currentStore.name;
+                
+                if (currentStore.logo_url) {
+                    document.getElementById('store-logo').src = getFullUrl(currentStore.logo_url);
+                } else {
+                    document.getElementById('store-logo').style.display = 'none';
+                }
+
+                if (currentStore.banner_url) {
+                    document.getElementById('store-banner').src = getFullUrl(currentStore.banner_url);
+                }
+
+                document.getElementById('content').style.display = 'block';
+
+            } catch (err) {
+                console.error(err);
+                alert('Erro ao carregar os dados do estabelecimento.');
+                window.location.href = 'index.html';
+            }
+        }
+
+        function handleCTAClick() {
+            const savedLead = localStorage.getItem('preco_facil_lead');
+            if (savedLead) {
+                // User already identified, proceed
+                const leadData = JSON.parse(savedLead);
+                registerInteractionAndRedirect(leadData);
+            } else {
+                // Open modal
+                document.getElementById('lead-modal').style.display = 'flex';
+            }
+        }
+
+        async function saveLead(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = 'Processando...';
+            btn.disabled = true;
+
+            const name = document.getElementById('lead-name').value.trim();
+            const phone = document.getElementById('lead-phone').value.trim();
+
+            const leadData = { name, phone, captured_at: new Date().toISOString() };
+            localStorage.setItem('preco_facil_lead', JSON.stringify(leadData));
+
+            await registerInteractionAndRedirect(leadData);
+        }
+
+        async function registerInteractionAndRedirect(leadData) {
+            try {
+                // Save to local 'leads' endpoint
+                await fetch(`${API_URL}/api/leads`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        store_id: storeId,
+                        customer_name: leadData.name,
+                        customer_phone: leadData.phone,
+                        access_time: new Date().toISOString()
+                    })
+                });
+            } catch (error) {
+                console.error('Erro ao salvar lead:', error);
+                // Continue with redirect even if analytics fail
+            }
+
+            // Redirect
+            let targetUrl = currentStore.external_url;
+            if (!targetUrl.startsWith('http')) {
+                targetUrl = 'https://' + targetUrl;
+            }
+            window.location.href = targetUrl;
+        }
+
+        init();
+    </script>
+</body>
+</html>

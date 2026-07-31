@@ -497,11 +497,13 @@
                                 style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
                         </div>
                     </div>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Bairro</label>
+                        <input type="text" id="new-neighborhood" placeholder="Setor Central" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
                     <div style="margin-bottom:24px;">
-                        <label
-                            style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Bairro</label>
-                        <input type="text" id="new-neighborhood" placeholder="Setor Central"
-                            style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">URL Externa (Opcional - Parceiro Vitrine)</label>
+                        <input type="text" id="new-external-url" placeholder="https://siteparceiro.com.br" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
                     </div>
                     <button type="submit"
                         style="width:100%; padding:16px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-weight:700; cursor:pointer;">Finalizar
@@ -801,6 +803,7 @@
                 password: document.getElementById('new-pass').value,
                 neighborhood: document.getElementById('new-neighborhood').value,
                 phone: document.getElementById('new-phone').value,
+                external_url: document.getElementById('new-external-url').value,
             };
 
             const res = await fetchAdmin('api/admin/stores', {
@@ -841,7 +844,8 @@
                 phone: document.getElementById('edit-phone').value,
                 street: document.getElementById('edit-street').value,
                 number: document.getElementById('edit-number').value,
-                neighborhood: document.getElementById('edit-neighborhood').value
+                neighborhood: document.getElementById('edit-neighborhood').value,
+                external_url: document.getElementById('edit-external-url') ? document.getElementById('edit-external-url').value : ''
             };
             const res = await fetchAdmin(`api/admin/stores/${id}`, { method: 'PUT', body: JSON.stringify(body) });
             if (res.ok) { closeEditModal(); loadStores(); alert('Loja atualizada com sucesso!'); }

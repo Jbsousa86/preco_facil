@@ -342,13 +342,16 @@ async function loadMerchants() {
         if (allStoresContainer) {
             allStoresContainer.innerHTML = activeStores.map(s => {
                 const hasPromo = s.has_promo; // This column already exists in our updated API
+                const isExternal = s.external_url && s.external_url.trim() !== '';
+                const linkHref = isExternal ? `transition.html?id=${s.id}` : `store_profile.html?id=${s.id}`;
                 return `
-                <div onclick="window.location.href='store_profile.html?id=${s.id}'" style="display:flex; flex-direction:column; align-items:center; cursor:pointer; gap:8px; text-align:center; position:relative;">
+                <div onclick="window.location.href='${linkHref}'" style="display:flex; flex-direction:column; align-items:center; cursor:pointer; gap:8px; text-align:center; position:relative;">
                     ${hasPromo ? `<div style="position:absolute; top:-5px; right:-5px; background:#fbbf24; color:#fff; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:2;">🔥</div>` : ''}
-                    <div style="width:70px; height:70px; border-radius:50%; background:#fff; border:${hasPromo ? '2px solid #fbbf24' : '1px solid #e2e8f0'}; overflow:hidden; box-shadow:${hasPromo ? '0 0 10px rgba(251, 191, 36, 0.3)' : '0 1px 3px rgba(0,0,0,0.05)'};">
+                    <div style="width:70px; height:70px; border-radius:50%; background:#fff; border:${hasPromo ? '2px solid #fbbf24' : (isExternal ? '2px solid #10b981' : '1px solid #e2e8f0')}; overflow:hidden; box-shadow:${hasPromo ? '0 0 10px rgba(251, 191, 36, 0.3)' : '0 1px 3px rgba(0,0,0,0.05)'};">
                         ${s.logo_url ? `<img src="${getFullUrl(s.logo_url)}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="display:flex; align-items:center; justify-content:center; height:100%; font-size:1.5rem;">🏪</div>`}
                     </div>
-                    <span style="font-size:0.75rem; font-weight:600; color:${hasPromo ? '#d97706' : '#1e293b'}; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${s.name}</span>
+                    ${isExternal ? `<div style="background:#10b981; color:#fff; font-size:0.5rem; padding:2px 4px; border-radius:4px; font-weight:800; text-transform:uppercase; margin-top:-12px; z-index:2;">Parceiro Oficial</div>` : ''}
+                    <span style="font-size:0.75rem; font-weight:600; color:${hasPromo ? '#d97706' : (isExternal ? '#10b981' : '#1e293b')}; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin-top:${isExternal ? '0' : '0'};">${s.name}</span>
                 </div>
             `;}).join('');
         }
