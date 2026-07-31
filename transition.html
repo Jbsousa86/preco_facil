@@ -256,8 +256,8 @@
             <!-- Step 4: Address (New User or Update) -->
             <div id="step-address" class="flow-step" style="display: none;">
                 <div style="font-size: 3rem; margin-bottom: 16px;">📍</div>
-                <h2 class="modal-title">Endereço de Entrega</h2>
-                <p class="modal-desc">Para onde enviamos o seu pedido?</p>
+                <h2 class="modal-title">Qual é o seu endereço?</h2>
+                <p class="modal-desc">Informe seu endereço completo.</p>
                 
                 <form onsubmit="handleAddressSubmit(event)">
                     <div class="input-group">
@@ -271,7 +271,7 @@
             <div id="step-final" class="flow-step" style="display: none;">
                 <div style="font-size: 3rem; margin-bottom: 16px;">🚀</div>
                 <h2 class="modal-title">Perfeito, tudo pronto!</h2>
-                <p class="modal-desc" id="final-store-msg">Vou abrir o WhatsApp agora mesmo para você enviar o pedido.</p>
+                <p class="modal-desc" id="final-store-msg">Vou abrir o catálogo agora mesmo para você fazer seu pedido.</p>
             </div>
 
         </div>
@@ -407,7 +407,7 @@
         }
 
         async function finishFlow(updateStorage = false) {
-            document.getElementById('final-store-msg').innerText = `Vou abrir o WhatsApp do ${currentStore.name} agora mesmo para você enviar o pedido. 🚀`;
+            document.getElementById('final-store-msg').innerText = `Vou abrir o catálogo do ${currentStore.name} agora mesmo para você fazer seu pedido. 🚀`;
             showStep('step-final');
             
             // Always ensure the cache is up to date
