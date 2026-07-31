@@ -684,7 +684,7 @@ app.get('/api/admin/stores', async (req, res) => {
 
 // POST /api/admin/stores - Adicionar loja
 app.post('/api/admin/stores', async (req, res) => {
-    const { name, password, street, number, neighborhood, phone, external_url } = req.body;
+    const { name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message } = req.body;
     if (!name || !password) {
         return res.status(400).json({ error: 'Nome e senha são obrigatórios' });
     }
@@ -699,8 +699,8 @@ app.post('/api/admin/stores', async (req, res) => {
         }
 
         const result = await client.query(
-            'INSERT INTO stores (name, password, rating, lat, lon, street, number, neighborhood, phone, external_url) VALUES (\$1, \$2, 5.0, 0.0, 0.0, \$3, \$4, \$5, \$6, \$7) RETURNING *',
-            [name, password, street, number, neighborhood, phone, external_url]
+            'INSERT INTO stores (name, password, rating, lat, lon, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message) VALUES ($1, $2, 5.0, 0.0, 0.0, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
+            [name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message]
         );
         client.release();
         res.json(result.rows[0]);
@@ -713,10 +713,10 @@ app.post('/api/admin/stores', async (req, res) => {
 // PUT /api/admin/stores/:id - Editar loja
 app.put('/api/admin/stores/:id', async (req, res) => {
     const { id } = req.params;
-    const { name, password, street, number, neighborhood, phone, external_url } = req.body;
+    const { name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message } = req.body;
     try {
         const client = await pool.connect();
-        await client.query('UPDATE stores SET name = $1, password = $2, street = $3, number = $4, neighborhood = \$5, phone = \$6, external_url = \$7 WHERE id = \$8', [name, password, street, number, neighborhood, phone, external_url, id]);
+        await client.query('UPDATE stores SET name = $1, password = $2, street = $3, number = $4, neighborhood = $5, phone = $6, external_url = $7, logo_url = $8, banner_url = $9, poster_message = $10 WHERE id = $11', [name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, id]);
         client.release();
         res.json({ success: true });
     } catch (e) {
