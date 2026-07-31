@@ -430,6 +430,7 @@
             <div class="nav-item" onclick="showSection('destaques', this)">💎 Destaques</div>
             <div class="nav-item" onclick="showSection('parceiros', this)">🤝 Parceiros Ext.</div>
             <div class="nav-item" onclick="showSection('seguranca', this)">🛡️ Segurança</div>
+            <div class="nav-item" onclick="showSection('leads', this)">👥 Leads & Clientes</div>
         </nav>
         <div style="padding: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
             <a href="index.html" class="nav-item" style="padding: 0;">⬅️ Ir para o Site</a>
@@ -493,6 +494,32 @@
             </div>
         </section>
 
+        <!-- SEÇÃO: LEADS & CLIENTES -->
+        <section id="section-leads" style="display:none;">
+            <div class="table-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                    <h2 style="margin:0;">👥 Leads & Clientes (Captados)</h2>
+                    <button onclick="loadLeads()" class="btn-icon" style="width:auto; padding:0 20px;">🔄 Atualizar</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome do Lead</th>
+                                <th>WhatsApp</th>
+                                <th>Endereço Cadastrado</th>
+                                <th>Destino (Loja)</th>
+                                <th>Data/Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads-table">
+                            <tr><td colspan="5" style="text-align:center; padding:40px;">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <!-- MODAL: NOVO PARCEIRO -->
         <div id="new-partner-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:20px;">
             <div style="background:#fff; width:100%; max-width:500px; padding:32px; border-radius:24px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto;">
@@ -523,11 +550,99 @@
                         <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Descrição Rápida (Sobre)</label>
                         <textarea id="part-desc" placeholder="A melhor lanchonete da cidade..." style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px; resize:vertical; min-height:60px;"></textarea>
                     </div>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Horário de Funcionamento</label>
+                        <input type="text" id="part-hours" placeholder="Ex: Seg a Sab das 18h às 23h" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
+                    <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Telefone/Whats</label>
+                            <input type="text" id="part-phone" placeholder="(63) 9999-9999" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Bairro</label>
+                            <input type="text" id="part-neighborhood" placeholder="Setor Central" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:16px; display:grid; grid-template-columns:3fr 1fr; gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Rua/Avenida</label>
+                            <input type="text" id="part-street" placeholder="Rua 1" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Número</label>
+                            <input type="text" id="part-number" placeholder="123" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                    </div>
                     <div style="margin-bottom:24px;">
                         <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Link de Redirecionamento</label>
                         <input type="text" id="part-ext" required placeholder="https://herosburger.com.br" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
                     </div>
                     <button type="submit" style="width:100%; padding:16px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-weight:700; cursor:pointer;">Cadastrar Parceiro</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL: EDITAR PARCEIRO -->
+        <div id="edit-partner-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+            <div style="background:#fff; width:100%; max-width:500px; padding:32px; border-radius:24px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                    <h2 style="margin:0; font-size:1.25rem;">✏️ Editar Parceiro</h2>
+                    <button onclick="document.getElementById('edit-partner-modal').style.display='none'" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+                </div>
+                <form id="edit-partner-form">
+                    <input type="hidden" id="edit-part-id">
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Nome da Loja</label>
+                        <input type="text" id="edit-part-name" required style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Senha Provisória</label>
+                        <input type="text" id="edit-part-pass" required style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
+                    <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Logo URL</label>
+                            <input type="text" id="edit-part-logo" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Capa (Banner) URL</label>
+                            <input type="text" id="edit-part-banner" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Descrição Rápida (Sobre)</label>
+                        <textarea id="edit-part-desc" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px; resize:vertical; min-height:60px;"></textarea>
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Horário de Funcionamento</label>
+                        <input type="text" id="edit-part-hours" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
+                    <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Telefone/Whats</label>
+                            <input type="text" id="edit-part-phone" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Bairro</label>
+                            <input type="text" id="edit-part-neighborhood" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:16px; display:grid; grid-template-columns:3fr 1fr; gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Rua/Avenida</label>
+                            <input type="text" id="edit-part-street" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Número</label>
+                            <input type="text" id="edit-part-number" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:24px;">
+                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Link de Redirecionamento</label>
+                        <input type="text" id="edit-part-ext" required style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
+                    <button type="submit" style="width:100%; padding:16px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-weight:700; cursor:pointer;">Atualizar Parceiro</button>
                 </form>
             </div>
         </div>
@@ -749,6 +864,36 @@
             }
         }
 
+        async function loadLeads() {
+            try {
+                const res = await fetchAdmin('api/admin/leads');
+                if (!res.ok) throw new Error('Falha ao carregar leads');
+                const leads = await res.json();
+                
+                const tbody = document.getElementById('leads-table');
+                if (leads.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--secondary);">Nenhum lead captado ainda.</td></tr>`;
+                    return;
+                }
+                
+                tbody.innerHTML = leads.map(l => {
+                    const dateStr = new Date(l.access_time).toLocaleString('pt-BR');
+                    return `
+                        <tr>
+                            <td style="font-weight:600;">${l.customer_name || 'N/I'}</td>
+                            <td><a href="https://wa.me/${(l.customer_phone || '').replace(/\D/g,'')}" target="_blank" style="color:var(--primary); font-weight:600;">${l.customer_phone || 'N/I'}</a></td>
+                            <td style="font-size:0.85rem; color:var(--text-light); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${l.address || ''}">${l.address || 'N/I'}</td>
+                            <td><span class="badge badge-success">${l.store_name || 'Desconhecida'}</span></td>
+                            <td style="font-size:0.85rem;">${dateStr}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error(e);
+                document.getElementById('leads-table').innerHTML = `<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--danger);">Erro ao carregar dados.</td></tr>`;
+            }
+        }
+
         function updateKPIs() {
             document.getElementById('stat-total-stores').innerText = allStores.length;
             document.getElementById('stat-active-stores').innerText = allStores.filter(s => !s.is_blocked).length;
@@ -771,18 +916,24 @@
                 'banners': 'Gestão de Banners',
                 'destaques': 'Curadoria de Destaques',
                 'seguranca': 'Segurança e Bloqueios',
-                'parceiros': 'Gestão de Parceiros Ext.'
+                'parceiros': 'Gestão de Parceiros Ext.',
+                'leads': 'Gestão de Leads & Clientes'
             };
             document.getElementById('page-title').innerText = titles[section] || 'Painel Admin';
             document.getElementById('table-title').innerText = section === 'dashboard' ? 'Todos os Comerciantes' : section.toUpperCase();
 
             document.getElementById('kpi-section').style.display = section === 'dashboard' ? 'grid' : 'none';
-            document.getElementById('section-table').style.display = (section === 'banners' || section === 'parceiros') ? 'none' : 'block';
+            document.getElementById('section-table').style.display = (section === 'banners' || section === 'parceiros' || section === 'leads') ? 'none' : 'block';
             document.getElementById('section-banners').style.display = (section === 'banners') ? 'block' : 'none';
             document.getElementById('section-parceiros').style.display = (section === 'parceiros') ? 'block' : 'none';
+            document.getElementById('section-leads').style.display = (section === 'leads') ? 'block' : 'none';
             document.getElementById('add-store-btn').style.display = (section === 'dashboard' || section === 'lojistas') ? 'block' : 'none';
 
-            renderStoresTable();
+            if (section === 'leads') {
+                loadLeads();
+            } else {
+                renderStoresTable();
+            }
         }
 
         function renderStoresTable() {
@@ -874,6 +1025,9 @@
                             </td>
                             <td>
                                 <div class="actions-cell">
+                                    <button onclick="openEditPartner(${s.id})" class="btn-icon" title="Editar">
+                                        ✏️
+                                    </button>
                                     <button onclick="toggleBlock(${s.id}, ${s.is_blocked ? true : false})" class="btn-icon" title="${s.is_blocked ? 'Ativar' : 'Inativar'}">
                                         ${s.is_blocked ? '🔓' : '🚫'}
                                     </button>
@@ -909,7 +1063,12 @@
                 logo_url: document.getElementById('part-logo').value,
                 banner_url: document.getElementById('part-banner').value,
                 poster_message: document.getElementById('part-desc').value,
-                external_url: document.getElementById('part-ext').value
+                external_url: document.getElementById('part-ext').value,
+                opening_hours: document.getElementById('part-hours').value,
+                phone: document.getElementById('part-phone').value,
+                neighborhood: document.getElementById('part-neighborhood').value,
+                street: document.getElementById('part-street').value,
+                number: document.getElementById('part-number').value
             };
 
             const res = await fetchAdmin('api/admin/stores', {
@@ -924,6 +1083,51 @@
             } else {
                 const data = await res.json();
                 alert('Erro: ' + data.error);
+            }
+        });
+
+        function openEditPartner(id) {
+            const store = allStores.find(s => s.id === id);
+            if (!store) return;
+            document.getElementById('edit-part-id').value = store.id;
+            document.getElementById('edit-part-name').value = store.name;
+            document.getElementById('edit-part-pass').value = store.password || '';
+            document.getElementById('edit-part-logo').value = store.logo_url || '';
+            document.getElementById('edit-part-banner').value = store.banner_url || '';
+            document.getElementById('edit-part-desc').value = store.poster_message || '';
+            document.getElementById('edit-part-hours').value = store.opening_hours || '';
+            document.getElementById('edit-part-phone').value = store.phone || '';
+            document.getElementById('edit-part-neighborhood').value = store.neighborhood || '';
+            document.getElementById('edit-part-street').value = store.street || '';
+            document.getElementById('edit-part-number').value = store.number || '';
+            document.getElementById('edit-part-ext').value = store.external_url || '';
+            document.getElementById('edit-partner-modal').style.display = 'flex';
+        }
+
+        document.getElementById('edit-partner-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('edit-part-id').value;
+            const body = {
+                name: document.getElementById('edit-part-name').value,
+                password: document.getElementById('edit-part-pass').value,
+                logo_url: document.getElementById('edit-part-logo').value,
+                banner_url: document.getElementById('edit-part-banner').value,
+                poster_message: document.getElementById('edit-part-desc').value,
+                external_url: document.getElementById('edit-part-ext').value,
+                opening_hours: document.getElementById('edit-part-hours').value,
+                phone: document.getElementById('edit-part-phone').value,
+                neighborhood: document.getElementById('edit-part-neighborhood').value,
+                street: document.getElementById('edit-part-street').value,
+                number: document.getElementById('edit-part-number').value
+            };
+            const res = await fetchAdmin(`api/admin/stores/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+            if (res.ok) { 
+                document.getElementById('edit-partner-modal').style.display = 'none';
+                loadStores(); 
+                alert('Parceiro atualizado com sucesso!'); 
+            } else { 
+                const data = await res.json(); 
+                alert('Erro: ' + data.error); 
             }
         });
 

@@ -208,6 +208,7 @@ async function initializeDatabase() {
             ALTER TABLE stores ADD COLUMN IF NOT EXISTS banner_url TEXT;
             ALTER TABLE stores ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
             ALTER TABLE stores ADD COLUMN IF NOT EXISTS whatsapp_clicks INTEGER DEFAULT 0;
+            ALTER TABLE stores ADD COLUMN IF NOT EXISTS opening_hours TEXT;
         `);
         // Products
         await pool.query(`
@@ -235,7 +236,7 @@ app.get('/api/store/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const client = await pool.connect();
-        const result = await client.query('SELECT id, name, logo_url, banner_url, street, number, neighborhood, poster_message, phone, whatsapp_clicks, external_url FROM stores WHERE id = \$1', [id]);
+        const result = await client.query('SELECT id, name, logo_url, banner_url, street, number, neighborhood, poster_message, phone, whatsapp_clicks, external_url, opening_hours FROM stores WHERE id = $1', [id]);
         client.release();
         if (result.rows.length > 0) {
             res.json(result.rows[0]);
@@ -684,7 +685,7 @@ app.get('/api/admin/stores', async (req, res) => {
 
 // POST /api/admin/stores - Adicionar loja
 app.post('/api/admin/stores', async (req, res) => {
-    const { name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message } = req.body;
+    const { name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours } = req.body;
     if (!name || !password) {
         return res.status(400).json({ error: 'Nome e senha são obrigatórios' });
     }
@@ -699,8 +700,8 @@ app.post('/api/admin/stores', async (req, res) => {
         }
 
         const result = await client.query(
-            'INSERT INTO stores (name, password, rating, lat, lon, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message) VALUES ($1, $2, 5.0, 0.0, 0.0, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
-            [name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message]
+            'INSERT INTO stores (name, password, rating, lat, lon, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours) VALUES ($1, $2, 5.0, 0.0, 0.0, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+            [name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours]
         );
         client.release();
         res.json(result.rows[0]);
@@ -713,10 +714,10 @@ app.post('/api/admin/stores', async (req, res) => {
 // PUT /api/admin/stores/:id - Editar loja
 app.put('/api/admin/stores/:id', async (req, res) => {
     const { id } = req.params;
-    const { name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message } = req.body;
+    const { name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours } = req.body;
     try {
         const client = await pool.connect();
-        await client.query('UPDATE stores SET name = $1, password = $2, street = $3, number = $4, neighborhood = $5, phone = $6, external_url = $7, logo_url = $8, banner_url = $9, poster_message = $10 WHERE id = $11', [name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, id]);
+        await client.query('UPDATE stores SET name = $1, password = $2, street = $3, number = $4, neighborhood = $5, phone = $6, external_url = $7, logo_url = $8, banner_url = $9, poster_message = $10, opening_hours = $11 WHERE id = $12', [name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours, id]);
         client.release();
         res.json({ success: true });
     } catch (e) {
@@ -765,6 +766,24 @@ app.patch('/api/admin/stores/:id/feature', async (req, res) => {
         await client.query('UPDATE stores SET is_featured = $1 WHERE id = $2', [is_featured, id]);
         client.release();
         res.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// GET /api/admin/leads - Listar todos os leads captados
+app.get('/api/admin/leads', async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query(`
+            SELECT l.id, l.customer_name, l.customer_phone, l.address, l.access_time, s.name as store_name 
+            FROM leads l
+            LEFT JOIN stores s ON s.id = l.store_id
+            ORDER BY l.access_time DESC
+        `);
+        client.release();
+        res.json(result.rows);
     } catch (e) {
         console.error(e);
         res.status(500).json({ error: e.message });
