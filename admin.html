@@ -508,8 +508,8 @@
                                 <th>Nome do Lead</th>
                                 <th>WhatsApp</th>
                                 <th>Endereço Cadastrado</th>
-                                <th>Destino (Loja)</th>
-                                <th>Data/Hora</th>
+                                <th>Qtd Redirecionamentos</th>
+                                <th>Último Acesso</th>
                             </tr>
                         </thead>
                         <tbody id="leads-table">
@@ -519,6 +519,31 @@
                 </div>
             </div>
         </section>
+
+        <!-- MODAL: HISTÓRICO DO LEAD -->
+        <div id="lead-history-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+            <div style="background:#fff; width:100%; max-width:600px; padding:32px; border-radius:24px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                    <div>
+                        <h2 style="margin:0; font-size:1.25rem;">📜 Histórico de Redirecionamentos</h2>
+                        <div id="lead-history-name" style="color:var(--text-light); font-size:0.9rem; margin-top:4px;"></div>
+                    </div>
+                    <button onclick="document.getElementById('lead-history-modal').style.display='none'" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Loja Destino</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lead-history-table">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
         <!-- MODAL: NOVO PARCEIRO -->
         <div id="new-partner-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; padding:20px;">
@@ -752,6 +777,7 @@
 
         const adminKey = sessionStorage.getItem('admin_key');
         let allStores = [];
+        let allLeads = [];
         let currentSection = 'dashboard';
 
         // Check Auth and Start
@@ -868,22 +894,45 @@
             try {
                 const res = await fetchAdmin('api/admin/leads');
                 if (!res.ok) throw new Error('Falha ao carregar leads');
-                const leads = await res.json();
+                allLeads = await res.json();
                 
                 const tbody = document.getElementById('leads-table');
-                if (leads.length === 0) {
+                if (allLeads.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--secondary);">Nenhum lead captado ainda.</td></tr>`;
                     return;
                 }
                 
-                tbody.innerHTML = leads.map(l => {
-                    const dateStr = new Date(l.access_time).toLocaleString('pt-BR');
+                // Agrupar leads por telefone
+                const uniqueLeads = {};
+                allLeads.forEach(l => {
+                    if (!l.customer_phone) return;
+                    if (!uniqueLeads[l.customer_phone]) {
+                        uniqueLeads[l.customer_phone] = {
+                            customer_name: l.customer_name,
+                            customer_phone: l.customer_phone,
+                            address: l.address,
+                            history: [],
+                            last_access: l.access_time
+                        };
+                    }
+                    uniqueLeads[l.customer_phone].history.push(l);
+                    // Como a API já retorna ordenado por access_time DESC, o primeiro que bater será o último acesso
+                });
+                
+                const groupedArray = Object.values(uniqueLeads);
+
+                tbody.innerHTML = groupedArray.map(l => {
+                    const dateStr = new Date(l.last_access).toLocaleString('pt-BR');
                     return `
                         <tr>
                             <td style="font-weight:600;">${l.customer_name || 'N/I'}</td>
-                            <td><a href="https://wa.me/${(l.customer_phone || '').replace(/\D/g,'')}" target="_blank" style="color:var(--primary); font-weight:600;">${l.customer_phone || 'N/I'}</a></td>
+                            <td>
+                                <button onclick="openLeadHistory('${l.customer_phone}')" style="background:none; border:none; padding:0; color:var(--primary); font-weight:600; cursor:pointer; text-decoration:underline;">
+                                    ${l.customer_phone}
+                                </button>
+                            </td>
                             <td style="font-size:0.85rem; color:var(--text-light); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${l.address || ''}">${l.address || 'N/I'}</td>
-                            <td><span class="badge badge-success">${l.store_name || 'Desconhecida'}</span></td>
+                            <td><span class="badge badge-success">${l.history.length} redirecionamentos</span></td>
                             <td style="font-size:0.85rem;">${dateStr}</td>
                         </tr>
                     `;
@@ -892,6 +941,25 @@
                 console.error(e);
                 document.getElementById('leads-table').innerHTML = `<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--danger);">Erro ao carregar dados.</td></tr>`;
             }
+        }
+
+        function openLeadHistory(phone) {
+            const customerHistory = allLeads.filter(l => l.customer_phone === phone);
+            if (customerHistory.length === 0) return;
+            
+            document.getElementById('lead-history-name').innerText = `Cliente: ${customerHistory[0].customer_name || 'N/I'} (${phone})`;
+            
+            const tbody = document.getElementById('lead-history-table');
+            tbody.innerHTML = customerHistory.map(h => {
+                return `
+                    <tr>
+                        <td style="font-size:0.85rem;">${new Date(h.access_time).toLocaleString('pt-BR')}</td>
+                        <td style="font-weight:600; color:var(--text-dark);">${h.store_name || 'Desconhecida'}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('lead-history-modal').style.display = 'flex';
         }
 
         function updateKPIs() {
