@@ -277,7 +277,8 @@
                         <span>▼</span>
                     </button>
                     <div id="menu-recentes" class="profile-menu-content">
-                        <div class="placeholder-text">Histórico de produtos em breve...</div>
+                        <div id="recent-products-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+                        <div id="recent-products-empty" class="placeholder-text" style="display:none;">Você ainda não tem produtos no histórico.</div>
                     </div>
                 </li>
 
@@ -287,7 +288,15 @@
                         <span>▼</span>
                     </button>
                     <div id="menu-interesses" class="profile-menu-content">
-                        <div class="placeholder-text">Personalize seus interesses em breve...</div>
+                        <p style="font-size:0.9rem; color:var(--text-light); margin-top:0;">Selecione o que você mais gosta para recebermos ofertas mais certeiras:</p>
+                        <form onsubmit="handleUpdate(event, 'interesses')" style="display:flex; flex-direction:column; gap:12px;">
+                            <label><input type="checkbox" name="interest" value="Mercado"> 🛒 Supermercado & Mercearia</label>
+                            <label><input type="checkbox" name="interest" value="Farmacia"> 💊 Farmácia & Saúde</label>
+                            <label><input type="checkbox" name="interest" value="Lanches"> 🍔 Lanches & Fast Food</label>
+                            <label><input type="checkbox" name="interest" value="Bebidas"> 🍻 Distribuidoras & Bebidas</label>
+                            <label><input type="checkbox" name="interest" value="Vestuario"> 👗 Moda & Vestuário</label>
+                            <button type="submit" class="btn btn-primary" style="padding:12px; margin-top:8px;">Salvar Interesses</button>
+                        </form>
                     </div>
                 </li>
 
@@ -297,7 +306,8 @@
                         <span>▼</span>
                     </button>
                     <div id="menu-lojas" class="profile-menu-content">
-                        <div class="placeholder-text">Histórico de lojas em breve...</div>
+                        <div id="visited-stores-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+                        <div id="visited-stores-empty" class="placeholder-text" style="display:none;">Você ainda não interagiu com nenhuma loja.</div>
                     </div>
                 </li>
 
@@ -403,6 +413,10 @@
             const success = await fetchAndShowProfile(phone);
             if (!success) {
                 document.getElementById('auth-error').style.display = 'block';
+            } else {
+                loadVisitedStores(phone);
+                loadRecentProducts();
+                loadInterests();
             }
 
             btn.innerText = 'Acessar';
@@ -431,6 +445,10 @@
                     document.getElementById('auth-card').style.display = 'none';
                     document.getElementById('profile-card').style.display = 'block';
                     
+                    loadVisitedStores(phone);
+                    loadRecentProducts();
+                    loadInterests();
+                    
                     // Atualiza local também
                     localStorage.setItem('preco_facil_lead', JSON.stringify({
                         phone: data.customer_phone || phone,
@@ -445,6 +463,77 @@
                 console.error("Erro ao buscar perfil:", err);
                 return false;
             }
+        }
+
+        async function loadVisitedStores(phone) {
+            try {
+                const res = await fetch(`${API_URL}/api/leads/${encodeURIComponent(phone)}/stores`);
+                if (res.ok) {
+                    const stores = await res.json();
+                    const list = document.getElementById('visited-stores-list');
+                    const empty = document.getElementById('visited-stores-empty');
+                    
+                    if (stores.length === 0) {
+                        list.style.display = 'none';
+                        empty.style.display = 'block';
+                    } else {
+                        empty.style.display = 'none';
+                        list.style.display = 'flex';
+                        list.innerHTML = stores.map(s => `
+                            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:#f8fafc; border-radius:12px; border:1px solid #e2e8f0;">
+                                <div style="width:40px; height:40px; border-radius:8px; overflow:hidden; background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-weight:bold;">
+                                    ${s.logo_url ? `<img src="${s.logo_url.startsWith('http') ? s.logo_url : API_URL+'/'+s.logo_url}" style="width:100%; height:100%; object-fit:cover;">` : s.name.charAt(0)}
+                                </div>
+                                <div style="flex:1;">
+                                    <h4 style="margin:0; font-size:1rem;">${s.name}</h4>
+                                </div>
+                                <a href="${s.external_url ? s.external_url : 'store_profile.html?id='+s.id}" style="color:var(--primary); font-size:0.85rem; font-weight:600; text-decoration:none;">Visitar</a>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (e) { console.error('Erro lojas:', e); }
+        }
+
+        function loadRecentProducts() {
+            try {
+                const list = document.getElementById('recent-products-list');
+                const empty = document.getElementById('recent-products-empty');
+                const saved = localStorage.getItem('preco_facil_recent_products');
+                let products = saved ? JSON.parse(saved) : [];
+                
+                if (products.length === 0) {
+                    list.style.display = 'none';
+                    empty.style.display = 'block';
+                } else {
+                    empty.style.display = 'none';
+                    list.style.display = 'flex';
+                    list.innerHTML = products.map(p => `
+                        <div style="display:flex; align-items:center; gap:12px; padding:12px; background:#f8fafc; border-radius:12px; border:1px solid #e2e8f0;">
+                            <div style="width:50px; height:50px; border-radius:8px; overflow:hidden; background:#fff;">
+                                ${p.image_url ? `<img src="${p.image_url.startsWith('http') ? p.image_url : API_URL+'/'+p.image_url}" style="width:100%; height:100%; object-fit:contain;">` : '📦'}
+                            </div>
+                            <div style="flex:1;">
+                                <h4 style="margin:0; font-size:0.95rem;">${p.name}</h4>
+                                <span style="font-size:0.85rem; font-weight:700; color:var(--primary);">R$ ${p.price}</span>
+                            </div>
+                            <a href="store_profile.html?id=${p.store_id}" style="color:var(--text-light); font-size:1.2rem; text-decoration:none;">➔</a>
+                        </div>
+                    `).join('');
+                }
+            } catch(e) {}
+        }
+
+        function loadInterests() {
+            try {
+                const saved = localStorage.getItem('preco_facil_interests');
+                if (saved) {
+                    const arr = JSON.parse(saved);
+                    document.querySelectorAll('input[name="interest"]').forEach(cb => {
+                        cb.checked = arr.includes(cb.value);
+                    });
+                }
+            } catch(e) {}
         }
 
         function showAuth() {
@@ -475,6 +564,14 @@
                 originalText = btn.innerText;
                 btn.innerText = 'Salvando...';
                 btn.disabled = true;
+            }
+
+            if (section === 'interesses') {
+                const selected = Array.from(document.querySelectorAll('input[name="interest"]:checked')).map(cb => cb.value);
+                localStorage.setItem('preco_facil_interests', JSON.stringify(selected));
+                alert('Seus interesses foram salvos!');
+                if (btn) { btn.innerText = originalText; btn.disabled = false; }
+                return;
             }
 
             try {

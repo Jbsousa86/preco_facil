@@ -615,6 +615,25 @@ app.get('/api/leads/:phone', async (req, res) => {
     }
 });
 
+// Endpoint: GET /api/leads/:phone/stores - Busca o histórico de lojas visitadas
+app.get('/api/leads/:phone/stores', async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query(`
+            SELECT DISTINCT s.id, s.name, s.logo_url, s.external_url 
+            FROM leads l
+            JOIN stores s ON l.store_id = s.id
+            WHERE l.customer_phone = $1
+            ORDER BY s.name ASC
+        `, [req.params.phone]);
+        client.release();
+        res.json(result.rows);
+    } catch (e) {
+        console.error('Erro ao buscar lojas do lead:', e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
 // Endpoint: POST /api/leads - Salva lead de redirecionamento
 app.post('/api/leads', async (req, res) => {
     const { store_id, customer_name, customer_phone, address, neighborhood, access_time, promo_optin } = req.body;

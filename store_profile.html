@@ -1237,6 +1237,22 @@
             const product = allProducts.find(p => String(p.id) === String(id));
             if (!product) return;
 
+            // TRACK RECENTLY VIEWED PRODUCTS
+            try {
+                const saved = localStorage.getItem('preco_facil_recent_products');
+                let recents = saved ? JSON.parse(saved) : [];
+                recents = recents.filter(p => String(p.id) !== String(product.id));
+                recents.unshift({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image_url: product.image_url,
+                    store_id: storeId
+                });
+                if (recents.length > 20) recents.pop();
+                localStorage.setItem('preco_facil_recent_products', JSON.stringify(recents));
+            } catch(e) {}
+
             selectedProduct = product;
             const inCart = cart[id];
             selectedProductQty = inCart ? inCart.qty : 1;
