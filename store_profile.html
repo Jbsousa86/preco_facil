@@ -1476,7 +1476,7 @@
             const userData = JSON.parse(savedLead);
             try { fetch(API_BASE_URL + '/api/store/' + storeId + '/track_whatsapp', { method: 'POST' }); } catch(e){}
             
-            const msg = 'Olá! Sou ' + userData.name + ', acessei pelo Mercado Local. Meu endereço é: ' + (userData.address || 'Não informado') + '. Gostaria de tirar uma dúvida ou fazer um pedido.';
+            const msg = 'Olá! Sou ' + userData.name + ', acessei pelo Mercado Local. Meu endereço é: ' + (userData.address || 'Não informado') + (userData.neighborhood ? ' - Bairro: ' + userData.neighborhood : '') + '. Gostaria de tirar uma dúvida ou fazer um pedido.';
             const phone = storeData.phone ? storeData.phone.replace(/\D/g, '') : '5563992225774';
             window.open('https://wa.me/55' + phone + '?text=' + encodeURIComponent(msg), '_blank');
         }
@@ -1501,6 +1501,9 @@
             message += '🏪 *Loja:* ' + storeData.name + '\n';
             message += '👤 *Cliente:* ' + (userData.name || 'Não informado') + '\n';
             message += '📍 *Endereço de Entrega:* ' + (userData.address || 'Não informado') + '\n';
+            if (userData.neighborhood) {
+                message += '🏘️ *Bairro:* ' + userData.neighborhood + '\n';
+            }
             message += '--------------------------\n';
 
             let total = 0;

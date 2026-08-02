@@ -511,6 +511,7 @@
                                 <th>Nome do Lead</th>
                                 <th>WhatsApp</th>
                                 <th>Endereço Cadastrado</th>
+                                <th>Recebe Ofertas?</th>
                                 <th>Qtd Redirecionamentos</th>
                                 <th>Último Acesso</th>
                             </tr>
@@ -918,9 +919,12 @@
                             customer_name: l.customer_name,
                             customer_phone: l.customer_phone,
                             address: l.address,
+                            promo_optin: !!l.promo_optin,
                             history: [],
                             last_access: l.access_time
                         };
+                    } else if (l.promo_optin) {
+                        uniqueLeads[l.customer_phone].promo_optin = true;
                     }
                     uniqueLeads[l.customer_phone].history.push(l);
                     // Como a API já retorna ordenado por access_time DESC, o primeiro que bater será o último acesso
@@ -939,7 +943,12 @@
                                 </button>
                             </td>
                             <td style="font-size:0.85rem; color:var(--text-light); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${l.address || ''}">${l.address || 'N/I'}</td>
-                            <td><span class="badge badge-success">${l.history.length} redirecionamentos</span></td>
+                            <td>
+                                <span class="badge ${l.promo_optin ? 'badge-success' : 'badge-danger'}">
+                                    ${l.promo_optin ? 'Sim' : 'Não'}
+                                </span>
+                            </td>
+                            <td><span class="badge badge-success" style="background:#e0f2fe; color:#0369a1;">${l.history.length} redirecionamentos</span></td>
                             <td style="font-size:0.85rem;">${dateStr}</td>
                         </tr>
                     `;
@@ -989,25 +998,34 @@
             const uniqueLeads = {};
             allLeads.forEach(l => {
                 if (!l.customer_phone || l.customer_phone === 'Não informado') return;
+                
+                // Opt-in pode ter sido true em alguma interação, então priorizamos true
+                const currentOptin = l.promo_optin ? 'Sim' : 'Não';
+                
                 if (!uniqueLeads[l.customer_phone]) {
                     uniqueLeads[l.customer_phone] = {
                         Nome: l.customer_name || '',
                         Telefone: l.customer_phone || '',
                         Endereco: l.address || '',
+                        Bairro: l.neighborhood || '',
+                        AceitaOfertas: currentOptin,
                         UltimoAcesso: new Date(l.access_time).toLocaleString('pt-BR')
                     };
                 } else {
                     uniqueLeads[l.customer_phone].UltimoAcesso = new Date(l.access_time).toLocaleString('pt-BR');
+                    if (l.promo_optin) {
+                        uniqueLeads[l.customer_phone].AceitaOfertas = 'Sim';
+                    }
                 }
             });
 
             const rows = Object.values(uniqueLeads);
             if (rows.length === 0) return alert("Nenhum lead real capturado.");
 
-            let csvContent = "data:text/csv;charset=utf-8,Nome,Telefone,Endereço,Último Acesso\n";
+            let csvContent = "data:text/csv;charset=utf-8,Nome,Telefone,Endereço,Bairro,Aceita Ofertas,Último Acesso\n";
             rows.forEach(row => {
                 const escapeCSV = (str) => '"' + String(str).replace(/"/g, '""') + '"';
-                csvContent += `${escapeCSV(row.Nome)},${escapeCSV(row.Telefone)},${escapeCSV(row.Endereco)},${escapeCSV(row.UltimoAcesso)}\n`;
+                csvContent += `${escapeCSV(row.Nome)},${escapeCSV(row.Telefone)},${escapeCSV(row.Endereco)},${escapeCSV(row.Bairro)},${escapeCSV(row.AceitaOfertas)},${escapeCSV(row.UltimoAcesso)}\n`;
             });
 
             const encodedUri = encodeURI(csvContent);

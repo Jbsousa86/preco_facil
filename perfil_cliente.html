@@ -7,13 +7,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #10b981;
-            --primary-dark: #059669;
-            --danger: #ef4444;
-            --danger-dark: #dc2626;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
             --bg-main: #f8fafc;
             --text-dark: #1e293b;
             --text-light: #64748b;
+            --danger: #ef4444;
         }
 
         body {
@@ -21,29 +20,29 @@
             margin: 0;
             background-color: var(--bg-main);
             color: var(--text-dark);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
         }
 
         .header {
             background: #fff;
-            padding: 16px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            position: relative;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .back-btn {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
             background: none;
             border: none;
             font-size: 1.5rem;
             color: var(--text-dark);
             cursor: pointer;
+            margin-right: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
@@ -75,6 +74,59 @@
             font-size: 0.95rem;
         }
 
+        /* Menu de Perfil (Accordion) */
+        .profile-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .profile-menu-item {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .profile-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .profile-menu-btn {
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            padding: 20px 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            transition: background 0.2s;
+        }
+
+        .profile-menu-btn:hover {
+            background: #f8fafc;
+        }
+
+        .profile-menu-btn .icon-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-menu-content {
+            display: none;
+            padding: 10px 10px 24px 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .profile-menu-content.open {
+            display: block;
+        }
+
+        /* Formulários e Inputs */
         .input-group {
             margin-bottom: 16px;
         }
@@ -143,6 +195,21 @@
         .auth-card {
             /* herda .card */
         }
+
+        .placeholder-text {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            background: #f1f5f9;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -154,34 +221,119 @@
 
     <div class="container">
         
-        <div id="profile-card" class="card" style="display: none;">
-            <h1 class="title">Seus Dados</h1>
-            <p class="desc">Gerencie suas informações de contato e entrega.</p>
+        <div id="profile-card" class="card" style="display: none; padding: 16px 20px;">
             
-            <form id="profile-form" onsubmit="handleUpdate(event)">
-                <div class="input-group">
-                    <label>Telefone (WhatsApp)</label>
-                    <input type="tel" id="user-phone" disabled>
-                    <small style="color: var(--text-light); font-size: 0.75rem;">O telefone não pode ser alterado, pois é a sua identificação.</small>
-                </div>
-                <div class="input-group">
-                    <label>Nome</label>
-                    <input type="text" id="user-name" required>
-                </div>
-                <div class="input-group">
-                    <label>Endereço</label>
-                    <input type="text" id="user-address" required>
-                </div>
+            <div style="text-align: center; margin-bottom: 24px; padding-top: 16px;">
+                <div style="width: 80px; height: 80px; background: var(--primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; margin: 0 auto 12px auto;" id="avatar-initial">?</div>
+                <h2 style="margin: 0; font-size: 1.4rem;" id="header-name">Carregando...</h2>
+                <p style="margin: 4px 0 0 0; color: var(--text-light); font-size: 0.9rem;" id="header-phone"></p>
+            </div>
 
-                <button type="submit" class="btn btn-primary" id="btn-update">Salvar Alterações</button>
-                <button type="button" class="btn btn-danger" onclick="handleDelete()">Excluir Minha Conta</button>
-                <button type="button" class="btn" style="background: #e2e8f0; color: var(--text-dark); margin-top: 16px;" onclick="handleLogout()">Sair da Conta</button>
-            </form>
+            <ul class="profile-menu">
+                <li class="profile-menu-item">
+                    <button class="profile-menu-btn" onclick="toggleMenu('menu-dados')">
+                        <div class="icon-title"><span>👤</span> Meus dados</div>
+                        <span>▼</span>
+                    </button>
+                    <div id="menu-dados" class="profile-menu-content">
+                        <form onsubmit="handleUpdate(event, 'dados')">
+                            <div class="input-group">
+                                <label>Nome Completo</label>
+                                <input type="text" id="user-name" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Telefone (WhatsApp)</label>
+                                <input type="tel" id="user-phone" disabled>
+                                <small style="color: var(--text-light); font-size: 0.75rem;">O telefone é sua chave de identificação e não pode ser alterado.</small>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="padding: 12px;">Salvar Nome</button>
+                        </form>
+                    </div>
+                </li>
+
+                <li class="profile-menu-item">
+                    <button class="profile-menu-btn" onclick="toggleMenu('menu-enderecos')">
+                        <div class="icon-title"><span>📍</span> Meus endereços</div>
+                        <span>▼</span>
+                    </button>
+                    <div id="menu-enderecos" class="profile-menu-content">
+                        <form onsubmit="handleUpdate(event, 'enderecos')">
+                            <div class="input-group">
+                                <label>Endereço de Entrega (Rua, Número)</label>
+                                <input type="text" id="user-address" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Bairro</label>
+                                <input type="text" id="user-neighborhood" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="padding: 12px;">Salvar Endereço</button>
+                        </form>
+                    </div>
+                </li>
+
+                <li class="profile-menu-item">
+                    <button class="profile-menu-btn" onclick="toggleMenu('menu-recentes')">
+                        <div class="icon-title"><span>🕒</span> Visualizados recentemente</div>
+                        <span>▼</span>
+                    </button>
+                    <div id="menu-recentes" class="profile-menu-content">
+                        <div class="placeholder-text">Histórico de produtos em breve...</div>
+                    </div>
+                </li>
+
+                <li class="profile-menu-item">
+                    <button class="profile-menu-btn" onclick="toggleMenu('menu-interesses')">
+                        <div class="icon-title"><span>📩</span> Meus interesses</div>
+                        <span>▼</span>
+                    </button>
+                    <div id="menu-interesses" class="profile-menu-content">
+                        <div class="placeholder-text">Personalize seus interesses em breve...</div>
+                    </div>
+                </li>
+
+                <li class="profile-menu-item">
+                    <button class="profile-menu-btn" onclick="toggleMenu('menu-lojas')">
+                        <div class="icon-title"><span>🏪</span> Lojas visitadas</div>
+                        <span>▼</span>
+                    </button>
+                    <div id="menu-lojas" class="profile-menu-content">
+                        <div class="placeholder-text">Histórico de lojas em breve...</div>
+                    </div>
+                </li>
+
+                <li class="profile-menu-item">
+                    <button class="profile-menu-btn" onclick="toggleMenu('menu-promocoes')">
+                        <div class="icon-title"><span>🔔</span> Preferências de promoções</div>
+                        <span>▼</span>
+                    </button>
+                    <div id="menu-promocoes" class="profile-menu-content">
+                        <p style="font-size: 0.9rem; color: var(--text-light); margin-top:0;">Escolha se deseja receber ofertas do Mercado Local e de lojistas parceiros.</p>
+                        <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; cursor: pointer;">
+                            <input type="checkbox" id="user-promo-optin" style="width: 20px; height: 20px;">
+                            <span style="font-weight: 600;">Receber promoções e novidades</span>
+                        </label>
+                        <button type="button" class="btn btn-primary" style="padding: 12px;" onclick="handleUpdate(event, 'promocoes')">Salvar Preferências</button>
+                    </div>
+                </li>
+
+                <li class="profile-menu-item">
+                    <button class="profile-menu-btn" onclick="toggleMenu('menu-privacidade')">
+                        <div class="icon-title"><span>🔒</span> Privacidade e LGPD</div>
+                        <span>▼</span>
+                    </button>
+                    <div id="menu-privacidade" class="profile-menu-content">
+                        <p style="font-size: 0.9rem; color: var(--text-light); margin-top:0;">Você tem o direito de solicitar a exclusão total dos seus dados de nossos servidores, de acordo com a Lei Geral de Proteção de Dados (LGPD).</p>
+                        <button type="button" class="btn btn-danger" style="padding: 12px; margin-top: 0;" onclick="handleDelete()">Excluir Minha Conta Permanentemente</button>
+                    </div>
+                </li>
+            </ul>
+
+            <button type="button" class="btn" style="background: #e2e8f0; color: var(--text-dark); margin-top: 24px; padding: 12px;" onclick="handleLogout()">Sair da Conta</button>
         </div>
 
         <div id="auth-card" class="card" style="display: none;">
             <h1 class="title">Acessar Perfil</h1>
-            <p class="desc">Informe o seu número de WhatsApp para gerenciar seus dados (LGPD).</p>
+            <p class="desc">Informe o seu número de WhatsApp para gerenciar seus dados.</p>
             
             <form onsubmit="handleAuth(event)">
                 <div class="input-group">
@@ -211,6 +363,18 @@
         ) ? 'http://localhost:3000' : '';
 
         let userData = null;
+
+        function toggleMenu(menuId) {
+            const content = document.getElementById(menuId);
+            const isOpen = content.classList.contains('open');
+            
+            // Fechar todos
+            document.querySelectorAll('.profile-menu-content').forEach(el => el.classList.remove('open'));
+            
+            if (!isOpen) {
+                content.classList.add('open');
+            }
+        }
 
         async function loadProfile() {
             const savedStr = localStorage.getItem('preco_facil_lead');
@@ -250,16 +414,30 @@
                 const res = await fetch(`${API_URL}/api/leads/${encodeURIComponent(phone)}`);
                 if (res.ok) {
                     const data = await res.json();
-                    userData = { phone: phone, name: data.customer_name, address: data.address };
+                    userData = data;
                     
-                    localStorage.setItem('preco_facil_lead', JSON.stringify(userData));
-
-                    document.getElementById('user-phone').value = phone;
+                    // Preenche campos
+                    document.getElementById('user-phone').value = data.customer_phone || phone;
                     document.getElementById('user-name').value = data.customer_name || '';
                     document.getElementById('user-address').value = data.address || '';
+                    document.getElementById('user-neighborhood').value = data.neighborhood || '';
+                    document.getElementById('user-promo-optin').checked = !!data.promo_optin;
                     
-                    document.getElementById('profile-card').style.display = 'block';
+                    // Header visual
+                    document.getElementById('header-name').innerText = data.customer_name || 'Usuário';
+                    document.getElementById('header-phone').innerText = data.customer_phone || phone;
+                    document.getElementById('avatar-initial').innerText = (data.customer_name || 'U').charAt(0).toUpperCase();
+
                     document.getElementById('auth-card').style.display = 'none';
+                    document.getElementById('profile-card').style.display = 'block';
+                    
+                    // Atualiza local também
+                    localStorage.setItem('preco_facil_lead', JSON.stringify({
+                        phone: data.customer_phone || phone,
+                        name: data.customer_name,
+                        address: data.address,
+                        neighborhood: data.neighborhood
+                    }));
                     return true;
                 }
                 return false;
@@ -282,39 +460,59 @@
             showAuth();
         }
 
-        async function handleUpdate(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-update');
-            btn.innerText = 'Salvando...';
-            btn.disabled = true;
-
+        async function handleUpdate(e, section) {
+            if (e) e.preventDefault();
+            
             const name = document.getElementById('user-name').value.trim();
             const address = document.getElementById('user-address').value.trim();
-            const phone = userData.phone;
+            const neighborhood = document.getElementById('user-neighborhood').value.trim();
+            const promoOptin = document.getElementById('user-promo-optin').checked;
+            const phone = document.getElementById('user-phone').value.trim();
+            
+            const btn = e ? e.target.querySelector('button[type="submit"]') || e.target : null;
+            let originalText = '';
+            if (btn) {
+                originalText = btn.innerText;
+                btn.innerText = 'Salvando...';
+                btn.disabled = true;
+            }
 
             try {
                 const res = await fetch(`${API_URL}/api/leads/${encodeURIComponent(phone)}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ customer_name: name, address: address })
+                    body: JSON.stringify({ 
+                        customer_name: name, 
+                        address: address, 
+                        neighborhood: neighborhood,
+                        promo_optin: promoOptin
+                    })
                 });
 
                 if (res.ok) {
-                    // Atualiza LocalStorage
-                    userData.name = name;
-                    userData.address = address;
-                    localStorage.setItem('preco_facil_lead', JSON.stringify(userData));
-                    alert('Dados atualizados com sucesso!');
+                    alert('Preferências salvas com sucesso!');
+                    
+                    document.getElementById('header-name').innerText = name || 'Usuário';
+                    document.getElementById('avatar-initial').innerText = (name || 'U').charAt(0).toUpperCase();
+
+                    localStorage.setItem('preco_facil_lead', JSON.stringify({
+                        phone: phone,
+                        name: name,
+                        address: address,
+                        neighborhood: neighborhood
+                    }));
                 } else {
-                    alert('Erro ao atualizar os dados.');
+                    alert('Erro ao atualizar perfil.');
                 }
             } catch (err) {
                 console.error(err);
-                alert('Erro de conexão ao atualizar os dados.');
+                alert('Erro de conexão ao salvar.');
             }
-
-            btn.innerText = 'Salvar Alterações';
-            btn.disabled = false;
+            
+            if (btn) {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
         }
 
         async function handleDelete() {
@@ -323,7 +521,7 @@
             }
 
             try {
-                const phone = userData.phone;
+                const phone = document.getElementById('user-phone').value.trim();
                 const res = await fetch(`${API_URL}/api/leads/${encodeURIComponent(phone)}`, {
                     method: 'DELETE'
                 });

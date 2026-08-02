@@ -178,6 +178,8 @@ async function initializeDatabase() {
         await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS banner_url TEXT;').catch(e => {});
         await pool.query('ALTER TABLE stores ADD COLUMN IF NOT EXISTS whatsapp_clicks INTEGER DEFAULT 0; ALTER TABLE stores ADD COLUMN IF NOT EXISTS external_url TEXT;').catch(e => {});
         await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS address TEXT;').catch(e => {});
+        await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS neighborhood TEXT;').catch(e => {});
+        await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS promo_optin BOOLEAN DEFAULT FALSE;').catch(e => {});
         
         console.log("Tabelas base (stores, products, history, stats) criadas.");
 
@@ -600,7 +602,7 @@ app.post('/api/track_visit', async (req, res) => {
 app.get('/api/leads/:phone', async (req, res) => {
     try {
         const client = await pool.connect();
-        const result = await client.query('SELECT customer_name, address FROM leads WHERE customer_phone = $1 ORDER BY access_time DESC LIMIT 1', [req.params.phone]);
+        const result = await client.query('SELECT customer_name, address, neighborhood, promo_optin FROM leads WHERE customer_phone = $1 ORDER BY access_time DESC LIMIT 1', [req.params.phone]);
         client.release();
         if (result.rows.length > 0) {
             res.json(result.rows[0]);
@@ -615,12 +617,12 @@ app.get('/api/leads/:phone', async (req, res) => {
 
 // Endpoint: POST /api/leads - Salva lead de redirecionamento
 app.post('/api/leads', async (req, res) => {
-    const { store_id, customer_name, customer_phone, address, access_time } = req.body;
+    const { store_id, customer_name, customer_phone, address, neighborhood, access_time, promo_optin } = req.body;
     try {
         const client = await pool.connect();
         await client.query(
-            'INSERT INTO leads (store_id, customer_name, customer_phone, address, access_time) VALUES ($1, $2, $3, $4, $5)',
-            [store_id, customer_name, customer_phone, address || '', access_time || new Date()]
+            'INSERT INTO leads (store_id, customer_name, customer_phone, address, neighborhood, access_time, promo_optin) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+            [store_id, customer_name, customer_phone, address || '', neighborhood || '', access_time || new Date(), promo_optin || false]
         );
         client.release();
         res.status(200).json({ success: true });
@@ -632,13 +634,19 @@ app.post('/api/leads', async (req, res) => {
 
 // Endpoint: PUT /api/leads/:phone - Atualiza os dados do lead
 app.put('/api/leads/:phone', async (req, res) => {
-    const { customer_name, address } = req.body;
+    const { customer_name, address, neighborhood, promo_optin } = req.body;
     try {
         const client = await pool.connect();
-        await client.query(
-            'UPDATE leads SET customer_name = $1, address = $2 WHERE customer_phone = $3',
-            [customer_name, address, req.params.phone]
-        );
+        
+        let updateQuery = 'UPDATE leads SET customer_name = $1, address = $2, neighborhood = $3 WHERE customer_phone = $4';
+        let queryParams = [customer_name, address, neighborhood || '', req.params.phone];
+        
+        if (promo_optin !== undefined) {
+            updateQuery = 'UPDATE leads SET customer_name = $1, address = $2, neighborhood = $3, promo_optin = $4 WHERE customer_phone = $5';
+            queryParams = [customer_name, address, neighborhood || '', promo_optin, req.params.phone];
+        }
+
+        await client.query(updateQuery, queryParams);
         client.release();
         res.status(200).json({ success: true });
     } catch (e) {
@@ -828,7 +836,7 @@ app.get('/api/admin/leads', async (req, res) => {
     try {
         const client = await pool.connect();
         const result = await client.query(`
-            SELECT l.id, l.customer_name, l.customer_phone, l.address, l.access_time, s.name as store_name 
+            SELECT l.id, l.customer_name, l.customer_phone, l.address, l.neighborhood, l.access_time, l.promo_optin, s.name as store_name 
             FROM leads l
             LEFT JOIN stores s ON s.id = l.store_id
             ORDER BY l.access_time DESC

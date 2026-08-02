@@ -379,6 +379,7 @@
                         customer_name: leadData.name,
                         customer_phone: leadData.phone,
                         address: leadData.address,
+                        neighborhood: leadData.neighborhood || '',
                         access_time: new Date().toISOString()
                     })
                 });
@@ -402,7 +403,7 @@
                 const isAnonymous = (leadData.name === 'Cliente Anônimo');
                 const msg = isAnonymous 
                     ? `Olá! Vim pelo Mercado Local e gostaria de conferir os produtos.`
-                    : `Olá! Sou ${leadData.name}, acessei pelo Mercado Local. Meu endereço para entrega é: ${leadData.address || 'Não informado'}. Gostaria de conferir os produtos e fazer um pedido.`;
+                    : `Olá! Sou ${leadData.name}, acessei pelo Mercado Local. Meu endereço para entrega é: ${leadData.address || 'Não informado'}${leadData.neighborhood ? ' - Bairro: ' + leadData.neighborhood : ''}. Gostaria de conferir os produtos e fazer um pedido.`;
                 
                 try {
                     const urlObj = new URL(targetUrl);

@@ -207,8 +207,12 @@
                         <input type="text" id="user-name" placeholder="Como você se chama?" required>
                     </div>
                     <div class="input-group">
-                        <label>Endereço de Entrega</label>
-                        <input type="text" id="user-address" placeholder="Rua, Número, Bairro" required>
+                        <label>Endereço de Entrega (Rua, Número)</label>
+                        <input type="text" id="user-address" placeholder="Ex: Rua das Flores, 123" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Bairro</label>
+                        <input type="text" id="user-neighborhood" placeholder="Ex: Centro" required>
                     </div>
 
                     <div class="lgpd-notice">
@@ -294,6 +298,8 @@
             e.preventDefault();
             const name = document.getElementById('user-name').value.trim();
             const address = document.getElementById('user-address').value.trim();
+            const neighborhood = document.getElementById('user-neighborhood').value.trim();
+            const promoOptin = document.getElementById('user-promo-optin').checked;
             const btn = document.getElementById('btn-register');
             btn.innerText = 'Salvando...';
             btn.disabled = true;
@@ -309,7 +315,9 @@
                         customer_name: name,
                         customer_phone: currentPhone,
                         address: address,
-                        access_time: new Date().toISOString()
+                        neighborhood: neighborhood,
+                        access_time: new Date().toISOString(),
+                        promo_optin: promoOptin
                     })
                 });
             } catch (error) {
@@ -318,7 +326,7 @@
             }
 
             // Salva na sessão local
-            const userData = { phone: currentPhone, name: name, address: address };
+            const userData = { phone: currentPhone, name: name, address: address, neighborhood: neighborhood };
             localStorage.setItem('preco_facil_lead', JSON.stringify(userData));
 
             btn.innerText = 'Tudo Pronto!';
