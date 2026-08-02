@@ -802,6 +802,22 @@ app.patch('/api/admin/stores/:id/feature', async (req, res) => {
     }
 });
 
+// PATCH /api/admin/stores/:id/password - Redefinir senha de loja
+app.patch('/api/admin/stores/:id/password', async (req, res) => {
+    const { id } = req.params;
+    const { new_password } = req.body;
+    if (!new_password) return res.status(400).json({ error: 'Nova senha é obrigatória' });
+    try {
+        const client = await pool.connect();
+        await client.query('UPDATE stores SET password = $1 WHERE id = $2', [new_password, id]);
+        client.release();
+        res.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
 // GET /api/admin/leads - Listar todos os leads captados
 app.get('/api/admin/leads', async (req, res) => {
     try {

@@ -1056,6 +1056,9 @@
                         </td>
                         <td>
                             <div class="actions-cell">
+                                <button onclick="resetStorePassword(${s.id}, '${s.name.replace(/'/g, "\\'")}')" class="btn-icon" title="Redefinir Senha">
+                                    🔑
+                                </button>
                                 <button onclick="toggleBlock(${s.id}, ${s.is_blocked ? true : false})" class="btn-icon" title="${s.is_blocked ? 'Desbloquear' : 'Bloquear'}">
                                     ${s.is_blocked ? '🔓' : '🚫'}
                                 </button>
@@ -1262,6 +1265,23 @@
                 body: JSON.stringify({ is_blocked: !current })
             });
             if (res.ok) loadStores();
+        }
+
+        async function resetStorePassword(id, name) {
+            const newPassword = prompt(`Digite a nova senha para o lojista "${name}":`);
+            if (!newPassword || newPassword.trim() === '') return;
+
+            const res = await fetchAdmin(`api/admin/stores/${id}/password`, {
+                method: 'PATCH',
+                body: JSON.stringify({ new_password: newPassword.trim() })
+            });
+
+            if (res.ok) {
+                alert(`Senha do lojista "${name}" redefinida com sucesso!`);
+            } else {
+                const data = await res.json();
+                alert('Erro ao redefinir a senha: ' + data.error);
+            }
         }
 
         async function toggleFeatured(id, current) {
