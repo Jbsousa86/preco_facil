@@ -499,7 +499,10 @@
             <div class="table-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
                     <h2 style="margin:0;">👥 Leads & Clientes (Captados)</h2>
-                    <button onclick="loadLeads()" class="btn-icon" style="width:auto; padding:0 20px;">🔄 Atualizar</button>
+                    <div style="display:flex; gap:12px;">
+                        <button onclick="exportLeadsToCSV()" class="btn-icon" style="width:auto; padding:0 20px; background:#10b981; color:#fff; font-weight:600; border:none;">📥 Exportar CSV</button>
+                        <button onclick="loadLeads()" class="btn-icon" style="width:auto; padding:0 20px;">🔄 Atualizar</button>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table>
@@ -737,6 +740,10 @@
                 <span class="kpi-label" style="color:var(--primary);">Total de Visitas</span>
                 <span id="stat-total-visits" class="kpi-value">0</span>
             </div>
+            <div class="kpi-card" onclick="showSection('leads', document.querySelectorAll('.nav-item')[6])" style="cursor:pointer; background:#f0fdf4; border-color:#bbf7d0;">
+                <span class="kpi-label" style="color:var(--success);">Clientes Cadastrados</span>
+                <span id="stat-total-leads" class="kpi-value" style="color:var(--success);">0</span>
+            </div>
         </section>
 
         <section class="table-card" id="section-table">
@@ -967,10 +974,49 @@
             document.getElementById('stat-active-stores').innerText = allStores.filter(s => !s.is_blocked).length;
             document.getElementById('stat-blocked-stores').innerText = allStores.filter(s => s.is_blocked).length;
 
-            // Fetch platform-wide visits
+            // Fetch platform-wide visits and leads
             fetchAdmin('api/admin/stats').then(res => res.json()).then(data => {
                 document.getElementById('stat-total-visits').innerText = data.visits || 0;
-            }).catch(e => console.error('Erro ao carregar visitas platform wide'));
+                const leadsKPI = document.getElementById('stat-total-leads');
+                if (leadsKPI) leadsKPI.innerText = data.leads || 0;
+            }).catch(e => console.error('Erro ao carregar stats da plataforma'));
+        }
+
+        function exportLeadsToCSV() {
+            if (!allLeads || allLeads.length === 0) return alert("Nenhum dado para exportar.");
+            
+            // Agrupar leads por telefone
+            const uniqueLeads = {};
+            allLeads.forEach(l => {
+                if (!l.customer_phone || l.customer_phone === 'Não informado') return;
+                if (!uniqueLeads[l.customer_phone]) {
+                    uniqueLeads[l.customer_phone] = {
+                        Nome: l.customer_name || '',
+                        Telefone: l.customer_phone || '',
+                        Endereco: l.address || '',
+                        UltimoAcesso: new Date(l.access_time).toLocaleString('pt-BR')
+                    };
+                } else {
+                    uniqueLeads[l.customer_phone].UltimoAcesso = new Date(l.access_time).toLocaleString('pt-BR');
+                }
+            });
+
+            const rows = Object.values(uniqueLeads);
+            if (rows.length === 0) return alert("Nenhum lead real capturado.");
+
+            let csvContent = "data:text/csv;charset=utf-8,Nome,Telefone,Endereço,Último Acesso\n";
+            rows.forEach(row => {
+                const escapeCSV = (str) => '"' + String(str).replace(/"/g, '""') + '"';
+                csvContent += `${escapeCSV(row.Nome)},${escapeCSV(row.Telefone)},${escapeCSV(row.Endereco)},${escapeCSV(row.UltimoAcesso)}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "mercado_local_clientes.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function showSection(section, el) {

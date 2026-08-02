@@ -687,12 +687,17 @@ app.get('/api/admin/stats', async (req, res) => {
         const prices = await client.query('SELECT COUNT(*) FROM prices');
         const visitsResult = await client.query("SELECT stat_value FROM site_stats WHERE stat_key = 'total_visits'");
         const visits = visitsResult.rows.length > 0 ? visitsResult.rows[0].stat_value : 0;
+        
+        const leadsResult = await client.query("SELECT COUNT(DISTINCT customer_phone) FROM leads WHERE customer_phone != 'Não informado'");
+        const leads = leadsResult.rows[0].count;
+
         client.release();
         res.json({
             stores: stores.rows[0].count,
             products: products.rows[0].count,
             prices: prices.rows[0].count,
-            visits: visits
+            visits: visits,
+            leads: leads
         });
     } catch (e) {
         console.error(e);
