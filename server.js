@@ -180,6 +180,7 @@ async function initializeDatabase() {
         await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS address TEXT;').catch(e => {});
         await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS neighborhood TEXT;').catch(e => {});
         await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS promo_optin BOOLEAN DEFAULT FALSE;').catch(e => {});
+        await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS interests TEXT;').catch(e => {});
         
         console.log("Tabelas base (stores, products, history, stats) criadas.");
 
@@ -653,19 +654,27 @@ app.post('/api/leads', async (req, res) => {
 
 // Endpoint: PUT /api/leads/:phone - Atualiza os dados do lead
 app.put('/api/leads/:phone', async (req, res) => {
-    const { customer_name, address, neighborhood, promo_optin } = req.body;
+    const { customer_name, address, neighborhood, promo_optin, interests } = req.body;
     try {
         const client = await pool.connect();
         
-        let updateQuery = 'UPDATE leads SET customer_name = $1, address = $2, neighborhood = $3 WHERE customer_phone = $4';
-        let queryParams = [customer_name, address, neighborhood || '', req.params.phone];
-        
-        if (promo_optin !== undefined) {
-            updateQuery = 'UPDATE leads SET customer_name = $1, address = $2, neighborhood = $3, promo_optin = $4 WHERE customer_phone = $5';
-            queryParams = [customer_name, address, neighborhood || '', promo_optin, req.params.phone];
+        // Vamos usar um array de atualizações dinâmico
+        const updates = [];
+        const queryParams = [];
+        let i = 1;
+
+        if (customer_name !== undefined) { updates.push(`customer_name = $${i++}`); queryParams.push(customer_name); }
+        if (address !== undefined) { updates.push(`address = $${i++}`); queryParams.push(address); }
+        if (neighborhood !== undefined) { updates.push(`neighborhood = $${i++}`); queryParams.push(neighborhood); }
+        if (promo_optin !== undefined) { updates.push(`promo_optin = $${i++}`); queryParams.push(promo_optin); }
+        if (interests !== undefined) { updates.push(`interests = $${i++}`); queryParams.push(interests); }
+
+        if (updates.length > 0) {
+            queryParams.push(req.params.phone);
+            const updateQuery = `UPDATE leads SET ${updates.join(', ')} WHERE customer_phone = $${i}`;
+            await client.query(updateQuery, queryParams);
         }
 
-        await client.query(updateQuery, queryParams);
         client.release();
         res.status(200).json({ success: true });
     } catch (e) {
@@ -718,13 +727,23 @@ app.get('/api/admin/stats', async (req, res) => {
         const leadsResult = await client.query("SELECT COUNT(DISTINCT customer_phone) FROM leads WHERE customer_phone != 'Não informado'");
         const leads = leadsResult.rows[0].count;
 
+        const topStoresResult = await client.query(`
+            SELECT s.name, COUNT(l.id) as total_visits 
+            FROM leads l 
+            JOIN stores s ON l.store_id = s.id 
+            GROUP BY s.name 
+            ORDER BY total_visits DESC 
+            LIMIT 5
+        `);
+
         client.release();
         res.json({
             stores: stores.rows[0].count,
             products: products.rows[0].count,
             prices: prices.rows[0].count,
             visits: visits,
-            leads: leads
+            leads: leads,
+            topStores: topStoresResult.rows
         });
     } catch (e) {
         console.error(e);
@@ -855,7 +874,7 @@ app.get('/api/admin/leads', async (req, res) => {
     try {
         const client = await pool.connect();
         const result = await client.query(`
-            SELECT l.id, l.customer_name, l.customer_phone, l.address, l.neighborhood, l.access_time, l.promo_optin, s.name as store_name 
+            SELECT l.id, l.customer_name, l.customer_phone, l.address, l.neighborhood, l.access_time, l.promo_optin, l.interests, s.name as store_name 
             FROM leads l
             LEFT JOIN stores s ON s.id = l.store_id
             ORDER BY l.access_time DESC

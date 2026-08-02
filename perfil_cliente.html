@@ -568,7 +568,17 @@
 
             if (section === 'interesses') {
                 const selected = Array.from(document.querySelectorAll('input[name="interest"]:checked')).map(cb => cb.value);
+                const interestsStr = selected.join(',');
                 localStorage.setItem('preco_facil_interests', JSON.stringify(selected));
+                
+                try {
+                    await fetch(`${API_URL}/api/leads/${encodeURIComponent(phone)}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ interests: interestsStr })
+                    });
+                } catch(e) { console.error(e); }
+                
                 alert('Seus interesses foram salvos!');
                 if (btn) { btn.innerText = originalText; btn.disabled = false; }
                 return;

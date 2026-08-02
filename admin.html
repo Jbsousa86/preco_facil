@@ -512,6 +512,7 @@
                                 <th>WhatsApp</th>
                                 <th>Endereço Cadastrado</th>
                                 <th>Recebe Ofertas?</th>
+                                <th>Interesses</th>
                                 <th>Qtd Redirecionamentos</th>
                                 <th>Último Acesso</th>
                             </tr>
@@ -747,6 +748,16 @@
             </div>
         </section>
 
+        <!-- TOP LOJAS RANKING -->
+        <section id="top-stores-section" class="table-card" style="display:none; margin-bottom:32px;">
+            <div class="table-header">
+                <h3>🏆 Top 5 Lojas Mais Acessadas</h3>
+            </div>
+            <div class="table-container" style="padding: 24px;">
+                <div id="top-stores-list" style="display:flex; flex-direction:column; gap:16px;"></div>
+            </div>
+        </section>
+
         <section class="table-card" id="section-table">
             <div class="table-header">
                 <h3 id="table-title">Todos os Comerciantes</h3>
@@ -920,11 +931,13 @@
                             customer_phone: l.customer_phone,
                             address: l.address,
                             promo_optin: !!l.promo_optin,
+                            interests: l.interests || '',
                             history: [],
                             last_access: l.access_time
                         };
-                    } else if (l.promo_optin) {
-                        uniqueLeads[l.customer_phone].promo_optin = true;
+                    } else {
+                        if (l.promo_optin) uniqueLeads[l.customer_phone].promo_optin = true;
+                        if (l.interests) uniqueLeads[l.customer_phone].interests = l.interests;
                     }
                     uniqueLeads[l.customer_phone].history.push(l);
                     // Como a API já retorna ordenado por access_time DESC, o primeiro que bater será o último acesso
@@ -947,6 +960,9 @@
                                 <span class="badge ${l.promo_optin ? 'badge-success' : 'badge-danger'}">
                                     ${l.promo_optin ? 'Sim' : 'Não'}
                                 </span>
+                            </td>
+                            <td style="font-size:0.85rem; color:var(--text-light); max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${l.interests || ''}">
+                                ${l.interests ? l.interests.replace(/,/g, ', ') : 'Nenhum'}
                             </td>
                             <td><span class="badge badge-success" style="background:#e0f2fe; color:#0369a1;">${l.history.length} redirecionamentos</span></td>
                             <td style="font-size:0.85rem;">${dateStr}</td>
@@ -988,6 +1004,22 @@
                 document.getElementById('stat-total-visits').innerText = data.visits || 0;
                 const leadsKPI = document.getElementById('stat-total-leads');
                 if (leadsKPI) leadsKPI.innerText = data.leads || 0;
+                
+                // Render Top Stores
+                const topSec = document.getElementById('top-stores-section');
+                const topList = document.getElementById('top-stores-list');
+                if (data.topStores && data.topStores.length > 0) {
+                    topSec.style.display = 'block';
+                    topList.innerHTML = data.topStores.map((ts, i) => `
+                        <div style="display:flex; align-items:center; gap:16px; background:#f8fafc; padding:12px 16px; border-radius:12px; border:1px solid #e2e8f0;">
+                            <div style="font-size:1.5rem; font-weight:800; color:var(--primary); width:30px; text-align:center;">#${i+1}</div>
+                            <div style="flex:1; font-weight:700; font-size:1.1rem;">${ts.name}</div>
+                            <div style="background:#e0f2fe; color:#0369a1; padding:6px 12px; border-radius:20px; font-weight:700; font-size:0.9rem;">
+                                ${ts.total_visits} acessos
+                            </div>
+                        </div>
+                    `).join('');
+                }
             }).catch(e => console.error('Erro ao carregar stats da plataforma'));
         }
 
@@ -1009,23 +1041,23 @@
                         Endereco: l.address || '',
                         Bairro: l.neighborhood || '',
                         AceitaOfertas: currentOptin,
+                        Interesses: l.interests || '',
                         UltimoAcesso: new Date(l.access_time).toLocaleString('pt-BR')
                     };
                 } else {
                     uniqueLeads[l.customer_phone].UltimoAcesso = new Date(l.access_time).toLocaleString('pt-BR');
-                    if (l.promo_optin) {
-                        uniqueLeads[l.customer_phone].AceitaOfertas = 'Sim';
-                    }
+                    if (l.promo_optin) uniqueLeads[l.customer_phone].AceitaOfertas = 'Sim';
+                    if (l.interests) uniqueLeads[l.customer_phone].Interesses = l.interests;
                 }
             });
 
             const rows = Object.values(uniqueLeads);
             if (rows.length === 0) return alert("Nenhum lead real capturado.");
 
-            let csvContent = "data:text/csv;charset=utf-8,Nome,Telefone,Endereço,Bairro,Aceita Ofertas,Último Acesso\n";
+            let csvContent = "data:text/csv;charset=utf-8,Nome,Telefone,Endereço,Bairro,Aceita Ofertas,Interesses,Último Acesso\n";
             rows.forEach(row => {
                 const escapeCSV = (str) => '"' + String(str).replace(/"/g, '""') + '"';
-                csvContent += `${escapeCSV(row.Nome)},${escapeCSV(row.Telefone)},${escapeCSV(row.Endereco)},${escapeCSV(row.Bairro)},${escapeCSV(row.AceitaOfertas)},${escapeCSV(row.UltimoAcesso)}\n`;
+                csvContent += `${escapeCSV(row.Nome)},${escapeCSV(row.Telefone)},${escapeCSV(row.Endereco)},${escapeCSV(row.Bairro)},${escapeCSV(row.AceitaOfertas)},${escapeCSV(row.Interesses)},${escapeCSV(row.UltimoAcesso)}\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
@@ -1055,6 +1087,7 @@
             document.getElementById('table-title').innerText = section === 'dashboard' ? 'Todos os Comerciantes' : section.toUpperCase();
 
             document.getElementById('kpi-section').style.display = section === 'dashboard' ? 'grid' : 'none';
+            document.getElementById('top-stores-section').style.display = (section === 'dashboard' && document.getElementById('top-stores-list').innerHTML !== '') ? 'block' : 'none';
             document.getElementById('section-table').style.display = (section === 'banners' || section === 'parceiros' || section === 'leads') ? 'none' : 'block';
             document.getElementById('section-banners').style.display = (section === 'banners') ? 'block' : 'none';
             document.getElementById('section-parceiros').style.display = (section === 'parceiros') ? 'block' : 'none';
