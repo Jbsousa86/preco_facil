@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meu Perfil - Mercado Local</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --danger: #ef4444;
+            --danger-dark: #dc2626;
+            --bg-main: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #fff;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 32px auto;
+            padding: 0 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 0 0 8px;
+            text-align: center;
+        }
+
+        .desc {
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+        }
+
+        .input-group input:disabled {
+            background: #f1f5f9;
+            cursor: not-allowed;
+            color: #94a3b8;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            border: none;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: var(--danger);
+            border: 2px solid var(--danger);
+            margin-top: 16px;
+        }
+
+        .btn-danger:hover {
+            background: #fef2f2;
+        }
+
+        .auth-card {
+            /* herda .card */
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <button class="back-btn" onclick="window.location.href='index.html'">←</button>
+        <span style="font-weight: 700; font-size: 1.2rem;">Meu Perfil</span>
+    </header>
+
+    <div class="container">
+        
+        <div id="profile-card" class="card" style="display: none;">
+            <h1 class="title">Seus Dados</h1>
+            <p class="desc">Gerencie suas informações de contato e entrega.</p>
+            
+            <form id="profile-form" onsubmit="handleUpdate(event)">
+                <div class="input-group">
+                    <label>Telefone (WhatsApp)</label>
+                    <input type="tel" id="user-phone" disabled>
+                    <small style="color: var(--text-light); font-size: 0.75rem;">O telefone não pode ser alterado, pois é a sua identificação.</small>
+                </div>
+                <div class="input-group">
+                    <label>Nome</label>
+                    <input type="text" id="user-name" required>
+                </div>
+                <div class="input-group">
+                    <label>Endereço</label>
+                    <input type="text" id="user-address" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="btn-update">Salvar Alterações</button>
+                <button type="button" class="btn btn-danger" onclick="handleDelete()">Excluir Minha Conta</button>
+                <button type="button" class="btn" style="background: #e2e8f0; color: var(--text-dark); margin-top: 16px;" onclick="handleLogout()">Sair da Conta</button>
+            </form>
+        </div>
+
+        <div id="auth-card" class="card" style="display: none;">
+            <h1 class="title">Acessar Perfil</h1>
+            <p class="desc">Informe o seu número de WhatsApp para gerenciar seus dados (LGPD).</p>
+            
+            <form onsubmit="handleAuth(event)">
+                <div class="input-group">
+                    <label>Telefone</label>
+                    <input type="tel" id="auth-phone" placeholder="(00) 00000-0000" required>
+                </div>
+                <button type="submit" class="btn btn-primary" id="btn-auth">Acessar</button>
+            </form>
+            <p id="auth-error" style="color: var(--danger); text-align: center; margin-top: 16px; display: none; font-size: 0.9rem;">Cadastro não encontrado para este número.</p>
+        </div>
+
+    </div>
+
+    <script>
+        const API_URL = (
+            window.location.hostname === 'localhost' || 
+            window.location.hostname === '127.0.0.1' || 
+            window.location.hostname.startsWith('192.168.') || 
+            window.location.hostname.startsWith('10.') || 
+            window.location.hostname === "" || 
+            window.location.protocol === 'file:'
+        ) ? 'http://localhost:3000' : '';
+
+        let userData = null;
+
+        async function loadProfile() {
+            const savedStr = localStorage.getItem('preco_facil_lead');
+            if (savedStr) {
+                try {
+                    const localData = JSON.parse(savedStr);
+                    if (localData && localData.phone) {
+                        const found = await fetchAndShowProfile(localData.phone);
+                        if (found) return;
+                    }
+                } catch (e) {
+                    console.error("Erro ao ler dados do localStorage:", e);
+                }
+            }
+            showAuth();
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
+            const phone = document.getElementById('auth-phone').value.trim();
+            const btn = document.getElementById('btn-auth');
+            btn.innerText = 'Buscando...';
+            btn.disabled = true;
+            document.getElementById('auth-error').style.display = 'none';
+
+            const success = await fetchAndShowProfile(phone);
+            if (!success) {
+                document.getElementById('auth-error').style.display = 'block';
+            }
+
+            btn.innerText = 'Acessar';
+            btn.disabled = false;
+        }
+
+        async function fetchAndShowProfile(phone) {
+            try {
+                const res = await fetch(`${API_URL}/api/leads/${encodeURIComponent(phone)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    userData = { phone: phone, name: data.customer_name, address: data.address };
+                    
+                    localStorage.setItem('preco_facil_lead', JSON.stringify(userData));
+
+                    document.getElementById('user-phone').value = phone;
+                    document.getElementById('user-name').value = data.customer_name || '';
+                    document.getElementById('user-address').value = data.address || '';
+                    
+                    document.getElementById('profile-card').style.display = 'block';
+                    document.getElementById('auth-card').style.display = 'none';
+                    return true;
+                }
+                return false;
+            } catch (err) {
+                console.error("Erro ao buscar perfil:", err);
+                return false;
+            }
+        }
+
+        function showAuth() {
+            document.getElementById('profile-card').style.display = 'none';
+            document.getElementById('auth-card').style.display = 'block';
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('preco_facil_lead');
+            userData = null;
+            document.getElementById('auth-phone').value = '';
+            document.getElementById('auth-error').style.display = 'none';
+            showAuth();
+        }
+
+        async function handleUpdate(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-update');
+            btn.innerText = 'Salvando...';
+            btn.disabled = true;
+
+            const name = document.getElementById('user-name').value.trim();
+            const address = document.getElementById('user-address').value.trim();
+            const phone = userData.phone;
+
+            try {
+                const res = await fetch(`${API_URL}/api/leads/${encodeURIComponent(phone)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ customer_name: name, address: address })
+                });
+
+                if (res.ok) {
+                    // Atualiza LocalStorage
+                    userData.name = name;
+                    userData.address = address;
+                    localStorage.setItem('preco_facil_lead', JSON.stringify(userData));
+                    alert('Dados atualizados com sucesso!');
+                } else {
+                    alert('Erro ao atualizar os dados.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erro de conexão ao atualizar os dados.');
+            }
+
+            btn.innerText = 'Salvar Alterações';
+            btn.disabled = false;
+        }
+
+        async function handleDelete() {
+            if (!confirm('Tem certeza que deseja excluir sua conta e apagar todos os seus dados? Esta ação não pode ser desfeita.')) {
+                return;
+            }
+
+            try {
+                const phone = userData.phone;
+                const res = await fetch(`${API_URL}/api/leads/${encodeURIComponent(phone)}`, {
+                    method: 'DELETE'
+                });
+
+                if (res.ok) {
+                    localStorage.removeItem('preco_facil_lead');
+                    alert('Sua conta e dados foram excluídos permanentemente.');
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Erro ao excluir conta.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erro de conexão ao excluir a conta.');
+            }
+        }
+
+        window.onload = loadProfile;
+    </script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro - Mercado Local</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-main: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 450px;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 40px 32px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 0 0 8px;
+            color: var(--text-dark);
+        }
+
+        .desc {
+            color: var(--text-light);
+            margin-bottom: 32px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+        }
+
+        .lgpd-notice {
+            text-align: left;
+            margin-bottom: 24px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.5;
+            background: #f1f5f9;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .lgpd-notice label {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            margin: 0;
+            font-weight: 400;
+            color: var(--text-dark);
+        }
+
+        .lgpd-notice input[type="checkbox"] {
+            margin-top: 3px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 24px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover {
+            color: var(--text-dark);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <img src="assets/logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+            
+            <!-- Step 1: Identificação (Telefone) -->
+            <div id="step-phone" class="step active">
+                <h1 class="title">Acesse ou Cadastre-se</h1>
+                <p class="desc">Para acessar o catálogo e se comunicar com os lojistas, informe seu WhatsApp.</p>
+                
+                <form onsubmit="handlePhoneSubmit(event)">
+                    <div class="input-group">
+                        <label>Seu WhatsApp</label>
+                        <input type="tel" id="user-phone" placeholder="(00) 00000-0000" required autofocus>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="btn-phone">Continuar</button>
+                </form>
+                
+                <a href="javascript:history.back()" class="back-link">← Voltar</a>
+            </div>
+
+            <!-- Step 2: Cadastro de Dados -->
+            <div id="step-register" class="step">
+                <h1 class="title">Complete seu Perfil</h1>
+                <p class="desc">Falta pouco! Preencha seus dados para finalizar o cadastro.</p>
+                
+                <form onsubmit="handleRegisterSubmit(event)">
+                    <div class="input-group">
+                        <label>Nome Completo</label>
+                        <input type="text" id="user-name" placeholder="Como você se chama?" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Endereço de Entrega</label>
+                        <input type="text" id="user-address" placeholder="Rua, Número, Bairro" required>
+                    </div>
+
+                    <div class="lgpd-notice">
+                        <label>
+                            <input type="checkbox" required>
+                            <span>
+                                <strong>Termo de Privacidade (LGPD):</strong> Concordo que os dados informados sejam utilizados pela plataforma para melhorias internas e pelo comerciante parceiro para identificação e entrega do meu pedido, mesmo que o contato seja feito por WhatsApp.
+                            </span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="btn-register">Concluir e Acessar</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const API_URL = (
+            window.location.hostname === 'localhost' || 
+            window.location.hostname === '127.0.0.1' || 
+            window.location.hostname.startsWith('192.168.') || 
+            window.location.hostname.startsWith('10.') || 
+            window.location.hostname === "" || 
+            window.location.protocol === 'file:'
+        ) ? 'http://localhost:3000' : '';
+
+        // Obter URL de redirecionamento (para onde ir após logar/cadastrar)
+        const urlParams = new URLSearchParams(window.location.search);
+        let redirectUrl = urlParams.get('redirect') || 'index.html';
+
+        let currentPhone = '';
+
+        async function handlePhoneSubmit(e) {
+            e.preventDefault();
+            const phone = document.getElementById('user-phone').value.trim();
+            const btn = document.getElementById('btn-phone');
+            btn.innerText = 'Buscando...';
+            btn.disabled = true;
+
+            try {
+                // Verifica se já tem cadastro
+                const res = await fetch(`${API_URL}/api/leads/${encodeURIComponent(phone)}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    // Já tem cadastro, salva na sessão e redireciona de volta
+                    const userData = { phone: phone, name: data.customer_name, address: data.address };
+                    localStorage.setItem('preco_facil_lead', JSON.stringify(userData));
+                    
+                    btn.innerText = 'Redirecionando...';
+                    window.location.href = redirectUrl;
+                } else {
+                    // Não tem cadastro, vai para o formulário
+                    currentPhone = phone;
+                    document.getElementById('step-phone').classList.remove('active');
+                    document.getElementById('step-register').classList.add('active');
+                }
+            } catch (err) {
+                console.error(err);
+                // Em caso de erro de rede, vai para o formulário para garantir
+                currentPhone = phone;
+                document.getElementById('step-phone').classList.remove('active');
+                document.getElementById('step-register').classList.add('active');
+            }
+            btn.innerText = 'Continuar';
+            btn.disabled = false;
+        }
+
+        async function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('user-name').value.trim();
+            const address = document.getElementById('user-address').value.trim();
+            const btn = document.getElementById('btn-register');
+            btn.innerText = 'Salvando...';
+            btn.disabled = true;
+
+            try {
+                // Apenas salva localmente primeiro (a criação no banco oficial pode acontecer na primeira loja acessada)
+                // Para manter consistência, gravamos o Lead global no banco passando null pro store_id
+                await fetch(`${API_URL}/api/leads`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        store_id: null,
+                        customer_name: name,
+                        customer_phone: currentPhone,
+                        address: address,
+                        access_time: new Date().toISOString()
+                    })
+                });
+            } catch (error) {
+                console.error('Erro ao salvar no servidor:', error);
+                // Continua mesmo assim
+            }
+
+            // Salva na sessão local
+            const userData = { phone: currentPhone, name: name, address: address };
+            localStorage.setItem('preco_facil_lead', JSON.stringify(userData));
+
+            btn.innerText = 'Tudo Pronto!';
+            
+            // Pequeno delay e redireciona
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 800);
+        }
+    </script>
+</body>
+</html>

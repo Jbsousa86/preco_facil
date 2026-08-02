@@ -175,6 +175,36 @@
             border-color: var(--primary);
         }
 
+        .lgpd-notice {
+            text-align: left;
+            margin-bottom: 16px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            line-height: 1.4;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .lgpd-notice label {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            cursor: pointer;
+            margin: 0;
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--text-dark);
+        }
+
+        .lgpd-notice input[type="checkbox"] {
+            margin-top: 2px;
+            width: auto;
+            padding: 0;
+            cursor: pointer;
+        }
+
         .submit-btn {
             background: var(--primary);
             color: #fff;
@@ -235,71 +265,7 @@
         </div>
     </div>
 
-    <!-- Lead Capture Modal (Conversational Flow) -->
-    <div id="lead-modal" class="modal-overlay">
-        <div class="modal-card">
-            
-            <!-- Step 1: Phone -->
-            <div id="step-phone" class="flow-step" style="display: none;">
-                <div style="font-size: 3rem; margin-bottom: 16px;">📱</div>
-                <h2 class="modal-title">Olá!</h2>
-                <p class="modal-desc">Para acessar o catálogo da loja, por favor informe o seu número de WhatsApp.</p>
-                
-                <form onsubmit="handlePhoneSubmit(event)">
-                    <div class="input-group">
-                        <input type="tel" id="flow-phone" placeholder="(00) 00000-0000" required>
-                    </div>
-                    <button type="submit" class="submit-btn" id="btn-phone">Continuar</button>
-                </form>
-            </div>
-
-            <!-- Step 2: Welcome Back -->
-            <div id="step-welcome-back" class="flow-step" style="display: none;">
-                <div style="font-size: 3rem; margin-bottom: 16px;">👋</div>
-                <h2 class="modal-title" id="welcome-back-title">Olá!</h2>
-                <p class="modal-desc" id="welcome-back-desc">Que bom te ver de novo. O endereço continua sendo X?</p>
-                
-                <button class="submit-btn" onclick="finishFlow(false)">Sim, continuar</button>
-                <button class="submit-btn" style="background: #f1f5f9; color: var(--text-dark); margin-top: 8px;" onclick="goToAddress()">Alterar endereço</button>
-            </div>
-
-            <!-- Step 3: Name (New User) -->
-            <div id="step-name" class="flow-step" style="display: none;">
-                <div style="font-size: 3rem; margin-bottom: 16px;">🤝</div>
-                <h2 class="modal-title">Seja bem-vindo!</h2>
-                <p class="modal-desc">Como você se chama?</p>
-                
-                <form onsubmit="handleNameSubmit(event)">
-                    <div class="input-group">
-                        <input type="text" id="flow-name" placeholder="Ex: Carlos Oliveira" required>
-                    </div>
-                    <button type="submit" class="submit-btn">Continuar</button>
-                </form>
-            </div>
-
-            <!-- Step 4: Address (New User or Update) -->
-            <div id="step-address" class="flow-step" style="display: none;">
-                <div style="font-size: 3rem; margin-bottom: 16px;">📍</div>
-                <h2 class="modal-title">Qual é o seu endereço?</h2>
-                <p class="modal-desc">Informe seu endereço completo.</p>
-                
-                <form onsubmit="handleAddressSubmit(event)">
-                    <div class="input-group">
-                        <input type="text" id="flow-address" placeholder="Ex: Rua Exemplo, 123 - Centro" required>
-                    </div>
-                    <button type="submit" class="submit-btn">Finalizar</button>
-                </form>
-            </div>
-
-            <!-- Step 5: Final -->
-            <div id="step-final" class="flow-step" style="display: none;">
-                <div style="font-size: 3rem; margin-bottom: 16px;">🚀</div>
-                <h2 class="modal-title">Perfeito, tudo pronto!</h2>
-                <p class="modal-desc" id="final-store-msg">Vou abrir o catálogo agora mesmo para você fazer seu pedido.</p>
-            </div>
-
-        </div>
-    </div>
+    <!-- Modal foi transferido para a página dedicada cadastro_cliente.html -->
 
     <script>
         const isLocal = (
@@ -386,76 +352,20 @@
         let flowData = { phone: '', name: '', address: '' };
 
         function handleCTAClick() {
-            document.getElementById('lead-modal').style.display = 'flex';
             const savedLead = localStorage.getItem('preco_facil_lead');
             if (savedLead) {
+                // Usuário já está logado/cadastrado.
                 const data = JSON.parse(savedLead);
-                flowData = data;
-                document.getElementById('welcome-back-title').innerText = `Olá, ${data.name}!`;
-                document.getElementById('welcome-back-desc').innerText = `Que bom te ver de novo. O endereço continua sendo ${data.address || 'não informado'}?`;
-                showStep('step-welcome-back');
+                registerInteractionAndRedirect(data);
             } else {
-                showStep('step-phone');
+                // Não está cadastrado: para parceiros externos, não exigimos o cadastro (fricção zero).
+                // Apenas geramos um registro anônimo para contabilizar o lead/encaminhamento na plataforma.
+                registerInteractionAndRedirect({
+                    name: 'Cliente Anônimo',
+                    phone: 'Não informado',
+                    address: ''
+                });
             }
-        }
-
-        function showStep(stepId) {
-            document.querySelectorAll('.flow-step').forEach(el => el.style.display = 'none');
-            document.getElementById(stepId).style.display = 'block';
-        }
-
-        async function handlePhoneSubmit(e) {
-            e.preventDefault();
-            const phone = document.getElementById('flow-phone').value.trim();
-            flowData.phone = phone;
-            const btn = document.getElementById('btn-phone');
-            btn.innerText = 'Buscando...';
-            btn.disabled = true;
-
-            try {
-                const res = await fetch(`${API_URL}/api/leads/${encodeURIComponent(phone)}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    flowData.name = data.customer_name;
-                    flowData.address = data.address || '';
-                    document.getElementById('welcome-back-title').innerText = `Olá, ${data.customer_name}!`;
-                    document.getElementById('welcome-back-desc').innerText = `Que bom te ver de novo. O endereço continua sendo ${data.address || 'não informado'}?`;
-                    showStep('step-welcome-back');
-                } else {
-                    showStep('step-name');
-                }
-            } catch (err) {
-                showStep('step-name');
-            }
-            btn.innerText = 'Continuar';
-            btn.disabled = false;
-        }
-
-        function handleNameSubmit(e) {
-            e.preventDefault();
-            flowData.name = document.getElementById('flow-name').value.trim();
-            showStep('step-address');
-        }
-
-        function goToAddress() {
-            document.getElementById('flow-address').value = flowData.address;
-            showStep('step-address');
-        }
-
-        function handleAddressSubmit(e) {
-            e.preventDefault();
-            flowData.address = document.getElementById('flow-address').value.trim();
-            finishFlow(true); // Must update storage
-        }
-
-        async function finishFlow(updateStorage = false) {
-            document.getElementById('final-store-msg').innerText = `Vou abrir o catálogo do ${currentStore.name} agora mesmo para você fazer seu pedido. 🚀`;
-            showStep('step-final');
-            
-            // Always ensure the cache is up to date
-            localStorage.setItem('preco_facil_lead', JSON.stringify(flowData));
-
-            await registerInteractionAndRedirect(flowData);
         }
 
         async function registerInteractionAndRedirect(leadData) {
@@ -474,17 +384,40 @@
                 });
             } catch (error) {
                 console.error('Erro ao salvar lead:', error);
-                // Continue with redirect even if analytics fail
             }
 
-            // Redirect with slight delay so they can read the success message
+            // Exibe mensagem visual rápida de redirecionamento (já que o modal saiu, podemos alterar o botão)
+            const ctaBtn = document.querySelector('.cta-btn');
+            if (ctaBtn) {
+                ctaBtn.innerHTML = `<span>Redirecionando...</span> <span style="font-size: 1.5rem;">🚀</span>`;
+            }
+
             setTimeout(() => {
                 let targetUrl = currentStore.external_url;
                 if (!targetUrl.startsWith('http')) {
                     targetUrl = 'https://' + targetUrl;
                 }
+
+                // Entrega o lead formatado para o comerciante apenas se for um cliente com dados reais
+                const isAnonymous = (leadData.name === 'Cliente Anônimo');
+                const msg = isAnonymous 
+                    ? `Olá! Vim pelo Mercado Local e gostaria de conferir os produtos.`
+                    : `Olá! Sou ${leadData.name}, acessei pelo Mercado Local. Meu endereço para entrega é: ${leadData.address || 'Não informado'}. Gostaria de conferir os produtos e fazer um pedido.`;
+                
+                try {
+                    const urlObj = new URL(targetUrl);
+                    if (urlObj.hostname.includes('wa.me') || urlObj.hostname.includes('whatsapp.com') || urlObj.hostname.includes('api.whatsapp.com')) {
+                        // Adiciona a mensagem automática apenas se for um link de WhatsApp
+                        urlObj.searchParams.set('text', msg);
+                        targetUrl = urlObj.toString();
+                    }
+                    // Se for um site externo (catálogo digital), simplesmente abre o link original sem modificações
+                } catch (e) {
+                    console.error('URL não pôde ser modificada:', e);
+                }
+
                 window.location.href = targetUrl;
-            }, 1800);
+            }, 500);
         }
 
         init();

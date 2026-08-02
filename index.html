@@ -401,7 +401,7 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             display: none;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             height: 65px;
             border-top: 1px solid #e2e8f0;
             box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
@@ -437,7 +437,7 @@
 
             .bottom-nav {
                 display: grid;
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(5, 1fr);
             }
 
             body {
@@ -548,6 +548,7 @@
             <nav class="header-nav">
                 <a href="javascript:void(0)" id="nav-home" onclick="showView('home')" class="nav-link active">Início</a>
                 <a href="javascript:void(0)" id="nav-stores" onclick="showView('stores')" class="nav-link">Lojas</a>
+                <a href="perfil_cliente.html" id="nav-profile" class="nav-link">Meu Perfil</a>
                 <a href="javascript:void(0)" id="nav-merchant" onclick="showView('merchant')"
                     class="nav-link merchant-link">Sou Lojista</a>
             </nav>
@@ -573,6 +574,10 @@
         <a href="javascript:void(0)" id="bnav-stores" onclick="showView('stores')" class="bottom-nav-item">
             <i>🏪</i>
             <span>Lojas</span>
+        </a>
+        <a href="perfil_cliente.html" id="bnav-profile" class="bottom-nav-item">
+            <i>👤</i>
+            <span>Perfil</span>
         </a>
         <a href="javascript:void(0)" id="bnav-merchant" onclick="showView('merchant')" class="bottom-nav-item">
             <i>💼</i>

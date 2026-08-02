@@ -630,6 +630,36 @@ app.post('/api/leads', async (req, res) => {
     }
 });
 
+// Endpoint: PUT /api/leads/:phone - Atualiza os dados do lead
+app.put('/api/leads/:phone', async (req, res) => {
+    const { customer_name, address } = req.body;
+    try {
+        const client = await pool.connect();
+        await client.query(
+            'UPDATE leads SET customer_name = $1, address = $2 WHERE customer_phone = $3',
+            [customer_name, address, req.params.phone]
+        );
+        client.release();
+        res.status(200).json({ success: true });
+    } catch (e) {
+        console.error('Erro ao atualizar lead:', e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// Endpoint: DELETE /api/leads/:phone - Exclui o lead e seus dados
+app.delete('/api/leads/:phone', async (req, res) => {
+    try {
+        const client = await pool.connect();
+        await client.query('DELETE FROM leads WHERE customer_phone = $1', [req.params.phone]);
+        client.release();
+        res.status(200).json({ success: true });
+    } catch (e) {
+        console.error('Erro ao excluir lead:', e);
+        res.status(500).json({ error: e.message });
+    }
+});
+
 // --- ADMIN ENDPOINTS ---
 
 // GET /api/admin/stats - Relatórios simples
