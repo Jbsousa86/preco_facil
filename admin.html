@@ -557,9 +557,9 @@
                         <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Nome da Loja</label>
                         <input type="text" id="part-name" required placeholder="Ex: Hero's Burger" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
                     </div>
-                    <div style="margin-bottom:16px;">
+                    <div style="margin-bottom:16px; display:none;">
                         <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Senha Provisória</label>
-                        <input type="text" id="part-pass" required placeholder="Senha secreta" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        <input type="text" id="part-pass" value="parceiro_externo" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
                     </div>
                     <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                         <div>
@@ -621,9 +621,9 @@
                         <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Nome da Loja</label>
                         <input type="text" id="edit-part-name" required style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
                     </div>
-                    <div style="margin-bottom:16px;">
+                    <div style="margin-bottom:16px; display:none;">
                         <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Senha Provisória</label>
-                        <input type="text" id="edit-part-pass" required style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        <input type="text" id="edit-part-pass" value="parceiro_externo" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
                     </div>
                     <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                         <div>
@@ -1127,7 +1127,7 @@
             e.preventDefault();
             const body = {
                 name: document.getElementById('part-name').value,
-                password: document.getElementById('part-pass').value,
+                password: document.getElementById('part-pass').value || ('ext_' + Date.now()),
                 logo_url: document.getElementById('part-logo').value,
                 banner_url: document.getElementById('part-banner').value,
                 poster_message: document.getElementById('part-desc').value,
@@ -1177,7 +1177,7 @@
             const id = document.getElementById('edit-part-id').value;
             const body = {
                 name: document.getElementById('edit-part-name').value,
-                password: document.getElementById('edit-part-pass').value,
+                password: document.getElementById('edit-part-pass').value || 'parceiro_externo',
                 logo_url: document.getElementById('edit-part-logo').value,
                 banner_url: document.getElementById('edit-part-banner').value,
                 poster_message: document.getElementById('edit-part-desc').value,
