@@ -1061,6 +1061,25 @@
                 await fetchProducts();
                 document.getElementById('loading-overlay').style.display = 'none';
 
+                // RASTREAR VISITA SE O USUÁRIO ESTIVER "LOGADO"
+                try {
+                    const savedLead = localStorage.getItem('preco_facil_lead');
+                    if (savedLead) {
+                        const lead = JSON.parse(savedLead);
+                        fetch(`${API_BASE_URL}/api/leads`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                store_id: storeId,
+                                customer_name: lead.name,
+                                customer_phone: lead.phone,
+                                address: lead.address,
+                                neighborhood: lead.neighborhood
+                            })
+                        }).catch(e => console.error('Erro ao registrar visita:', e));
+                    }
+                } catch(e) {}
+
                 if (tempCart && Object.keys(cart).length > 0) {
                     openCart();
                     setTimeout(() => checkoutWhatsApp(), 500);
