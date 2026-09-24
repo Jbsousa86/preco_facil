@@ -46,9 +46,9 @@
         }
 
         .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 5%;
+            max-width: 500px;
+            margin: 32px auto;
+            padding: 0 20px;
             width: 100%;
             box-sizing: border-box;
         }
@@ -58,33 +58,6 @@
             border-radius: 24px;
             padding: 32px;
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-        }
-
-        /* Default state is hidden */
-        #profile-card {
-            display: none;
-        }
-
-        /* When visible class is added, apply layout based on screen size */
-        @media (min-width: 768px) {
-            #profile-card.visible {
-                display: grid;
-                grid-template-columns: 300px 1fr;
-                gap: 40px;
-                align-items: start;
-                padding: 40px;
-            }
-            .profile-header-sec {
-                position: sticky;
-                top: 100px;
-            }
-        }
-        @media (max-width: 767px) {
-            #profile-card.visible {
-                display: flex;
-                flex-direction: column;
-                padding: 20px;
-            }
         }
 
         .title {
@@ -220,8 +193,7 @@
         }
 
         .auth-card {
-            max-width: 500px;
-            margin: 0 auto;
+            /* herda .card */
         }
 
         .placeholder-text {
@@ -249,125 +221,124 @@
 
     <div class="container">
         
-        <div id="profile-card" class="card">
+        <div id="profile-card" class="card" style="display: none; padding: 16px 20px;">
             
-            <div class="profile-header-sec" style="text-align: center; margin-bottom: 24px;">
-                <div style="width: 100px; height: 100px; background: var(--primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; margin: 0 auto 16px auto; box-shadow: 0 10px 15px -3px rgba(37,99,235,0.3);" id="avatar-initial">?</div>
-                <h2 style="margin: 0; font-size: 1.6rem;" id="header-name">Carregando...</h2>
-                <p style="margin: 4px 0 0 0; color: var(--text-light); font-size: 1rem;" id="header-phone"></p>
-                <button type="button" class="btn" style="background: #e2e8f0; color: var(--text-dark); margin-top: 32px; padding: 12px;" onclick="handleLogout()">Sair da Conta</button>
+            <div style="text-align: center; margin-bottom: 24px; padding-top: 16px;">
+                <div style="width: 80px; height: 80px; background: var(--primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; margin: 0 auto 12px auto;" id="avatar-initial">?</div>
+                <h2 style="margin: 0; font-size: 1.4rem;" id="header-name">Carregando...</h2>
+                <p style="margin: 4px 0 0 0; color: var(--text-light); font-size: 0.9rem;" id="header-phone"></p>
             </div>
 
-            <div class="profile-menu-sec">
-                <ul class="profile-menu">
-                    <li class="profile-menu-item">
-                        <button class="profile-menu-btn" onclick="toggleMenu('menu-dados')">
-                            <div class="icon-title"><span>👤</span> Meus dados</div>
-                            <span>▼</span>
-                        </button>
-                        <div id="menu-dados" class="profile-menu-content">
-                            <form onsubmit="handleUpdate(event, 'dados')">
-                                <div class="input-group">
-                                    <label>Nome Completo</label>
-                                    <input type="text" id="user-name" required>
-                                </div>
-                                <div class="input-group">
-                                    <label>Telefone (WhatsApp)</label>
-                                    <input type="tel" id="user-phone" disabled>
-                                    <small style="color: var(--text-light); font-size: 0.75rem;">O telefone é sua chave de identificação e não pode ser alterado.</small>
-                                </div>
-                                <button type="submit" class="btn btn-primary" style="padding: 12px;">Salvar Nome</button>
-                            </form>
-                        </div>
-                    </li>
+            <ul class="profile-menu">
+                <li class="profile-menu-item">
+                    <button class="profile-menu-btn" onclick="toggleMenu('menu-dados')">
+                        <div class="icon-title"><span>👤</span> Meus dados</div>
+                        <span>▼</span>
+                    </button>
+                    <div id="menu-dados" class="profile-menu-content">
+                        <form onsubmit="handleUpdate(event, 'dados')">
+                            <div class="input-group">
+                                <label>Nome Completo</label>
+                                <input type="text" id="user-name" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Telefone (WhatsApp)</label>
+                                <input type="tel" id="user-phone" disabled>
+                                <small style="color: var(--text-light); font-size: 0.75rem;">O telefone é sua chave de identificação e não pode ser alterado.</small>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="padding: 12px;">Salvar Nome</button>
+                        </form>
+                    </div>
+                </li>
 
-                    <li class="profile-menu-item">
-                        <button class="profile-menu-btn" onclick="toggleMenu('menu-enderecos')">
-                            <div class="icon-title"><span>📍</span> Meus endereços</div>
-                            <span>▼</span>
-                        </button>
-                        <div id="menu-enderecos" class="profile-menu-content">
-                            <form onsubmit="handleUpdate(event, 'enderecos')">
-                                <div class="input-group">
-                                    <label>Endereço de Entrega (Rua, Número)</label>
-                                    <input type="text" id="user-address" required>
-                                </div>
-                                <div class="input-group">
-                                    <label>Bairro</label>
-                                    <input type="text" id="user-neighborhood" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary" style="padding: 12px;">Salvar Endereço</button>
-                            </form>
-                        </div>
-                    </li>
+                <li class="profile-menu-item">
+                    <button class="profile-menu-btn" onclick="toggleMenu('menu-enderecos')">
+                        <div class="icon-title"><span>📍</span> Meus endereços</div>
+                        <span>▼</span>
+                    </button>
+                    <div id="menu-enderecos" class="profile-menu-content">
+                        <form onsubmit="handleUpdate(event, 'enderecos')">
+                            <div class="input-group">
+                                <label>Endereço de Entrega (Rua, Número)</label>
+                                <input type="text" id="user-address" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Bairro</label>
+                                <input type="text" id="user-neighborhood" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="padding: 12px;">Salvar Endereço</button>
+                        </form>
+                    </div>
+                </li>
 
-                    <li class="profile-menu-item">
-                        <button class="profile-menu-btn" onclick="toggleMenu('menu-recentes')">
-                            <div class="icon-title"><span>🕒</span> Visualizados recentemente</div>
-                            <span>▼</span>
-                        </button>
-                        <div id="menu-recentes" class="profile-menu-content">
-                            <div id="recent-products-list" style="display:flex; flex-direction:column; gap:12px;"></div>
-                            <div id="recent-products-empty" class="placeholder-text" style="display:none;">Você ainda não tem produtos no histórico.</div>
-                        </div>
-                    </li>
+                <li class="profile-menu-item">
+                    <button class="profile-menu-btn" onclick="toggleMenu('menu-recentes')">
+                        <div class="icon-title"><span>🕒</span> Visualizados recentemente</div>
+                        <span>▼</span>
+                    </button>
+                    <div id="menu-recentes" class="profile-menu-content">
+                        <div id="recent-products-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+                        <div id="recent-products-empty" class="placeholder-text" style="display:none;">Você ainda não tem produtos no histórico.</div>
+                    </div>
+                </li>
 
-                    <li class="profile-menu-item">
-                        <button class="profile-menu-btn" onclick="toggleMenu('menu-interesses')">
-                            <div class="icon-title"><span>📩</span> Meus interesses</div>
-                            <span>▼</span>
-                        </button>
-                        <div id="menu-interesses" class="profile-menu-content">
-                            <p style="font-size:0.9rem; color:var(--text-light); margin-top:0;">Selecione o que você mais gosta para recebermos ofertas mais certeiras:</p>
-                            <form onsubmit="handleUpdate(event, 'interesses')" style="display:flex; flex-direction:column; gap:12px;">
-                                <label><input type="checkbox" name="interest" value="Mercado"> 🛒 Supermercado & Mercearia</label>
-                                <label><input type="checkbox" name="interest" value="Farmacia"> 💊 Farmácia & Saúde</label>
-                                <label><input type="checkbox" name="interest" value="Lanches"> 🍔 Lanches & Fast Food</label>
-                                <label><input type="checkbox" name="interest" value="Bebidas"> 🍻 Distribuidoras & Bebidas</label>
-                                <label><input type="checkbox" name="interest" value="Vestuario"> 👗 Moda & Vestuário</label>
-                                <button type="submit" class="btn btn-primary" style="padding:12px; margin-top:8px;">Salvar Interesses</button>
-                            </form>
-                        </div>
-                    </li>
+                <li class="profile-menu-item">
+                    <button class="profile-menu-btn" onclick="toggleMenu('menu-interesses')">
+                        <div class="icon-title"><span>📩</span> Meus interesses</div>
+                        <span>▼</span>
+                    </button>
+                    <div id="menu-interesses" class="profile-menu-content">
+                        <p style="font-size:0.9rem; color:var(--text-light); margin-top:0;">Selecione o que você mais gosta para recebermos ofertas mais certeiras:</p>
+                        <form onsubmit="handleUpdate(event, 'interesses')" style="display:flex; flex-direction:column; gap:12px;">
+                            <label><input type="checkbox" name="interest" value="Mercado"> 🛒 Supermercado & Mercearia</label>
+                            <label><input type="checkbox" name="interest" value="Farmacia"> 💊 Farmácia & Saúde</label>
+                            <label><input type="checkbox" name="interest" value="Lanches"> 🍔 Lanches & Fast Food</label>
+                            <label><input type="checkbox" name="interest" value="Bebidas"> 🍻 Distribuidoras & Bebidas</label>
+                            <label><input type="checkbox" name="interest" value="Vestuario"> 👗 Moda & Vestuário</label>
+                            <button type="submit" class="btn btn-primary" style="padding:12px; margin-top:8px;">Salvar Interesses</button>
+                        </form>
+                    </div>
+                </li>
 
-                    <li class="profile-menu-item">
-                        <button class="profile-menu-btn" onclick="toggleMenu('menu-lojas')">
-                            <div class="icon-title"><span>🏪</span> Lojas visitadas</div>
-                            <span>▼</span>
-                        </button>
-                        <div id="menu-lojas" class="profile-menu-content">
-                            <div id="visited-stores-list" style="display:flex; flex-direction:column; gap:12px;"></div>
-                            <div id="visited-stores-empty" class="placeholder-text" style="display:none;">Você ainda não interagiu com nenhuma loja.</div>
-                        </div>
-                    </li>
+                <li class="profile-menu-item">
+                    <button class="profile-menu-btn" onclick="toggleMenu('menu-lojas')">
+                        <div class="icon-title"><span>🏪</span> Lojas visitadas</div>
+                        <span>▼</span>
+                    </button>
+                    <div id="menu-lojas" class="profile-menu-content">
+                        <div id="visited-stores-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+                        <div id="visited-stores-empty" class="placeholder-text" style="display:none;">Você ainda não interagiu com nenhuma loja.</div>
+                    </div>
+                </li>
 
-                    <li class="profile-menu-item">
-                        <button class="profile-menu-btn" onclick="toggleMenu('menu-promocoes')">
-                            <div class="icon-title"><span>🔔</span> Preferências de promoções</div>
-                            <span>▼</span>
-                        </button>
-                        <div id="menu-promocoes" class="profile-menu-content">
-                            <p style="font-size: 0.9rem; color: var(--text-light); margin-top:0;">Escolha se deseja receber ofertas do Mercado Local e de lojistas parceiros.</p>
-                            <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; cursor: pointer;">
-                                <input type="checkbox" id="user-promo-optin" style="width: 20px; height: 20px;">
-                                <span style="font-weight: 600;">Receber promoções e novidades</span>
-                            </label>
-                            <button type="button" class="btn btn-primary" style="padding: 12px;" onclick="handleUpdate(event, 'promocoes')">Salvar Preferências</button>
-                        </div>
-                    </li>
+                <li class="profile-menu-item">
+                    <button class="profile-menu-btn" onclick="toggleMenu('menu-promocoes')">
+                        <div class="icon-title"><span>🔔</span> Preferências de promoções</div>
+                        <span>▼</span>
+                    </button>
+                    <div id="menu-promocoes" class="profile-menu-content">
+                        <p style="font-size: 0.9rem; color: var(--text-light); margin-top:0;">Escolha se deseja receber ofertas do Mercado Local e de lojistas parceiros.</p>
+                        <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; cursor: pointer;">
+                            <input type="checkbox" id="user-promo-optin" style="width: 20px; height: 20px;">
+                            <span style="font-weight: 600;">Receber promoções e novidades</span>
+                        </label>
+                        <button type="button" class="btn btn-primary" style="padding: 12px;" onclick="handleUpdate(event, 'promocoes')">Salvar Preferências</button>
+                    </div>
+                </li>
 
-                    <li class="profile-menu-item">
-                        <button class="profile-menu-btn" onclick="toggleMenu('menu-privacidade')">
-                            <div class="icon-title"><span>🔒</span> Privacidade e LGPD</div>
-                            <span>▼</span>
-                        </button>
-                        <div id="menu-privacidade" class="profile-menu-content">
-                            <p style="font-size: 0.9rem; color: var(--text-light); margin-top:0;">Você tem o direito de solicitar a exclusão total dos seus dados de nossos servidores, de acordo com a Lei Geral de Proteção de Dados (LGPD).</p>
-                            <button type="button" class="btn btn-danger" style="padding: 12px; margin-top: 0;" onclick="handleDelete()">Excluir Minha Conta Permanentemente</button>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+                <li class="profile-menu-item">
+                    <button class="profile-menu-btn" onclick="toggleMenu('menu-privacidade')">
+                        <div class="icon-title"><span>🔒</span> Privacidade e LGPD</div>
+                        <span>▼</span>
+                    </button>
+                    <div id="menu-privacidade" class="profile-menu-content">
+                        <p style="font-size: 0.9rem; color: var(--text-light); margin-top:0;">Você tem o direito de solicitar a exclusão total dos seus dados de nossos servidores, de acordo com a Lei Geral de Proteção de Dados (LGPD).</p>
+                        <button type="button" class="btn btn-danger" style="padding: 12px; margin-top: 0;" onclick="handleDelete()">Excluir Minha Conta Permanentemente</button>
+                    </div>
+                </li>
+            </ul>
+
+            <button type="button" class="btn" style="background: #e2e8f0; color: var(--text-dark); margin-top: 24px; padding: 12px;" onclick="handleLogout()">Sair da Conta</button>
         </div>
 
         <div id="auth-card" class="card" style="display: none;">
@@ -472,7 +443,7 @@
                     document.getElementById('avatar-initial').innerText = (data.customer_name || 'U').charAt(0).toUpperCase();
 
                     document.getElementById('auth-card').style.display = 'none';
-                    document.getElementById('profile-card').classList.add('visible');
+                    document.getElementById('profile-card').style.display = 'block';
                     
                     loadVisitedStores(phone);
                     loadRecentProducts();
@@ -566,7 +537,7 @@
         }
 
         function showAuth() {
-            document.getElementById('profile-card').classList.remove('visible');
+            document.getElementById('profile-card').style.display = 'none';
             document.getElementById('auth-card').style.display = 'block';
         }
 
