@@ -212,6 +212,7 @@ async function initializeDatabase() {
             ALTER TABLE stores ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
             ALTER TABLE stores ADD COLUMN IF NOT EXISTS whatsapp_clicks INTEGER DEFAULT 0;
             ALTER TABLE stores ADD COLUMN IF NOT EXISTS opening_hours TEXT;
+            ALTER TABLE stores ADD COLUMN IF NOT EXISTS poster_message TEXT;
         `);
         // Products
         await pool.query(`
