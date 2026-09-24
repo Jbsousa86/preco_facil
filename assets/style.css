@@ -1,6 +1,10 @@
 /* assets/style.css */
 /* Modern Clean Light theme with smooth gradients and subtle micro‑animations */
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 :root {
   --primary-h: 220;
   --primary-s: 90%;
@@ -52,9 +56,10 @@ header h1 {
 }
 
 main {
-  max-width: 960px;
+  width: 100%;
   margin: 2rem auto;
   padding: 0 1rem;
+  box-sizing: border-box;
 }
 
 .search-section {
@@ -143,8 +148,9 @@ main {
 
 /* Result Cards */
 .results-section {
-  max-width: 600px;
+  width: 100%;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .result-card {
