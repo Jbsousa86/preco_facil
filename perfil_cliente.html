@@ -60,9 +60,15 @@
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
         }
 
+        /* Default state is hidden */
+        #profile-card {
+            display: none;
+        }
+
+        /* When visible class is added, apply layout based on screen size */
         @media (min-width: 768px) {
-            #profile-card {
-                display: grid !important; /* Will be toggled from none to grid in JS */
+            #profile-card.visible {
+                display: grid;
                 grid-template-columns: 300px 1fr;
                 gap: 40px;
                 align-items: start;
@@ -74,8 +80,8 @@
             }
         }
         @media (max-width: 767px) {
-            #profile-card {
-                display: flex !important; /* Will be toggled from none to flex */
+            #profile-card.visible {
+                display: flex;
                 flex-direction: column;
                 padding: 20px;
             }
@@ -243,7 +249,7 @@
 
     <div class="container">
         
-        <div id="profile-card" class="card" style="display: none;">
+        <div id="profile-card" class="card">
             
             <div class="profile-header-sec" style="text-align: center; margin-bottom: 24px;">
                 <div style="width: 100px; height: 100px; background: var(--primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; margin: 0 auto 16px auto; box-shadow: 0 10px 15px -3px rgba(37,99,235,0.3);" id="avatar-initial">?</div>
@@ -466,9 +472,7 @@
                     document.getElementById('avatar-initial').innerText = (data.customer_name || 'U').charAt(0).toUpperCase();
 
                     document.getElementById('auth-card').style.display = 'none';
-                    // We shouldn't force 'block' here because we want it to be 'grid' on desktop and 'flex' on mobile.
-                    // The CSS rules we added have !important, so setting it to empty string removes the inline display:none, allowing CSS to apply.
-                    document.getElementById('profile-card').style.display = '';
+                    document.getElementById('profile-card').classList.add('visible');
                     
                     loadVisitedStores(phone);
                     loadRecentProducts();
@@ -562,7 +566,7 @@
         }
 
         function showAuth() {
-            document.getElementById('profile-card').style.display = 'none';
+            document.getElementById('profile-card').classList.remove('visible');
             document.getElementById('auth-card').style.display = 'block';
         }
 
