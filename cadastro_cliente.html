@@ -207,6 +207,18 @@
                         <input type="text" id="user-name" placeholder="Como você se chama?" required>
                     </div>
                     <div class="input-group">
+                        <label>CEP</label>
+                        <input type="text" id="user-cep" placeholder="00000-000" maxlength="9" oninput="this.value = this.value.replace(/\D/g, '').replace(/^(\d{5})(\d)/, '$1-$2').substr(0, 9);" onblur="buscarCep(this.value)" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Cidade</label>
+                        <input type="text" id="user-city" placeholder="Preenchido pelo CEP" readonly required style="background: #f1f5f9;">
+                    </div>
+                    <div class="input-group">
+                        <label>Estado</label>
+                        <input type="text" id="user-state" placeholder="UF" readonly required style="background: #f1f5f9;">
+                    </div>
+                    <div class="input-group">
                         <label>Endereço de Entrega (Rua, Número)</label>
                         <input type="text" id="user-address" placeholder="Ex: Rua das Flores, 123" required>
                     </div>
@@ -259,6 +271,23 @@
 
         let currentPhone = '';
 
+        async function buscarCep(cep) {
+            cep = cep.replace(/\D/g, '');
+            if (cep.length !== 8) return;
+            try {
+                const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const data = await res.json();
+                if (!data.erro) {
+                    document.getElementById('user-city').value = data.localidade || '';
+                    document.getElementById('user-state').value = data.uf || '';
+                    document.getElementById('user-address').value = data.logradouro || '';
+                    document.getElementById('user-neighborhood').value = data.bairro || '';
+                }
+            } catch (e) {
+                console.error('Erro ViaCEP', e);
+            }
+        }
+
         async function handlePhoneSubmit(e) {
             e.preventDefault();
             const phone = document.getElementById('user-phone').value.trim();
@@ -297,6 +326,9 @@
         async function handleRegisterSubmit(e) {
             e.preventDefault();
             const name = document.getElementById('user-name').value.trim();
+            const cep = document.getElementById('user-cep').value.trim();
+            const city = document.getElementById('user-city').value.trim();
+            const state = document.getElementById('user-state').value.trim();
             const address = document.getElementById('user-address').value.trim();
             const neighborhood = document.getElementById('user-neighborhood').value.trim();
             const promoOptin = document.getElementById('user-promo-optin').checked;
@@ -314,6 +346,9 @@
                         store_id: null,
                         customer_name: name,
                         customer_phone: currentPhone,
+                        cep: cep,
+                        city: city,
+                        state: state,
                         address: address,
                         neighborhood: neighborhood,
                         access_time: new Date().toISOString(),
@@ -326,8 +361,11 @@
             }
 
             // Salva na sessão local
-            const userData = { phone: currentPhone, name: name, address: address, neighborhood: neighborhood };
+            const userData = { phone: currentPhone, name: name, cep: cep, city: city, state: state, address: address, neighborhood: neighborhood };
             localStorage.setItem('preco_facil_lead', JSON.stringify(userData));
+            if (city) {
+                localStorage.setItem('preco_facil_city', city);
+            }
 
             btn.innerText = 'Tudo Pronto!';
             

@@ -181,6 +181,9 @@ async function initializeDatabase() {
         await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS neighborhood TEXT;').catch(e => {});
         await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS promo_optin BOOLEAN DEFAULT FALSE;').catch(e => {});
         await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS interests TEXT;').catch(e => {});
+        await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS cep TEXT;').catch(e => {});
+        await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS city TEXT;').catch(e => {});
+        await pool.query('ALTER TABLE leads ADD COLUMN IF NOT EXISTS state TEXT;').catch(e => {});
         
         console.log("Tabelas base (stores, products, history, stats) criadas.");
 
@@ -652,7 +655,7 @@ app.post('/api/track_visit', async (req, res) => {
 app.get('/api/leads/:phone', async (req, res) => {
     try {
         const client = await pool.connect();
-        const result = await client.query('SELECT customer_name, address, neighborhood, promo_optin, interests FROM leads WHERE customer_phone = $1 ORDER BY access_time DESC LIMIT 1', [req.params.phone]);
+        const result = await client.query('SELECT customer_name, address, neighborhood, promo_optin, interests, cep, city, state FROM leads WHERE customer_phone = $1 ORDER BY access_time DESC LIMIT 1', [req.params.phone]);
         client.release();
         if (result.rows.length > 0) {
             res.json(result.rows[0]);
@@ -686,21 +689,32 @@ app.get('/api/leads/:phone/stores', async (req, res) => {
 
 // Endpoint: POST /api/leads - Salva lead de redirecionamento
 app.post('/api/leads', async (req, res) => {
-    const { store_id, customer_name, customer_phone, address, neighborhood, access_time, promo_optin } = req.body;
+    const { store_id, customer_name, customer_phone, address, neighborhood, access_time, promo_optin, cep, city, state } = req.body;
     try {
         const client = await pool.connect();
         
-        const existingRes = await client.query('SELECT promo_optin, interests FROM leads WHERE customer_phone = $1 ORDER BY access_time DESC LIMIT 1', [customer_phone]);
+        const existingRes = await client.query('SELECT promo_optin, interests, cep, city, state, address, neighborhood FROM leads WHERE customer_phone = $1 ORDER BY access_time DESC LIMIT 1', [customer_phone]);
         let finalPromo = promo_optin || false;
         let finalInterests = null;
+        let finalCep = cep || '';
+        let finalCity = city || '';
+        let finalState = state || '';
+        let finalAddress = address || '';
+        let finalNeighborhood = neighborhood || '';
+        
         if (existingRes.rows.length > 0) {
             if (promo_optin === undefined || promo_optin === null) finalPromo = existingRes.rows[0].promo_optin;
             finalInterests = existingRes.rows[0].interests;
+            if (!cep) finalCep = existingRes.rows[0].cep || '';
+            if (!city) finalCity = existingRes.rows[0].city || '';
+            if (!state) finalState = existingRes.rows[0].state || '';
+            if (!address) finalAddress = existingRes.rows[0].address || '';
+            if (!neighborhood) finalNeighborhood = existingRes.rows[0].neighborhood || '';
         }
 
         await client.query(
-            'INSERT INTO leads (store_id, customer_name, customer_phone, address, neighborhood, access_time, promo_optin, interests) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
-            [store_id, customer_name, customer_phone, address || '', neighborhood || '', access_time || new Date(), finalPromo, finalInterests]
+            'INSERT INTO leads (store_id, customer_name, customer_phone, address, neighborhood, access_time, promo_optin, interests, cep, city, state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
+            [store_id, customer_name, customer_phone, finalAddress, finalNeighborhood, access_time || new Date(), finalPromo, finalInterests, finalCep, finalCity, finalState]
         );
         client.release();
         res.status(200).json({ success: true });
@@ -712,7 +726,7 @@ app.post('/api/leads', async (req, res) => {
 
 // Endpoint: PUT /api/leads/:phone - Atualiza os dados do lead
 app.put('/api/leads/:phone', async (req, res) => {
-    const { customer_name, address, neighborhood, promo_optin, interests } = req.body;
+    const { customer_name, address, neighborhood, promo_optin, interests, cep, city, state } = req.body;
     try {
         const client = await pool.connect();
         
@@ -726,6 +740,9 @@ app.put('/api/leads/:phone', async (req, res) => {
         if (neighborhood !== undefined) { updates.push(`neighborhood = $${i++}`); queryParams.push(neighborhood); }
         if (promo_optin !== undefined) { updates.push(`promo_optin = $${i++}`); queryParams.push(promo_optin); }
         if (interests !== undefined) { updates.push(`interests = $${i++}`); queryParams.push(interests); }
+        if (cep !== undefined) { updates.push(`cep = $${i++}`); queryParams.push(cep); }
+        if (city !== undefined) { updates.push(`city = $${i++}`); queryParams.push(city); }
+        if (state !== undefined) { updates.push(`state = $${i++}`); queryParams.push(state); }
 
         if (updates.length > 0) {
             queryParams.push(req.params.phone);

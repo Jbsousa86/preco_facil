@@ -259,6 +259,18 @@
                     <div id="menu-enderecos" class="profile-menu-content">
                         <form onsubmit="handleUpdate(event, 'enderecos')">
                             <div class="input-group">
+                                <label>CEP</label>
+                                <input type="text" id="user-cep" placeholder="00000-000" maxlength="9" oninput="this.value = this.value.replace(/\D/g, '').replace(/^(\d{5})(\d)/, '$1-$2').substr(0, 9);" onblur="buscarCep(this.value)" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Cidade</label>
+                                <input type="text" id="user-city" placeholder="Preenchido pelo CEP" readonly required style="background: #f1f5f9;">
+                            </div>
+                            <div class="input-group">
+                                <label>Estado</label>
+                                <input type="text" id="user-state" placeholder="UF" readonly required style="background: #f1f5f9;">
+                            </div>
+                            <div class="input-group">
                                 <label>Endereço de Entrega (Rua, Número)</label>
                                 <input type="text" id="user-address" required>
                             </div>
@@ -374,6 +386,23 @@
 
         let userData = null;
 
+        async function buscarCep(cep) {
+            cep = cep.replace(/\D/g, '');
+            if (cep.length !== 8) return;
+            try {
+                const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const data = await res.json();
+                if (!data.erro) {
+                    document.getElementById('user-city').value = data.localidade || '';
+                    document.getElementById('user-state').value = data.uf || '';
+                    document.getElementById('user-address').value = data.logradouro || '';
+                    document.getElementById('user-neighborhood').value = data.bairro || '';
+                }
+            } catch (e) {
+                console.error('Erro ViaCEP', e);
+            }
+        }
+
         function toggleMenu(menuId) {
             const content = document.getElementById(menuId);
             const isOpen = content.classList.contains('open');
@@ -433,6 +462,9 @@
                     // Preenche campos
                     document.getElementById('user-phone').value = data.customer_phone || phone;
                     document.getElementById('user-name').value = data.customer_name || '';
+                    document.getElementById('user-cep').value = data.cep || '';
+                    document.getElementById('user-city').value = data.city || '';
+                    document.getElementById('user-state').value = data.state || '';
                     document.getElementById('user-address').value = data.address || '';
                     document.getElementById('user-neighborhood').value = data.neighborhood || '';
                     document.getElementById('user-promo-optin').checked = !!data.promo_optin;
@@ -457,9 +489,15 @@
                     localStorage.setItem('preco_facil_lead', JSON.stringify({
                         phone: data.customer_phone || phone,
                         name: data.customer_name,
+                        cep: data.cep,
+                        city: data.city,
+                        state: data.state,
                         address: data.address,
                         neighborhood: data.neighborhood
                     }));
+                    if (data.city) {
+                        localStorage.setItem('preco_facil_city', data.city);
+                    }
                     return true;
                 }
                 return false;
@@ -557,6 +595,9 @@
             if (e) e.preventDefault();
             
             const name = document.getElementById('user-name').value.trim();
+            const cep = document.getElementById('user-cep').value.trim();
+            const city = document.getElementById('user-city').value.trim();
+            const state = document.getElementById('user-state').value.trim();
             const address = document.getElementById('user-address').value.trim();
             const neighborhood = document.getElementById('user-neighborhood').value.trim();
             const promoOptin = document.getElementById('user-promo-optin').checked;
@@ -594,6 +635,9 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         customer_name: name, 
+                        cep: cep,
+                        city: city,
+                        state: state,
                         address: address, 
                         neighborhood: neighborhood,
                         promo_optin: promoOptin
@@ -609,9 +653,15 @@
                     localStorage.setItem('preco_facil_lead', JSON.stringify({
                         phone: phone,
                         name: name,
+                        cep: cep,
+                        city: city,
+                        state: state,
                         address: address,
                         neighborhood: neighborhood
                     }));
+                    if (city) {
+                        localStorage.setItem('preco_facil_city', city);
+                    }
                 } else {
                     alert('Erro ao atualizar perfil.');
                 }
