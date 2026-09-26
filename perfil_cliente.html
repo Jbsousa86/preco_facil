@@ -437,6 +437,10 @@
                     document.getElementById('user-neighborhood').value = data.neighborhood || '';
                     document.getElementById('user-promo-optin').checked = !!data.promo_optin;
                     
+                    if (data.interests) {
+                        localStorage.setItem('preco_facil_interests', JSON.stringify(data.interests.split(',')));
+                    }
+
                     // Header visual
                     document.getElementById('header-name').innerText = data.customer_name || 'Usuário';
                     document.getElementById('header-phone').innerText = data.customer_phone || phone;

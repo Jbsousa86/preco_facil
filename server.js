@@ -652,7 +652,7 @@ app.post('/api/track_visit', async (req, res) => {
 app.get('/api/leads/:phone', async (req, res) => {
     try {
         const client = await pool.connect();
-        const result = await client.query('SELECT customer_name, address, neighborhood, promo_optin FROM leads WHERE customer_phone = $1 ORDER BY access_time DESC LIMIT 1', [req.params.phone]);
+        const result = await client.query('SELECT customer_name, address, neighborhood, promo_optin, interests FROM leads WHERE customer_phone = $1 ORDER BY access_time DESC LIMIT 1', [req.params.phone]);
         client.release();
         if (result.rows.length > 0) {
             res.json(result.rows[0]);
@@ -689,9 +689,18 @@ app.post('/api/leads', async (req, res) => {
     const { store_id, customer_name, customer_phone, address, neighborhood, access_time, promo_optin } = req.body;
     try {
         const client = await pool.connect();
+        
+        const existingRes = await client.query('SELECT promo_optin, interests FROM leads WHERE customer_phone = $1 ORDER BY access_time DESC LIMIT 1', [customer_phone]);
+        let finalPromo = promo_optin || false;
+        let finalInterests = null;
+        if (existingRes.rows.length > 0) {
+            if (promo_optin === undefined || promo_optin === null) finalPromo = existingRes.rows[0].promo_optin;
+            finalInterests = existingRes.rows[0].interests;
+        }
+
         await client.query(
-            'INSERT INTO leads (store_id, customer_name, customer_phone, address, neighborhood, access_time, promo_optin) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-            [store_id, customer_name, customer_phone, address || '', neighborhood || '', access_time || new Date(), promo_optin || false]
+            'INSERT INTO leads (store_id, customer_name, customer_phone, address, neighborhood, access_time, promo_optin, interests) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+            [store_id, customer_name, customer_phone, address || '', neighborhood || '', access_time || new Date(), finalPromo, finalInterests]
         );
         client.release();
         res.status(200).json({ success: true });
