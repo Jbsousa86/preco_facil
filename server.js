@@ -938,17 +938,30 @@ app.get('/api/admin/leads', async (req, res) => {
 
 // Endpoint: GET /api/prices/cheapest - 5 preços mais baratos globais
 app.get('/api/prices/cheapest', async (req, res) => {
+    const { city, state } = req.query;
     try {
         const client = await pool.connect();
-        const result = await client.query(
-            `SELECT s.id as store_id, s.name as store_name, pr.price, pr.promo_price, pr.promo_expires_at, p.name as product_name, pr.image_url
+        let queryStr = `SELECT s.id as store_id, s.name as store_name, pr.price, pr.promo_price, pr.promo_expires_at, p.name as product_name, pr.image_url
              FROM prices pr
              JOIN products p ON p.id = pr.product_id
              JOIN stores s ON s.id = pr.store_id
-             WHERE (s.is_blocked IS NULL OR s.is_blocked = FALSE)
-             ORDER BY COALESCE(CASE WHEN pr.promo_expires_at > NOW() THEN pr.promo_price END, pr.price) ASC
-             LIMIT 20`
-        );
+             WHERE (s.is_blocked IS NULL OR s.is_blocked = FALSE)`;
+        
+        const queryParams = [];
+        let paramIdx = 1;
+
+        if (city) {
+            queryStr += ` AND unaccent(lower(s.city)) = unaccent(lower($${paramIdx++}))`;
+            queryParams.push(city);
+        }
+        if (state) {
+            queryStr += ` AND lower(s.state) = lower($${paramIdx++})`;
+            queryParams.push(state);
+        }
+
+        queryStr += ` ORDER BY COALESCE(CASE WHEN pr.promo_expires_at > NOW() THEN pr.promo_price END, pr.price) ASC LIMIT 20`;
+
+        const result = await client.query(queryStr, queryParams);
         client.release();
         res.json(result.rows);
     } catch (e) {
