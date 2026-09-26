@@ -496,7 +496,8 @@
                         neighborhood: data.neighborhood
                     }));
                     if (data.city) {
-                        localStorage.setItem('preco_facil_city', data.city);
+                        const locationData = { cep: data.cep, city: data.city, state: data.state };
+                        localStorage.setItem('customer_location', JSON.stringify(locationData));
                     }
                     return true;
                 }
@@ -660,7 +661,8 @@
                         neighborhood: neighborhood
                     }));
                     if (city) {
-                        localStorage.setItem('preco_facil_city', city);
+                        const locationData = { cep: cep, city: city, state: state };
+                        localStorage.setItem('customer_location', JSON.stringify(locationData));
                     }
                 } else {
                     alert('Erro ao atualizar perfil.');

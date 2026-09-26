@@ -364,7 +364,8 @@
             const userData = { phone: currentPhone, name: name, cep: cep, city: city, state: state, address: address, neighborhood: neighborhood };
             localStorage.setItem('preco_facil_lead', JSON.stringify(userData));
             if (city) {
-                localStorage.setItem('preco_facil_city', city);
+                const locationData = { cep: cep, city: city, state: state };
+                localStorage.setItem('customer_location', JSON.stringify(locationData));
             }
 
             btn.innerText = 'Tudo Pronto!';
