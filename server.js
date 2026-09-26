@@ -204,6 +204,9 @@ async function initializeDatabase() {
         await pool.query(`
             ALTER TABLE stores ADD COLUMN IF NOT EXISTS lat FLOAT DEFAULT 0.0;
             ALTER TABLE stores ADD COLUMN IF NOT EXISTS lon FLOAT DEFAULT 0.0;
+            ALTER TABLE stores ADD COLUMN IF NOT EXISTS cep TEXT;
+            ALTER TABLE stores ADD COLUMN IF NOT EXISTS city TEXT;
+            ALTER TABLE stores ADD COLUMN IF NOT EXISTS state TEXT;
             ALTER TABLE stores ADD COLUMN IF NOT EXISTS street TEXT;
             ALTER TABLE stores ADD COLUMN IF NOT EXISTS number TEXT;
             ALTER TABLE stores ADD COLUMN IF NOT EXISTS neighborhood TEXT;
@@ -240,7 +243,7 @@ app.get('/api/store/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const client = await pool.connect();
-        const result = await client.query('SELECT id, name, logo_url, banner_url, street, number, neighborhood, poster_message, phone, whatsapp_clicks, external_url, opening_hours FROM stores WHERE id = $1', [id]);
+        const result = await client.query('SELECT id, name, logo_url, banner_url, cep, city, state, street, number, neighborhood, poster_message, phone, whatsapp_clicks, external_url, opening_hours FROM stores WHERE id = $1', [id]);
         client.release();
         if (result.rows.length > 0) {
             res.json(result.rows[0]);
@@ -269,10 +272,11 @@ app.post('/api/store/:id/track_whatsapp', async (req, res) => {
 
 // Endpoint: GET /api/stores
 app.get('/api/stores', async (req, res) => {
+    const { city, state } = req.query;
     try {
         const client = await pool.connect();
-        const result = await client.query(`
-            SELECT s.id, s.name, s.logo_url, s.banner_url, s.is_blocked, s.is_featured, s.whatsapp_clicks, s.external_url,
+        let queryStr = `
+            SELECT s.id, s.name, s.logo_url, s.banner_url, s.is_blocked, s.is_featured, s.whatsapp_clicks, s.external_url, s.city, s.state,
             EXISTS (
                 SELECT 1 FROM prices p 
                 WHERE p.store_id = s.id 
@@ -280,8 +284,23 @@ app.get('/api/stores', async (req, res) => {
                 AND p.promo_expires_at > NOW()
             ) as has_promo
             FROM stores s 
-            ORDER BY s.is_featured DESC, s.name
-        `);
+            WHERE 1=1
+        `;
+        const queryParams = [];
+        let paramIdx = 1;
+
+        if (city) {
+            queryStr += ` AND unaccent(lower(s.city)) = unaccent(lower($${paramIdx++}))`;
+            queryParams.push(city);
+        }
+        if (state) {
+            queryStr += ` AND lower(s.state) = lower($${paramIdx++})`;
+            queryParams.push(state);
+        }
+
+        queryStr += ` ORDER BY s.is_featured DESC, s.name`;
+
+        const result = await client.query(queryStr, queryParams);
         client.release();
         res.json(result.rows);
     } catch (e) {
@@ -471,7 +490,7 @@ app.patch('/api/merchant/product/highlight', async (req, res) => {
 });
 
 app.post('/api/merchant/update-identity', async (req, res) => {
-    const { store_id, logo_url, banner_url, phone, street, number, neighborhood, poster_message } = req.body;
+    const { store_id, logo_url, banner_url, phone, cep, city, state, street, number, neighborhood, poster_message } = req.body;
     try {
         const client = await pool.connect();
         let query = 'UPDATE stores SET logo_url = $1, banner_url = $2';
@@ -479,6 +498,9 @@ app.post('/api/merchant/update-identity', async (req, res) => {
         let idx = 3;
         
         if (phone !== undefined) { query += `, phone = $${idx++}`; values.push(phone); }
+        if (cep !== undefined) { query += `, cep = $${idx++}`; values.push(cep); }
+        if (city !== undefined) { query += `, city = $${idx++}`; values.push(city); }
+        if (state !== undefined) { query += `, state = $${idx++}`; values.push(state); }
         if (street !== undefined) { query += `, street = $${idx++}`; values.push(street); }
         if (number !== undefined) { query += `, number = $${idx++}`; values.push(number); }
         if (neighborhood !== undefined) { query += `, neighborhood = $${idx++}`; values.push(neighborhood); }
@@ -509,7 +531,7 @@ app.patch('/api/merchant/update-logo', async (req, res) => {
 });
 // Endpoint: GET /api/search?product=...
 app.get('/api/search', async (req, res) => {
-    const { product } = req.query;
+    const { product, city, state } = req.query;
     if (!product) return res.status(400).json({ error: 'Missing product' });
 
     try {
@@ -526,19 +548,30 @@ app.get('/api/search', async (req, res) => {
             console.error('Erro ao salvar histórico (busca continuará):', histErr.message);
         }
 
-        // Busca aprimorada: similaridade, ignora acentos e aceita correspondências parciais
-        const result = await client.query(
-            `SELECT s.id as store_id, s.name as store_name, s.rating, pr.price, pr.promo_price, pr.promo_expires_at, pr.image_url, s.logo_url, s.street, s.number, s.neighborhood, s.phone, p.category, p.name as product_name,
+        let queryStr = `SELECT s.id as store_id, s.name as store_name, s.rating, pr.price, pr.promo_price, pr.promo_expires_at, pr.image_url, s.logo_url, s.street, s.number, s.neighborhood, s.phone, s.cep, s.city, s.state, p.category, p.name as product_name,
                     similarity(unaccent(lower(p.name)), unaccent(lower($1))) AS sim
              FROM prices pr
              JOIN products p ON p.id = pr.product_id
              JOIN stores s ON s.id = pr.store_id
              WHERE (unaccent(lower(p.name)) ILIKE unaccent(lower($1))
                     OR similarity(unaccent(lower(p.name)), unaccent(lower($1))) > 0.3)
-               AND (s.is_blocked IS NULL OR s.is_blocked = FALSE)
-             ORDER BY sim DESC, COALESCE(CASE WHEN pr.promo_expires_at > NOW() THEN pr.promo_price END, pr.price) ASC`,
-            [product]
-        );
+               AND (s.is_blocked IS NULL OR s.is_blocked = FALSE)`;
+               
+        const queryParams = [product];
+        let paramIdx = 2;
+
+        if (city) {
+            queryStr += ` AND unaccent(lower(s.city)) = unaccent(lower($${paramIdx++}))`;
+            queryParams.push(city);
+        }
+        if (state) {
+            queryStr += ` AND lower(s.state) = lower($${paramIdx++})`;
+            queryParams.push(state);
+        }
+        
+        queryStr += ` ORDER BY sim DESC, COALESCE(CASE WHEN pr.promo_expires_at > NOW() THEN pr.promo_price END, pr.price) ASC`;
+
+        const result = await client.query(queryStr, queryParams);
         client.release();
         res.json(result.rows);
     } catch (e) {
@@ -562,18 +595,33 @@ app.get('/api/search/trending', async (req, res) => {
 
 // Endpoint: GET /api/offers/trending - Top 10 Ofertas Ativas
 app.get('/api/offers/trending', async (req, res) => {
+    const { city, state } = req.query;
     try {
         const client = await pool.connect();
-        const result = await client.query(
-            `SELECT s.id as store_id, s.name as store_name, s.rating, pr.price, pr.promo_price, pr.promo_expires_at, pr.image_url, s.logo_url, s.street, s.number, s.neighborhood, s.phone, p.category, p.name as product_name
+        
+        let queryStr = `SELECT s.id as store_id, s.name as store_name, s.rating, pr.price, pr.promo_price, pr.promo_expires_at, pr.image_url, s.logo_url, s.street, s.number, s.neighborhood, s.phone, s.cep, s.city, s.state, p.category, p.name as product_name
              FROM prices pr
              JOIN products p ON p.id = pr.product_id
              JOIN stores s ON s.id = pr.store_id
              WHERE pr.promo_price IS NOT NULL 
                AND pr.promo_expires_at > NOW()
-               AND (s.is_blocked IS NULL OR s.is_blocked = FALSE)
-             LIMIT 30`
-        );
+               AND (s.is_blocked IS NULL OR s.is_blocked = FALSE)`;
+               
+        const queryParams = [];
+        let paramIdx = 1;
+
+        if (city) {
+            queryStr += ` AND unaccent(lower(s.city)) = unaccent(lower($${paramIdx++}))`;
+            queryParams.push(city);
+        }
+        if (state) {
+            queryStr += ` AND lower(s.state) = lower($${paramIdx++})`;
+            queryParams.push(state);
+        }
+        
+        queryStr += ` LIMIT 30`;
+
+        const result = await client.query(queryStr, queryParams);
         client.release();
         res.json(result.rows);
     } catch (e) {
@@ -767,7 +815,7 @@ app.get('/api/admin/stores', async (req, res) => {
 
 // POST /api/admin/stores - Adicionar loja
 app.post('/api/admin/stores', async (req, res) => {
-    const { name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours } = req.body;
+    const { name, password, cep, city, state, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours } = req.body;
     if (!name || !password) {
         return res.status(400).json({ error: 'Nome e senha são obrigatórios' });
     }
@@ -782,8 +830,8 @@ app.post('/api/admin/stores', async (req, res) => {
         }
 
         const result = await client.query(
-            'INSERT INTO stores (name, password, rating, lat, lon, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours) VALUES ($1, $2, 5.0, 0.0, 0.0, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
-            [name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours]
+            'INSERT INTO stores (name, password, rating, lat, lon, cep, city, state, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours) VALUES ($1, $2, 5.0, 0.0, 0.0, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *',
+            [name, password, cep, city, state, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours]
         );
         client.release();
         res.json(result.rows[0]);
@@ -796,10 +844,10 @@ app.post('/api/admin/stores', async (req, res) => {
 // PUT /api/admin/stores/:id - Editar loja
 app.put('/api/admin/stores/:id', async (req, res) => {
     const { id } = req.params;
-    const { name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours } = req.body;
+    const { name, password, cep, city, state, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours } = req.body;
     try {
         const client = await pool.connect();
-        await client.query('UPDATE stores SET name = $1, password = $2, street = $3, number = $4, neighborhood = $5, phone = $6, external_url = $7, logo_url = $8, banner_url = $9, poster_message = $10, opening_hours = $11 WHERE id = $12', [name, password, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours, id]);
+        await client.query('UPDATE stores SET name = $1, password = $2, cep = $3, city = $4, state = $5, street = $6, number = $7, neighborhood = $8, phone = $9, external_url = $10, logo_url = $11, banner_url = $12, poster_message = $13, opening_hours = $14 WHERE id = $15', [name, password, cep, city, state, street, number, neighborhood, phone, external_url, logo_url, banner_url, poster_message, opening_hours, id]);
         client.release();
         res.json({ success: true });
     } catch (e) {

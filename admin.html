@@ -594,7 +594,21 @@
                             <input type="text" id="part-neighborhood" placeholder="Setor Central" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
                         </div>
                     </div>
-                    <div style="margin-bottom:16px; display:grid; grid-template-columns:3fr 1fr; gap:12px;">
+                    <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">CEP</label>
+                            <input type="text" id="part-cep" placeholder="Ex: 01001-000" onblur="fetchStoreCep(this.value, 'part')" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Cidade</label>
+                            <input type="text" id="part-city" placeholder="Ex: São Paulo" readonly style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 3fr 1fr; gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">UF</label>
+                            <input type="text" id="part-state" placeholder="SP" readonly style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc;">
+                        </div>
                         <div>
                             <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Rua/Avenida</label>
                             <input type="text" id="part-street" placeholder="Rua 1" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
@@ -658,7 +672,21 @@
                             <input type="text" id="edit-part-neighborhood" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
                         </div>
                     </div>
-                    <div style="margin-bottom:16px; display:grid; grid-template-columns:3fr 1fr; gap:12px;">
+                    <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">CEP</label>
+                            <input type="text" id="edit-part-cep" placeholder="Ex: 01001-000" onblur="fetchStoreCep(this.value, 'edit-part')" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Cidade</label>
+                            <input type="text" id="edit-part-city" readonly style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 3fr 1fr; gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">UF</label>
+                            <input type="text" id="edit-part-state" readonly style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc;">
+                        </div>
                         <div>
                             <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Rua/Avenida</label>
                             <input type="text" id="edit-part-street" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
@@ -708,9 +736,25 @@
                                 style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
                         </div>
                     </div>
-                    <div style="margin-bottom:16px;">
-                        <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Bairro</label>
-                        <input type="text" id="new-neighborhood" placeholder="Setor Central" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                    <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">CEP</label>
+                            <input type="text" id="new-cep" placeholder="Ex: 01001-000" onblur="fetchStoreCep(this.value, 'new')" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Cidade</label>
+                            <input type="text" id="new-city" placeholder="Ex: São Paulo" readonly style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 3fr; gap:12px;">
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">UF</label>
+                            <input type="text" id="new-state" placeholder="SP" readonly style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Bairro</label>
+                            <input type="text" id="new-neighborhood" placeholder="Setor Central" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        </div>
                     </div>
                     <div style="margin-bottom:24px;">
                         <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">URL Externa (Opcional - Parceiro Vitrine)</label>
@@ -1236,7 +1280,10 @@
                 phone: document.getElementById('part-phone').value,
                 neighborhood: document.getElementById('part-neighborhood').value,
                 street: document.getElementById('part-street').value,
-                number: document.getElementById('part-number').value
+                number: document.getElementById('part-number').value,
+                cep: document.getElementById('part-cep') ? document.getElementById('part-cep').value : '',
+                city: document.getElementById('part-city') ? document.getElementById('part-city').value : '',
+                state: document.getElementById('part-state') ? document.getElementById('part-state').value : ''
             };
 
             const res = await fetchAdmin('api/admin/stores', {
@@ -1269,6 +1316,9 @@
             document.getElementById('edit-part-street').value = store.street || '';
             document.getElementById('edit-part-number').value = store.number || '';
             document.getElementById('edit-part-ext').value = store.external_url || '';
+            if (document.getElementById('edit-part-cep')) document.getElementById('edit-part-cep').value = store.cep || '';
+            if (document.getElementById('edit-part-city')) document.getElementById('edit-part-city').value = store.city || '';
+            if (document.getElementById('edit-part-state')) document.getElementById('edit-part-state').value = store.state || '';
             document.getElementById('edit-partner-modal').style.display = 'flex';
         }
 
@@ -1286,7 +1336,10 @@
                 phone: document.getElementById('edit-part-phone').value,
                 neighborhood: document.getElementById('edit-part-neighborhood').value,
                 street: document.getElementById('edit-part-street').value,
-                number: document.getElementById('edit-part-number').value
+                number: document.getElementById('edit-part-number').value,
+                cep: document.getElementById('edit-part-cep') ? document.getElementById('edit-part-cep').value : '',
+                city: document.getElementById('edit-part-city') ? document.getElementById('edit-part-city').value : '',
+                state: document.getElementById('edit-part-state') ? document.getElementById('edit-part-state').value : ''
             };
             const res = await fetchAdmin(`api/admin/stores/${id}`, { method: 'PUT', body: JSON.stringify(body) });
             if (res.ok) { 
@@ -1307,6 +1360,9 @@
                 neighborhood: document.getElementById('new-neighborhood').value,
                 phone: document.getElementById('new-phone').value,
                 external_url: document.getElementById('new-external-url').value,
+                cep: document.getElementById('new-cep') ? document.getElementById('new-cep').value : '',
+                city: document.getElementById('new-city') ? document.getElementById('new-city').value : '',
+                state: document.getElementById('new-state') ? document.getElementById('new-state').value : ''
             };
 
             const res = await fetchAdmin('api/admin/stores', {
@@ -1331,10 +1387,13 @@
             document.getElementById('edit-name').value = store.name;
             document.getElementById('edit-phone').value = store.phone || '';
             document.getElementById('edit-pass').value = store.password || '';
-            document.getElementById('edit-street').value = store.street || '';
-            document.getElementById('edit-number').value = store.number || '';
-            document.getElementById('edit-neighborhood').value = store.neighborhood || '';
-            document.getElementById('edit-store-modal').style.display = 'flex';
+            if (document.getElementById('edit-street')) document.getElementById('edit-street').value = store.street || '';
+            if (document.getElementById('edit-number')) document.getElementById('edit-number').value = store.number || '';
+            if (document.getElementById('edit-neighborhood')) document.getElementById('edit-neighborhood').value = store.neighborhood || '';
+            if (document.getElementById('edit-cep')) document.getElementById('edit-cep').value = store.cep || '';
+            if (document.getElementById('edit-city')) document.getElementById('edit-city').value = store.city || '';
+            if (document.getElementById('edit-state')) document.getElementById('edit-state').value = store.state || '';
+            if (document.getElementById('edit-store-modal')) document.getElementById('edit-store-modal').style.display = 'flex';
         }
         function closeEditModal() { document.getElementById('edit-store-modal').style.display = 'none'; }
 
@@ -1345,10 +1404,13 @@
                 name: document.getElementById('edit-name').value,
                 password: document.getElementById('edit-pass').value,
                 phone: document.getElementById('edit-phone').value,
-                street: document.getElementById('edit-street').value,
-                number: document.getElementById('edit-number').value,
-                neighborhood: document.getElementById('edit-neighborhood').value,
-                external_url: document.getElementById('edit-external-url') ? document.getElementById('edit-external-url').value : ''
+                street: document.getElementById('edit-street') ? document.getElementById('edit-street').value : '',
+                number: document.getElementById('edit-number') ? document.getElementById('edit-number').value : '',
+                neighborhood: document.getElementById('edit-neighborhood') ? document.getElementById('edit-neighborhood').value : '',
+                external_url: document.getElementById('edit-external-url') ? document.getElementById('edit-external-url').value : '',
+                cep: document.getElementById('edit-cep') ? document.getElementById('edit-cep').value : '',
+                city: document.getElementById('edit-city') ? document.getElementById('edit-city').value : '',
+                state: document.getElementById('edit-state') ? document.getElementById('edit-state').value : ''
             };
             const res = await fetchAdmin(`api/admin/stores/${id}`, { method: 'PUT', body: JSON.stringify(body) });
             if (res.ok) { closeEditModal(); loadStores(); alert('Loja atualizada com sucesso!'); }
@@ -1439,6 +1501,23 @@
         function logoutAdmin() {
             sessionStorage.removeItem('admin_key');
             location.reload();
+        }
+
+        async function fetchStoreCep(cepValue, prefix) {
+            const cep = cepValue.replace(/\D/g, '');
+            if (cep.length !== 8) return;
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const data = await response.json();
+                if (!data.erro) {
+                    if (document.getElementById(`${prefix}-city`)) document.getElementById(`${prefix}-city`).value = data.localidade;
+                    if (document.getElementById(`${prefix}-state`)) document.getElementById(`${prefix}-state`).value = data.uf;
+                    if (document.getElementById(`${prefix}-street`) && data.logradouro) document.getElementById(`${prefix}-street`).value = data.logradouro;
+                    if (document.getElementById(`${prefix}-neighborhood`) && data.bairro) document.getElementById(`${prefix}-neighborhood`).value = data.bairro;
+                }
+            } catch (err) {
+                console.error("Erro ao buscar CEP:", err);
+            }
         }
 
         // DESINSTALAÇÃO AGRESSIVA DE QUALQUER CACHE ANTIGO E LIMPEZA DE CACHE STORAGE

@@ -554,6 +554,9 @@
             <h1 class="header-title">Mercado Local</h1>
         </div>
         <div style="display: flex; align-items: center; gap: 12px;">
+            <button id="location-btn" onclick="openLocationModal()" style="background: #f1f5f9; color: var(--primary); border: none; padding: 8px 16px; border-radius: 20px; font-weight: 700; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                <span>📍</span> <span id="location-btn-text">Informar CEP</span>
+            </button>
             <button id="install-btn" class="install-btn">📲 Instalar</button>
             <nav class="header-nav">
                 <a href="javascript:void(0)" id="nav-home" onclick="showView('home')" class="nav-link active">Início</a>
@@ -676,6 +679,23 @@
             </div>
         </section>
     </main>
+
+    <!-- MODAL: LOCALIZAÇÃO DO CLIENTE -->
+    <div id="location-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9000; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:#fff; width:100%; max-width:400px; padding:32px; border-radius:24px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h2 style="margin:0; font-size:1.25rem;">📍 Sua Localização</h2>
+                <button onclick="document.getElementById('location-modal').style.display='none'" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <p style="color:#64748b; font-size:0.9rem; margin-bottom:24px;">Informe seu CEP para vermos as lojas disponíveis na sua cidade.</p>
+            <div style="margin-bottom:16px;">
+                <input type="text" id="customer-cep-input" placeholder="Apenas números (ex: 01001000)" style="width:100%; padding:14px; border:2px solid #e2e8f0; border-radius:12px; font-size:1.1rem; text-align:center;">
+            </div>
+            <div id="customer-city-display" style="text-align:center; font-weight:600; color:var(--primary); margin-bottom:16px; display:none;"></div>
+            <button onclick="checkCustomerCep()" style="width:100%; padding:14px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-weight:700; font-size:1rem; cursor:pointer;">Confirmar CEP</button>
+            <button onclick="clearCustomerLocation()" style="width:100%; padding:14px; background:transparent; color:#ef4444; border:none; font-weight:600; font-size:0.9rem; cursor:pointer; margin-top:8px;">Ver todas as cidades (Limpar)</button>
+        </div>
+    </div>
 
 
     <script src="assets/app.js?v=4.0"></script>

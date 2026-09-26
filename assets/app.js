@@ -23,6 +23,76 @@ function getFullUrl(path) {
     return `${API_BASE_URL}${finalPath}`;
 }
 
+function getCustomerCity() {
+    try {
+        const loc = JSON.parse(localStorage.getItem('customer_location'));
+        return loc && loc.city ? loc.city : '';
+    } catch(e) { return ''; }
+}
+
+function openLocationModal() {
+    document.getElementById('location-modal').style.display = 'flex';
+    try {
+        const loc = JSON.parse(localStorage.getItem('customer_location'));
+        if (loc && loc.cep) {
+            document.getElementById('customer-cep-input').value = loc.cep;
+            document.getElementById('customer-city-display').innerText = `${loc.city} - ${loc.state}`;
+            document.getElementById('customer-city-display').style.display = 'block';
+        }
+    } catch(e) {}
+}
+
+function updateLocationButton() {
+    const city = getCustomerCity();
+    const btnText = document.getElementById('location-btn-text');
+    if (btnText) {
+        btnText.innerText = city ? city : 'Informar CEP';
+    }
+}
+
+async function checkCustomerCep() {
+    const cepInput = document.getElementById('customer-cep-input').value.replace(/\D/g, '');
+    if (cepInput.length !== 8) {
+        alert('Por favor, informe um CEP válido com 8 dígitos.');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`https://viacep.com.br/ws/${cepInput}/json/`);
+        const data = await response.json();
+        if (data.erro) {
+            alert('CEP não encontrado.');
+            return;
+        }
+        
+        const locationData = {
+            cep: cepInput,
+            city: data.localidade,
+            state: data.uf
+        };
+        
+        localStorage.setItem('customer_location', JSON.stringify(locationData));
+        document.getElementById('customer-city-display').innerText = `${data.localidade} - ${data.uf}`;
+        document.getElementById('customer-city-display').style.display = 'block';
+        updateLocationButton();
+        
+        setTimeout(() => {
+            document.getElementById('location-modal').style.display = 'none';
+            location.reload();
+        }, 800);
+        
+    } catch(err) {
+        alert('Erro ao buscar o CEP.');
+    }
+}
+
+function clearCustomerLocation() {
+    localStorage.removeItem('customer_location');
+    updateLocationButton();
+    document.getElementById('location-modal').style.display = 'none';
+    location.reload();
+}
+
 if (form) {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -37,12 +107,15 @@ if (form) {
         window.history.pushState({}, '', newUrl);
 
         try {
-            const res = await fetch(`${API_BASE_URL}/api/search?product=${encodeURIComponent(product)}`);
+            const city = getCustomerCity();
+            const res = await fetch(`${API_BASE_URL}/api/search?product=${encodeURIComponent(product)}${city ? '&city=' + encodeURIComponent(city) : ''}`);
             if (!res.ok) throw new Error('Erro na resposta do servidor');
             const data = await res.json();
 
             if (data.length === 0) {
-                resultsContainer.innerHTML = '<div style="text-align:center; padding:40px; color: #64748b;"><div style="font-size:3rem; margin-bottom:12px;">😔</div><p>Nenhum produto encontrado. Tente outro termo.</p></div>';
+                const city = getCustomerCity();
+                const cityMsg = city ? ` em ${city}` : '';
+                resultsContainer.innerHTML = `<div style="text-align:center; padding:40px; color: #64748b;"><div style="font-size:3rem; margin-bottom:12px;">😔</div><p>Nenhum produto encontrado${cityMsg}. Tente outro termo.</p></div>`;
                 return;
             }
 
@@ -192,7 +265,8 @@ window.searchTrending = (term) => {
 
 async function loadTrendingOffers() {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/offers/trending`);
+        const city = getCustomerCity();
+        const res = await fetch(`${API_BASE_URL}/api/offers/trending${city ? '?city=' + encodeURIComponent(city) : ''}`);
         if (res.ok) {
             const offers = await res.json();
             const container = document.getElementById('offers-container');
@@ -223,6 +297,7 @@ async function loadTrendingOffers() {
 
 // Global Init
 document.addEventListener('DOMContentLoaded', () => {
+    updateLocationButton();
     // Tracking
     fetch(`${API_BASE_URL}/api/track_visit`, { method: 'POST' }).catch(() => {});
 
@@ -234,7 +309,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadCheapest() {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/prices/cheapest`);
+        const city = getCustomerCity();
+        const res = await fetch(`${API_BASE_URL}/api/prices/cheapest${city ? '?city=' + encodeURIComponent(city) : ''}`);
         if (res.ok) {
             const items = await res.json();
             const section = document.getElementById('cheapest-prices-section');
@@ -335,8 +411,18 @@ async function loadHeroPromotions() {
 
 async function loadMerchants() {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/stores`);
+        const city = getCustomerCity();
+        const res = await fetch(`${API_BASE_URL}/api/stores${city ? '?city=' + encodeURIComponent(city) : ''}`);
         const stores = await res.json();
+        
+        if (stores.length === 0 && city) {
+            const allStoresContainer = document.getElementById('all-stores-container');
+            if (allStoresContainer) {
+                allStoresContainer.innerHTML = `<div style="text-align:center; width:100%; grid-column:1/-1; padding:20px; color:#64748b; font-weight:600;">😔 Nenhuma loja parceira encontrada em ${city}.</div>`;
+            }
+            return;
+        }
+
         const activeStores = stores.filter(s => !s.is_blocked);
         const allStoresContainer = document.getElementById('all-stores-container');
         if (allStoresContainer) {
